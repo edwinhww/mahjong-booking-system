@@ -1,0 +1,515 @@
+
+<!-- saved from url=(0128)file:///C:/Users/edwin/OneDrive%20-%20Zenithmon%20Healthcare%20Monitoring%20Ltd/Dev/mah%20joh/mahjong_booking_system_mockup.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{max-width:420px;margin:0 auto;background:var(--color-background-secondary);border-radius:var(--border-radius-xl);overflow:hidden;border:0.5px solid var(--color-border-tertiary)}
+.screen{display:none;flex-direction:column;min-height:700px}
+.screen.active{display:flex}
+.topbar{padding:14px 16px 10px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px}
+.topbar-title{font-size:15px;font-weight:500;color:var(--color-text-primary);flex:1}
+.topbar-sub{font-size:12px;color:var(--color-text-secondary)}
+.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.content{flex:1;padding:16px;overflow-y:auto}
+.nav-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:7px 14px;font-size:13px;color:var(--color-text-primary);cursor:pointer}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.logo-area{text-align:center;padding:32px 16px 20px}
+.logo-tile{width:64px;height:64px;background:#1D9E75;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px}
+.logo-name{font-size:22px;font-weight:500;color:var(--color-text-primary);letter-spacing:-0.5px}
+.logo-sub{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.login-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;margin-bottom:12px}
+.login-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.login-input{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-primary);background:var(--color-background-primary)}
+.login-input:focus{outline:none;border-color:#1D9E75}
+.role-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.role-btn{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:14px 8px;text-align:center;cursor:pointer;background:var(--color-background-primary)}
+.role-btn.selected{border:2px solid #1D9E75;background:#EAF3DE}
+.role-btn .r-icon{font-size:22px;margin-bottom:6px}
+.role-btn .r-label{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.role-btn .r-sub{font-size:11px;color:var(--color-text-secondary)}
+.cta-btn{width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:15px;font-weight:500;cursor:pointer;margin-top:4px}
+.cta-btn:hover{background:#0F6E56}
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+.slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.slot-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;background:var(--color-background-primary);cursor:pointer;transition:border-color 0.15s}
+.slot-card:hover{border-color:#1D9E75}
+.slot-card.selected{border:2px solid #1D9E75;background:#EAF3DE}
+.slot-card.full{background:#F1EFE8;cursor:default;opacity:0.6}
+.slot-card.mine{border:2px solid #1D9E75}
+.slot-time{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.slot-seats{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.seat-dots{display:flex;gap:4px;margin-top:6px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--color-border-secondary)}
+.dot.filled{background:#1D9E75}
+.dot.me{background:#BA7517}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:13px;color:var(--color-text-secondary)}
+.info-val{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.confirm-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:12px}
+.timer-ring{width:80px;height:80px;border:3px solid var(--color-border-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 12px;border-top-color:#BA7517}
+.timer-val{font-size:18px;font-weight:500;color:#BA7517}
+.timer-label{font-size:10px;color:var(--color-text-secondary)}
+.player-chip{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.player-chip:last-child{border-bottom:none}
+.avatar{width:32px;height:32px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#3B6D11;flex-shrink:0}
+.avatar.me{background:#FAEEDA;color:#854F0B}
+.player-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.player-status{font-size:11px;color:var(--color-text-secondary)}
+.admin-tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.atab{flex:1;padding:10px 4px;text-align:center;font-size:12px;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent}
+.atab.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500}
+.admin-panel{display:none;padding:16px}
+.admin-panel.active{display:block}
+.table-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px}
+.table-time{font-size:13px;font-weight:500;color:var(--color-text-primary);min-width:60px}
+.seat-bar{flex:1;display:flex;gap:4px}
+.seat-blk{flex:1;height:20px;border-radius:4px;background:var(--color-border-tertiary)}
+.seat-blk.taken{background:#1D9E75}
+.seat-blk.me{background:#BA7517}
+.action-chip{font-size:11px;padding:3px 8px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary)}
+.action-chip:hover{background:var(--color-background-secondary)}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
+.metric-num{font-size:24px;font-weight:500;color:var(--color-text-primary)}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.msg-row{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.msg-row:last-child{border-bottom:none}
+.msg-icon{width:36px;height:36px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.msg-body{flex:1}
+.msg-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.msg-text{font-size:12px;color:var(--color-text-secondary);margin-top:2px;line-height:1.4}
+.msg-time{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.wa-btn{display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;border:none;border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;width:100%;justify-content:center;margin-top:8px}
+.customer-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.customer-row:last-child{border-bottom:none}
+.cust-info{flex:1}
+.cust-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.cust-meta{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.mini-wa{width:28px;height:28px;background:#25D366;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center}
+.audit-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:6px}
+.audit-left{font-size:13px;color:var(--color-text-primary)}
+.audit-sub{font-size:11px;color:var(--color-text-secondary)}
+.audit-fee{font-size:13px;font-weight:500;color:#3B6D11}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:13px;color:var(--color-text-primary)}
+.settings-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.settings-input{width:80px;padding:6px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;text-align:right}
+.toggle{width:40px;height:22px;background:var(--color-border-tertiary);border-radius:11px;cursor:pointer;position:relative;border:none}
+.toggle.on{background:#1D9E75}
+.toggle::after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.15s}
+.toggle.on::after{left:21px}
+.notif-bar{background:#EAF3DE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.notif-text{font-size:12px;color:#3B6D11;line-height:1.5}
+.screen-nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px 0;justify-content:center}
+.snav{font-size:11px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary);background:var(--color-background-primary)}
+.snav.active{background:#EAF3DE;color:#3B6D11;border-color:#9FE1CB}
+.bottom-bar{padding:12px 16px;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px}
+.bottom-bar .nav-btn{flex:1;text-align:center}
+</style>
+
+<style id="__web-inspector-hide-shortcut-style__">
+.__web-inspector-hide-shortcut__, .__web-inspector-hide-shortcut__ *
+{
+    visibility: hidden !important;
+}
+</style></head><body><h2 class="sr-only">Mahjong booking system interactive mockup — navigate between Login, Player view, Admin view, Booking confirmation, and Audit screens</h2>
+
+<div style="padding:12px 0 4px">
+  <div class="screen-nav" id="navBar">
+    <button class="snav active" onclick="showScreen(&#39;login&#39;)">Login</button>
+    <button class="snav" onclick="showScreen(&#39;player&#39;)">Player</button>
+    <button class="snav" onclick="showScreen(&#39;confirm&#39;)">Booking</button>
+    <button class="snav" onclick="showScreen(&#39;admin&#39;)">Admin</button>
+    <button class="snav __web-inspector-hide-shortcut__" onclick="showScreen(&#39;audit&#39;)">Audit</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen active" id="screen-login">
+    <div class="logo-area">
+      <div class="logo-tile">🀄</div>
+      <div class="logo-name">MahjongHub</div>
+      <div class="logo-sub">Book your table. Play with confidence.</div>
+    </div>
+    <div class="content">
+      <div class="login-card">
+        <div class="role-row">
+          <div class="role-btn" id="role-player" onclick="selectRole(&#39;player&#39;)">
+            <div class="r-icon">🎮</div>
+            <div class="r-label">Player</div>
+            <div class="r-sub">Book a timeslot</div>
+          </div>
+          <div class="role-btn selected" id="role-admin" onclick="selectRole(&#39;admin&#39;)">
+            <div class="r-icon">🏪</div>
+            <div class="r-label">Business</div>
+            <div class="r-sub">Manage tables</div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div class="login-label">Mobile / WhatsApp number</div>
+          <input class="login-input" type="tel" placeholder="+44 7700 900123" value="+44 7700 900456">
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="login-label">PIN / Password</div>
+          <input class="login-input" type="password" value="••••••">
+        </div>
+        <button class="cta-btn" onclick="showScreen(&#39;player&#39;)">Sign in</button>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--color-text-secondary)">New player? Contact the business to register.</p>
+    </div>
+  </div>
+
+  <!-- PLAYER SCREEN -->
+  <div class="screen" id="screen-player">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Hello, Wei Lin</div>
+        <div class="topbar-sub">Thu 17 Apr — Select a timeslot</div>
+      </div>
+      <span class="badge badge-green">Player</span>
+    </div>
+    <div class="content">
+      <div class="notif-bar">
+        <span style="font-size:16px">✉</span>
+        <div class="notif-text">Table at <strong>2:00 PM</strong> now has 3/4 players — only 1 seat left! Tap to claim it.</div>
+      </div>
+      <div class="section-title">Available timeslots</div>
+      <div class="slot-grid">
+        <div class="slot-card" onclick="showScreen(&#39;confirm&#39;)">
+          <div class="slot-time">10:00 AM</div>
+          <div class="slot-seats">2 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div class="slot-card mine" onclick="showScreen(&#39;confirm&#39;)">
+          <div class="slot-time">12:00 PM</div>
+          <div class="slot-seats">You + 2 others</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot me"></div><div class="dot filled"></div><div class="dot"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-amber">Your slot</span></div>
+        </div>
+        <div class="slot-card" onclick="showScreen(&#39;confirm&#39;)">
+          <div class="slot-time">2:00 PM</div>
+          <div class="slot-seats">3 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-red">1 seat left!</span></div>
+        </div>
+        <div class="slot-card full">
+          <div class="slot-time">4:00 PM</div>
+          <div class="slot-seats">Table full</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-gray">Locked</span></div>
+        </div>
+        <div class="slot-card" onclick="showScreen(&#39;confirm&#39;)">
+          <div class="slot-time">6:00 PM</div>
+          <div class="slot-seats">1 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div class="slot-card" onclick="showScreen(&#39;confirm&#39;)">
+          <div class="slot-time">8:00 PM</div>
+          <div class="slot-seats">Open — be first!</div>
+          <div class="seat-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px">
+        <div class="section-title">My session history</div>
+        <div class="info-row"><span class="info-key">Last played</span><span class="info-val">Tue 15 Apr, 2:00 PM</span></div>
+        <div class="info-row"><span class="info-key">Sessions this month</span><span class="info-val">6</span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="badge badge-green">Active</span></div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="showScreen(&#39;login&#39;)">← Sign out</button>
+    </div>
+  </div>
+
+  <!-- BOOKING CONFIRM SCREEN -->
+  <div class="screen" id="screen-confirm">
+    <div class="topbar">
+      <button class="nav-btn" style="padding:5px 10px;font-size:12px" onclick="showScreen(&#39;player&#39;)">← Back</button>
+      <div style="flex:1;padding-left:10px">
+        <div class="topbar-title">2:00 PM — 4:00 PM</div>
+        <div class="topbar-sub">Thu 17 Apr · Table 3</div>
+      </div>
+      <span class="badge badge-red">1 seat left</span>
+    </div>
+    <div class="content">
+      <div class="confirm-card">
+        <div style="text-align:center;padding-bottom:14px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px">
+          <div class="timer-ring">
+            <div class="timer-val" id="timerVal">23:04</div>
+            <div class="timer-label">undo window</div>
+          </div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">Seat locked after 30 min cooldown</div>
+        </div>
+        <div class="section-title">Players at this table</div>
+        <div class="player-chip">
+          <div class="avatar">AK</div>
+          <div><div class="player-name">Alex K.</div><div class="player-status">Confirmed · locked in</div></div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar">SM</div>
+          <div><div class="player-name">Shu Ming</div><div class="player-status">Confirmed · locked in</div></div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar">JL</div>
+          <div><div class="player-name">Jade L.</div><div class="player-status">Cooling down · 12 min left</div></div>
+          <span class="badge badge-amber">⌛</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar" style="background:#F1EFE8;color:#888">?</div>
+          <div><div class="player-name">Seat 4 — Open</div><div class="player-status">Waiting for final player</div></div>
+          <span class="badge badge-red">Free</span>
+        </div>
+      </div>
+      <button class="cta-btn" style="background:#1D9E75;margin-bottom:10px" onclick="alert(&#39;Seat claimed! WhatsApp confirmation sent.&#39;)">Claim this seat</button>
+      <button class="cta-btn" style="background:var(--color-background-secondary);color:#A32D2D;border:0.5px solid #F7C1C1" onclick="showScreen(&#39;player&#39;)">Undo my booking (28 min left)</button>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN -->
+  <div class="screen" id="screen-admin">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dragon Palace MJ</div>
+        <div class="topbar-sub">Admin · Thu 17 Apr</div>
+      </div>
+      <span class="badge badge-blue">Admin</span>
+    </div>
+    <div class="admin-tabs">
+      <div class="atab active" onclick="showAdminTab(&#39;schedule&#39;,this)">Schedule</div>
+      <div class="atab" onclick="showAdminTab(&#39;customers&#39;,this)">Customers</div>
+      <div class="atab" onclick="showAdminTab(&#39;messages&#39;,this)">Messages</div>
+      <div class="atab" onclick="showAdminTab(&#39;settings&#39;,this)">Settings</div>
+    </div>
+
+    <div class="admin-panel active" id="ap-schedule">
+      <div class="section-title">Today's tables</div>
+      <div class="table-row">
+        <div class="table-time">10:00 AM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-amber">2/4</span>
+        <span class="action-chip" onclick="alert(&#39;WhatsApp nudge sent to your player list!&#39;)">Nudge</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">12:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-red">3/4</span>
+        <span class="action-chip" onclick="alert(&#39;Broadcast: 1 seat left at 12 PM!&#39;)">Blast</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">2:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
+        <span class="badge badge-green">Full</span>
+        <span class="action-chip" onclick="alert(&#39;Table confirmed. All 4 players notified via WhatsApp.&#39;)">Notify</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">4:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
+        <span class="badge badge-green">Full</span>
+        <span class="action-chip">Locked</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">6:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-gray">1/4</span>
+        <span class="action-chip" onclick="alert(&#39;Nudge sent!&#39;)">Nudge</span>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)">
+        <div class="section-title">Locked-in players needing admin unlock</div>
+        <div class="customer-row">
+          <div class="avatar">TW</div>
+          <div class="cust-info"><div class="cust-name">Tony W.</div><div class="cust-meta">4:00 PM slot · locked 2h ago</div></div>
+          <button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="alert(&#39;Tony W. unlocked. Seat freed.&#39;)">Unlock</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="ap-customers">
+      <div class="section-title">Registered players (12)</div>
+      <div class="customer-row">
+        <div class="avatar">WL</div>
+        <div class="cust-info"><div class="cust-name">Wei Lin</div><div class="cust-meta">+44 7700 900456 · 6 sessions</div></div>
+        <button class="mini-wa" onclick="alert(&#39;WhatsApp opened for Wei Lin&#39;)">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">AK</div>
+        <div class="cust-info"><div class="cust-name">Alex K.</div><div class="cust-meta">+44 7700 900123 · 14 sessions</div></div>
+        <button class="mini-wa" onclick="alert(&#39;WhatsApp opened for Alex K.&#39;)">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">SM</div>
+        <div class="cust-info"><div class="cust-name">Shu Ming</div><div class="cust-meta">+44 7700 900789 · 9 sessions</div></div>
+        <button class="mini-wa" onclick="alert(&#39;WhatsApp opened for Shu Ming&#39;)">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">JL</div>
+        <div class="cust-info"><div class="cust-name">Jade L.</div><div class="cust-meta">+44 7700 900321 · 3 sessions</div></div>
+        <button class="mini-wa" onclick="alert(&#39;WhatsApp opened for Jade L.&#39;)">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar" style="background:#F1EFE8;color:#888">+</div>
+        <div class="cust-info"><div class="cust-name" style="color:#1D9E75">Add new player</div><div class="cust-meta">Register via mobile number</div></div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="wa-btn" onclick="alert(&#39;Broadcast WhatsApp message to all 12 players&#39;)">
+          <span style="font-size:16px">✉</span> Broadcast to all players
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="ap-messages">
+      <div class="section-title">Recent messages sent</div>
+      <div class="msg-row">
+        <div class="msg-icon">✉</div>
+        <div class="msg-body">
+          <div class="msg-title">Table full — 2:00 PM confirmed</div>
+          <div class="msg-text">All 4 players notified. Game confirmed for Thu 17 Apr at 2:00 PM. Please arrive 10 mins early.</div>
+          <div class="msg-time">Today 11:42 AM · 4 recipients · WhatsApp</div>
+        </div>
+      </div>
+      <div class="msg-row">
+        <div class="msg-icon">🔔</div>
+        <div class="msg-body">
+          <div class="msg-title">1 seat left — 12:00 PM</div>
+          <div class="msg-text">Only 1 seat remaining at the 12 PM table today. First to claim it gets to play!</div>
+          <div class="msg-time">Today 10:15 AM · 8 recipients · WhatsApp</div>
+        </div>
+      </div>
+      <div class="msg-row">
+        <div class="msg-icon">📅</div>
+        <div class="msg-body">
+          <div class="msg-title">Weekend availability open</div>
+          <div class="msg-text">Timeslots for Sat 19 Apr are now open. Login to MahjongHub and reserve your seat!</div>
+          <div class="msg-time">Wed 16 Apr · 12 recipients · WhatsApp</div>
+        </div>
+      </div>
+      <button class="wa-btn" onclick="alert(&#39;WhatsApp Business message composer opened&#39;)">
+        <span style="font-size:16px">✏</span> Compose new message
+      </button>
+    </div>
+
+    <div class="admin-panel" id="ap-settings">
+      <div class="section-title">Business settings</div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0 14px">
+        <div class="settings-row">
+          <div><div class="settings-label">Opening time</div><div class="settings-sub">First slot of the day</div></div>
+          <input class="settings-input" type="time" value="10:00">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Closing time</div><div class="settings-sub">Last slot ends by</div></div>
+          <input class="settings-input" type="time" value="22:00">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Tables available</div><div class="settings-sub">Concurrent games hosted</div></div>
+          <input class="settings-input" type="number" value="4" min="1" max="20" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Session duration</div><div class="settings-sub">Hours per game slot</div></div>
+          <input class="settings-input" type="number" value="2" min="1" max="6" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Cooldown period</div><div class="settings-sub">Minutes to undo booking</div></div>
+          <input class="settings-input" type="number" value="30" min="5" max="60" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">WhatsApp notifications</div><div class="settings-sub">Auto-send on table full</div></div>
+          <button class="toggle on" id="waToggle" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Session fee (per table)</div><div class="settings-sub">Used for audit &amp; billing</div></div>
+          <input class="settings-input" type="number" value="40" style="width:70px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Platform fee %</div><div class="settings-sub">Developer charge per session</div></div>
+          <input class="settings-input" type="number" value="5" min="1" max="20" style="width:60px">
+        </div>
+      </div>
+      <button class="cta-btn" style="margin-top:14px" onclick="alert(&#39;Settings saved.&#39;)">Save settings</button>
+    </div>
+  </div>
+
+  <!-- AUDIT SCREEN -->
+  <div class="screen" id="screen-audit">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Audit &amp; Revenue</div>
+        <div class="topbar-sub">Dragon Palace · April 2025</div>
+      </div>
+      <span class="badge badge-blue">Admin</span>
+    </div>
+    <div class="content">
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-num">47</div><div class="metric-label">Full tables booked</div></div>
+        <div class="metric-card"><div class="metric-num">188</div><div class="metric-label">Player sessions</div></div>
+        <div class="metric-card"><div class="metric-num">£1,880</div><div class="metric-label">Gross table fees</div></div>
+        <div class="metric-card"><div class="metric-num">£94</div><div class="metric-label">Platform fee (5%)</div></div>
+      </div>
+      <div class="section-title">Confirmed tables — this week</div>
+      <div class="audit-row">
+        <div><div class="audit-left">Thu 17 Apr · 2:00 PM · Table 3</div><div class="audit-sub">Wei L · Alex K · Shu M · Jade L</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Thu 17 Apr · 4:00 PM · Table 1</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Wed 16 Apr · 6:00 PM · Table 2</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Wed 16 Apr · 2:00 PM · Table 4</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div style="margin-top:14px;padding:14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+        <div class="section-title">Unlock log (admin actions)</div>
+        <div class="info-row"><span class="info-key">Tony W. — 4:00 PM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
+        <div class="info-row"><span class="info-key">Mei C. — 10:00 AM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
+        <div class="info-row"><span class="info-key">Audit exported</span><span class="badge badge-green">✓ CSV ready</span></div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="showScreen(&#39;admin&#39;)">← Admin</button>
+      <button class="nav-btn" style="flex:2;color:#1D9E75" onclick="alert(&#39;Audit CSV exported.&#39;)">Export CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));
+  var map={login:'Login',player:'Player',confirm:'Booking',admin:'Admin',audit:'Audit'};
+  document.querySelectorAll('.snav').forEach(b=>{if(b.textContent===map[id])b.classList.add('active')});
+}
+function selectRole(r){
+  document.getElementById('role-player').classList.toggle('selected',r==='player');
+  document.getElementById('role-admin').classList.toggle('selected',r==='admin');
+}
+function showAdminTab(tab,el){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ap-'+tab).classList.add('active');
+  el.classList.add('active');
+}
+var t=28*60+45;
+setInterval(function(){
+  if(t>0)t--;
+  var m=Math.floor(t/60),s=t%60;
+  var el=document.getElementById('timerVal');
+  if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+},1000);
+</script>
+</body></html>

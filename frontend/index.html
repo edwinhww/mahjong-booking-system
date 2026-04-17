@@ -1,0 +1,1181 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mahjong Booking System Mockup</title>
+<style>
+:root{
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --device-width:390px;
+  --device-height:844px;
+  --font-scale:1;
+  --color-background-primary:#FFFFFF;
+  --color-background-secondary:#FBFAF7;
+  --color-text-primary:#202124;
+  --color-text-secondary:#666C74;
+  --color-border-secondary:#D9D8D3;
+  --color-border-tertiary:#E8E6DF;
+  --border-radius-md:10px;
+  --border-radius-lg:14px;
+  --border-radius-xl:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#fff7de 0%,#f4f2ec 38%,#ecebe5 100%);padding:12px;color:var(--color-text-primary);display:flex;flex-direction:column;align-items:center;gap:8px}
+.app{width:min(100%,var(--device-width));margin:0 auto;background:var(--color-background-secondary);border-radius:var(--border-radius-xl);overflow:hidden;border:0.5px solid var(--color-border-tertiary);box-shadow:0 14px 36px rgba(34,43,56,0.14)}
+.screen{display:none;flex-direction:column;min-height:700px}
+.screen.active{display:flex}
+.topbar{padding:14px 16px 10px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px}
+.topbar-title{font-size:calc(16px * var(--font-scale));font-weight:600;color:var(--color-text-primary);flex:1;line-height:1.25}
+.topbar-sub{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);line-height:1.35}
+.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.content{flex:1;padding:16px;overflow-y:auto}
+.nav-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 14px;font-size:calc(14px * var(--font-scale));color:var(--color-text-primary);cursor:pointer;min-height:42px}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.logo-area{text-align:center;padding:32px 16px 20px}
+.logo-tile{width:64px;height:64px;background:#1D9E75;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px}
+.logo-name{font-size:calc(24px * var(--font-scale));font-weight:700;color:var(--color-text-primary);letter-spacing:-0.5px}
+.logo-sub{font-size:calc(14px * var(--font-scale));color:var(--color-text-secondary);margin-top:4px;line-height:1.4}
+.login-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;margin-bottom:12px}
+.login-label{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-bottom:6px}
+.login-input{width:100%;padding:11px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(15px * var(--font-scale));color:var(--color-text-primary);background:var(--color-background-primary)}
+.login-input:focus{outline:none;border-color:#1D9E75}
+.role-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.role-btn{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:14px 8px;text-align:center;cursor:pointer;background:var(--color-background-primary);min-height:86px}
+.role-btn.selected{border:2px solid #1D9E75;background:#EAF3DE}
+.role-btn .r-icon{font-size:22px;margin-bottom:6px}
+.role-btn .r-label{font-size:calc(14px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.role-btn .r-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
+.cta-btn{width:100%;padding:13px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:calc(16px * var(--font-scale));font-weight:600;cursor:pointer;margin-top:4px;min-height:46px}
+.cta-btn:hover{background:#0F6E56}
+.section-title{font-size:calc(12px * var(--font-scale));font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.slot-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;background:var(--color-background-primary);cursor:pointer;transition:border-color 0.15s;min-height:112px}
+.slot-card:hover{border-color:#1D9E75}
+.slot-card.selected{border:2px solid #1D9E75;background:#EAF3DE}
+.slot-card.full{background:#F1EFE8;cursor:default;opacity:0.6}
+.slot-card.mine{border:2px solid #1D9E75}
+.slot-time{font-size:calc(15px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.slot-seats{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:4px;line-height:1.35}
+.seat-dots{display:flex;gap:4px;margin-top:6px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--color-border-secondary)}
+.dot.filled{background:#1D9E75}
+.dot.me{background:#BA7517}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:calc(13px * var(--font-scale));color:var(--color-text-secondary)}
+.info-val{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.confirm-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:12px}
+.timer-ring{width:80px;height:80px;border:3px solid var(--color-border-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 12px;border-top-color:#BA7517}
+.timer-val{font-size:calc(18px * var(--font-scale));font-weight:500;color:#BA7517}
+.timer-label{font-size:calc(10px * var(--font-scale));color:var(--color-text-secondary)}
+.player-chip{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.player-chip:last-child{border-bottom:none}
+.avatar{width:32px;height:32px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#3B6D11;flex-shrink:0}
+.avatar.me{background:#FAEEDA;color:#854F0B}
+.player-name{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.player-status{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
+.admin-tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);overflow-x:auto}
+.atab{flex:1;padding:11px 8px;text-align:center;font-size:calc(13px * var(--font-scale));color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:90px}
+.atab.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500}
+.admin-panel{display:none;padding:16px}
+.admin-panel.active{display:block}
+.table-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;flex-wrap:wrap}
+.table-time{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary);min-width:60px}
+.seat-bar{flex:1;display:flex;gap:4px}
+.seat-blk{flex:1;height:20px;border-radius:4px;background:var(--color-border-tertiary)}
+.seat-blk.taken{background:#1D9E75}
+.seat-blk.me{background:#BA7517}
+.action-chip{font-size:11px;padding:3px 8px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary)}
+.action-chip:hover{background:var(--color-background-secondary)}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
+.metric-num{font-size:calc(24px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.metric-label{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
+.msg-row{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.msg-row:last-child{border-bottom:none}
+.msg-icon{width:36px;height:36px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.msg-body{flex:1}
+.msg-title{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.msg-text{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px;line-height:1.4}
+.msg-time{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:3px}
+.wa-btn{display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;border:none;border-radius:var(--border-radius-md);padding:10px 14px;font-size:calc(13px * var(--font-scale));font-weight:500;cursor:pointer;width:100%;justify-content:center;margin-top:8px}
+.customer-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.customer-row:last-child{border-bottom:none}
+.cust-info{flex:1}
+.cust-name{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.cust-meta{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:1px}
+.mini-wa{width:28px;height:28px;background:#25D366;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center}
+.audit-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:6px}
+.audit-left{font-size:calc(13px * var(--font-scale));color:var(--color-text-primary)}
+.audit-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
+.audit-fee{font-size:calc(13px * var(--font-scale));font-weight:500;color:#3B6D11}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:calc(13px * var(--font-scale));color:var(--color-text-primary)}
+.settings-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
+.settings-input{width:80px;padding:6px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(13px * var(--font-scale));text-align:right}
+.toggle{width:40px;height:22px;background:var(--color-border-tertiary);border-radius:11px;cursor:pointer;position:relative;border:none}
+.toggle.on{background:#1D9E75}
+.toggle::after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.15s}
+.toggle.on::after{left:21px}
+.notif-bar{background:#EAF3DE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.notif-text{font-size:calc(12px * var(--font-scale));color:#3B6D11;line-height:1.5}
+.screen-nav{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px 4px;justify-content:center}
+.snav{font-size:calc(12px * var(--font-scale));padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary);background:var(--color-background-primary);min-height:36px}
+.snav.active{background:#EAF3DE;color:#3B6D11;border-color:#9FE1CB}
+.bottom-bar{padding:12px 16px;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px}
+.bottom-bar .nav-btn{flex:1;text-align:center}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.preview-toolbar{width:min(100%,var(--device-width));display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px 2px}
+.toolbar-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.toolbar-chip{border:0.5px solid var(--color-border-secondary);background:#fff;border-radius:18px;padding:6px 10px;font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);cursor:pointer;min-height:32px}
+.toolbar-chip.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+body[data-device="android"]{--device-width:360px;--device-height:800px}
+body[data-device="ios"]{--device-width:390px;--device-height:844px}
+@media (max-width:430px){
+  body{padding:0;background:var(--color-background-primary);gap:0}
+  .preview-toolbar{width:100%;padding:10px 12px 6px}
+  .toolbar-chip{padding:7px 10px}
+  .app{max-width:100%;border-radius:0;border-left:none;border-right:none}
+  .slot-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-device="ios">
+
+<h2 class="sr-only" id="srTitle">Mahjong booking system interactive mockup - navigate between Login, Player view, Admin view, Booking confirmation, and Audit screens</h2>
+
+<div class="preview-toolbar">
+  <div class="toolbar-group" id="deviceSwitch">
+    <button class="toolbar-chip active" onclick="setDevice('ios',this)" id="deviceIOS">iOS 390</button>
+    <button class="toolbar-chip" onclick="setDevice('android',this)" id="deviceAndroid">Android 360</button>
+  </div>
+  <div class="toolbar-group" id="fontSwitch" aria-label="Font size switch">
+    <button class="toolbar-chip" onclick="setFontSize(0.85,this)" id="fontSmall">A-</button>
+    <button class="toolbar-chip active" onclick="setFontSize(1,this)" id="fontMedium">A</button>
+    <button class="toolbar-chip" onclick="setFontSize(1.2,this)" id="fontLarge">A+</button>
+  </div>
+  <div class="toolbar-group" id="langSwitch" aria-label="Language switch">
+    <button class="toolbar-chip" onclick="setLanguage('en',this)">EN</button>
+    <button class="toolbar-chip active" onclick="setLanguage('zh-Hant',this)">繁</button>
+    <button class="toolbar-chip" onclick="setLanguage('zh-Hans',this)">简</button>
+  </div>
+</div>
+
+<div style="padding:12px 0 4px;width:min(100%,var(--device-width))">
+  <div class="screen-nav" id="navBar">
+    <button class="snav active" data-screen="login" onclick="showScreen('login')" id="navLogin">Login</button>
+    <button class="snav" data-screen="player" onclick="showScreen('player')" id="navPlayer">Player</button>
+    <button class="snav" data-screen="confirm" onclick="showScreen('confirm')" id="navBooking">Booking</button>
+    <button class="snav" data-screen="admin" onclick="showScreen('admin')" id="navAdmin">Admin</button>
+    <button class="snav" data-screen="audit" onclick="showScreen('audit')" id="navAudit">Audit</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen active" id="screen-login">
+    <div class="logo-area">
+      <div class="logo-tile">&#x1F004;</div>
+      <div class="logo-name">MahjongHub</div>
+      <div class="logo-sub" id="logoSub">Book your table. Play with confidence.</div>
+    </div>
+    <div class="content">
+      <div class="login-card">
+        <div class="role-row">
+          <div class="role-btn selected" id="role-player" onclick="selectRole('player')">
+            <div class="r-icon">&#x1F3AE;</div>
+            <div class="r-label" id="rolePlayerLabel">Player</div>
+            <div class="r-sub" id="rolePlayerSub">Book a timeslot</div>
+          </div>
+          <div class="role-btn" id="role-admin" onclick="selectRole('admin')">
+            <div class="r-icon">&#x1F3EA;</div>
+            <div class="r-label" id="roleAdminLabel">Business</div>
+            <div class="r-sub" id="roleAdminSub">Manage tables</div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div class="login-label" id="mobileLabel">Mobile / WhatsApp number</div>
+          <input class="login-input" id="mobileInput" type="tel" placeholder="+44 7700 900123" value="+44 7700 900456">
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="login-label" id="passwordLabel">PIN / Password</div>
+          <input class="login-input" id="passwordInput" type="password" value="player1234">
+        </div>
+        <button class="cta-btn" onclick="handleSignIn()" id="signInBtn">Sign in</button>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--color-text-secondary)" id="newPlayerHint">New player? Contact the business to register.</p>
+    </div>
+  </div>
+
+  <!-- PLAYER SCREEN -->
+  <div class="screen" id="screen-player">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Hello, Wei Lin</div>
+        <div class="topbar-sub" id="playerSubTitle">Thu 17 Apr - Select a timeslot</div>
+      </div>
+      <span class="badge badge-green" id="playerBadge">Player</span>
+    </div>
+    <div class="content">
+      <div class="notif-bar">
+        <span style="font-size:16px">&#x2709;</span>
+        <div class="notif-text" id="playerNotice">Table at <strong>2:00 PM</strong> now has 3/4 players - only 1 seat left! Tap to claim it.</div>
+      </div>
+      <div class="section-title" id="availableSlotsTitle">Available timeslots</div>
+      <div class="slot-grid">
+        <div class="slot-card" onclick="showScreen('confirm')">
+          <div class="slot-time">10:00 AM</div>
+          <div class="slot-seats">2 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div class="slot-card mine" onclick="showScreen('confirm')">
+          <div class="slot-time">12:00 PM</div>
+          <div class="slot-seats">You + 2 others</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot me"></div><div class="dot filled"></div><div class="dot"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-amber">Your slot</span></div>
+        </div>
+        <div class="slot-card" onclick="showScreen('confirm')">
+          <div class="slot-time">2:00 PM</div>
+          <div class="slot-seats">3 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-red">1 seat left!</span></div>
+        </div>
+        <div class="slot-card full">
+          <div class="slot-time">4:00 PM</div>
+          <div class="slot-seats">Table full</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+          <div style="margin-top:6px"><span class="badge badge-gray">Locked</span></div>
+        </div>
+        <div class="slot-card" onclick="showScreen('confirm')">
+          <div class="slot-time">6:00 PM</div>
+          <div class="slot-seats">1 of 4 joined</div>
+          <div class="seat-dots"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div class="slot-card" onclick="showScreen('confirm')">
+          <div class="slot-time">8:00 PM</div>
+          <div class="slot-seats">Open — be first!</div>
+          <div class="seat-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px">
+        <div class="section-title" id="historyTitle">My session history</div>
+        <div class="info-row"><span class="info-key" id="lastPlayedLabel">Last played</span><span class="info-val">Tue 15 Apr, 2:00 PM</span></div>
+        <div class="info-row"><span class="info-key" id="sessionsMonthLabel">Sessions this month</span><span class="info-val">6</span></div>
+        <div class="info-row"><span class="info-key" id="statusLabel">Status</span><span class="badge badge-green" id="statusActive">Active</span></div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="handleSignOut()" id="signOutBtn">&#x2190; Sign out</button>
+    </div>
+  </div>
+
+  <!-- BOOKING CONFIRM SCREEN -->
+  <div class="screen" id="screen-confirm">
+    <div class="topbar">
+      <button class="nav-btn" style="padding:5px 10px;font-size:12px" onclick="showScreen('player')" id="backBtn">&#x2190; Back</button>
+      <div style="flex:1;padding-left:10px">
+        <div class="topbar-title">2:00 PM — 4:00 PM</div>
+        <div class="topbar-sub">Thu 17 Apr · Table 3</div>
+      </div>
+      <span class="badge badge-red">1 seat left</span>
+    </div>
+    <div class="content">
+      <div class="confirm-card">
+        <div style="text-align:center;padding-bottom:14px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px">
+          <div class="timer-ring">
+            <div class="timer-val" id="timerVal">28:45</div>
+            <div class="timer-label">undo window</div>
+          </div>
+          <div style="font-size:12px;color:var(--color-text-secondary)" id="seatLockedText">Seat locked after 30 min cooldown</div>
+        </div>
+        <div class="section-title" id="playersTableTitle">Players at this table</div>
+        <div class="player-chip">
+          <div class="avatar">AK</div>
+          <div><div class="player-name">Alex K.</div><div class="player-status">Confirmed · locked in</div></div>
+          <span class="badge badge-green">&#x2713;</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar">SM</div>
+          <div><div class="player-name">Shu Ming</div><div class="player-status">Confirmed · locked in</div></div>
+          <span class="badge badge-green">&#x2713;</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar">JL</div>
+          <div><div class="player-name">Jade L.</div><div class="player-status">Cooling down · 12 min left</div></div>
+          <span class="badge badge-amber">&#x231B;</span>
+        </div>
+        <div class="player-chip">
+          <div class="avatar" style="background:#F1EFE8;color:#888">?</div>
+          <div><div class="player-name">Seat 4 — Open</div><div class="player-status">Waiting for final player</div></div>
+          <span class="badge badge-red">Free</span>
+        </div>
+      </div>
+      <button class="cta-btn" style="background:#1D9E75;margin-bottom:10px" id="claimSeatBtn">Claim this seat</button>
+      <button class="cta-btn" style="background:var(--color-background-secondary);color:#A32D2D;border:0.5px solid #F7C1C1" id="undoBookingBtn">Undo my booking (28 min left)</button>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN -->
+  <div class="screen" id="screen-admin">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dragon Palace MJ</div>
+        <div class="topbar-sub" id="adminSubTitle">Admin · Thu 17 Apr</div>
+      </div>
+      <span class="badge badge-blue" id="adminBadge">Admin</span>
+    </div>
+    <div class="admin-tabs">
+      <div class="atab active" onclick="showAdminTab('schedule',this)" id="tabSchedule">Schedule</div>
+      <div class="atab" onclick="showAdminTab('customers',this)" id="tabCustomers">Customers</div>
+      <div class="atab" onclick="showAdminTab('messages',this)" id="tabMessages">Messages</div>
+      <div class="atab" onclick="showAdminTab('settings',this)" id="tabSettings">Settings</div>
+    </div>
+
+    <div class="admin-panel active" id="ap-schedule">
+      <div class="section-title" id="todayTablesTitle">Today's tables</div>
+      <div id="scheduleRows">
+      <div class="table-row">
+        <div class="table-time">10:00 AM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-amber">2/4</span>
+        <span class="action-chip" onclick="alert('WhatsApp nudge sent to your player list!')">Nudge</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">12:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-red">3/4</span>
+        <span class="action-chip" onclick="alert('Broadcast: 1 seat left at 12 PM!')">Blast</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">2:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
+        <span class="badge badge-green">Full</span>
+        <span class="action-chip" onclick="alert('Table confirmed. All 4 players notified via WhatsApp.')">Notify</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">4:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
+        <span class="badge badge-green">Full</span>
+        <span class="action-chip">Locked</span>
+      </div>
+      <div class="table-row">
+        <div class="table-time">6:00 PM</div>
+        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
+        <span class="badge badge-gray">1/4</span>
+        <span class="action-chip" onclick="alert('Nudge sent!')">Nudge</span>
+      </div>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)">
+        <div class="section-title" id="lockedPlayersTitle">Locked-in players needing admin unlock</div>
+        <div id="lockedBookingsRows">
+        <div class="customer-row">
+          <div class="avatar">TW</div>
+          <div class="cust-info"><div class="cust-name">Tony W.</div><div class="cust-meta">4:00 PM slot · locked 2h ago</div></div>
+          <button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="alert('Tony W. unlocked. Seat freed.')">Unlock</button>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="ap-customers">
+      <div class="section-title" id="registeredPlayersTitle">Registered players (12)</div>
+      <div id="customersRows">
+      <div class="customer-row">
+        <div class="avatar">WL</div>
+        <div class="cust-info"><div class="cust-name">Wei Lin</div><div class="cust-meta">+44 7700 900456 · 6 sessions</div></div>
+        <button class="mini-wa" onclick="alert('WhatsApp opened for Wei Lin')">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">AK</div>
+        <div class="cust-info"><div class="cust-name">Alex K.</div><div class="cust-meta">+44 7700 900123 · 14 sessions</div></div>
+        <button class="mini-wa" onclick="alert('WhatsApp opened for Alex K.')">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">SM</div>
+        <div class="cust-info"><div class="cust-name">Shu Ming</div><div class="cust-meta">+44 7700 900789 · 9 sessions</div></div>
+        <button class="mini-wa" onclick="alert('WhatsApp opened for Shu Ming')">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar">JL</div>
+        <div class="cust-info"><div class="cust-name">Jade L.</div><div class="cust-meta">+44 7700 900321 · 3 sessions</div></div>
+        <button class="mini-wa" onclick="alert('WhatsApp opened for Jade L.')">W</button>
+      </div>
+      <div class="customer-row">
+        <div class="avatar" style="background:#F1EFE8;color:#888">+</div>
+        <div class="cust-info"><div class="cust-name" style="color:#1D9E75" id="addPlayerTitle">Add new player</div><div class="cust-meta" id="addPlayerSub">Register via mobile number</div></div>
+      </div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="wa-btn" id="broadcastBtn">
+          <span style="font-size:16px">&#x2709;</span> Broadcast to all players
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="ap-messages">
+      <div class="section-title" id="recentMessagesTitle">Recent messages sent</div>
+      <div id="messageRows">
+      <div class="msg-row">
+        <div class="msg-icon">&#x2709;</div>
+        <div class="msg-body">
+          <div class="msg-title">Table full — 2:00 PM confirmed</div>
+          <div class="msg-text">All 4 players notified. Game confirmed for Thu 17 Apr at 2:00 PM. Please arrive 10 mins early.</div>
+          <div class="msg-time">Today 11:42 AM · 4 recipients · WhatsApp</div>
+        </div>
+      </div>
+      <div class="msg-row">
+        <div class="msg-icon">&#x1F514;</div>
+        <div class="msg-body">
+          <div class="msg-title">1 seat left — 12:00 PM</div>
+          <div class="msg-text">Only 1 seat remaining at the 12 PM table today. First to claim it gets to play!</div>
+          <div class="msg-time">Today 10:15 AM · 8 recipients · WhatsApp</div>
+        </div>
+      </div>
+      <div class="msg-row">
+        <div class="msg-icon">&#x1F4C5;</div>
+        <div class="msg-body">
+          <div class="msg-title">Weekend availability open</div>
+          <div class="msg-text">Timeslots for Sat 19 Apr are now open. Login to MahjongHub and reserve your seat!</div>
+          <div class="msg-time">Wed 16 Apr · 12 recipients · WhatsApp</div>
+        </div>
+      </div>
+      </div>
+      <button class="wa-btn" id="composeBtn">
+        <span style="font-size:16px">&#x270F;</span> Compose new message
+      </button>
+    </div>
+
+    <div class="admin-panel" id="ap-settings">
+      <div class="section-title" id="businessSettingsTitle">Business settings</div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0 14px">
+        <div class="settings-row">
+          <div><div class="settings-label" id="openingTimeLabel">Opening time</div><div class="settings-sub" id="openingTimeSub">First slot of the day</div></div>
+          <input class="settings-input" id="settingOpeningTime" type="time" value="10:00">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="closingTimeLabel">Closing time</div><div class="settings-sub" id="closingTimeSub">Last slot ends by</div></div>
+          <input class="settings-input" id="settingClosingTime" type="time" value="22:00">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="tablesAvailableLabel">Tables available</div><div class="settings-sub" id="tablesAvailableSub">Concurrent games hosted</div></div>
+          <input class="settings-input" id="settingTableCount" type="number" value="4" min="1" max="20" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="sessionDurationLabel">Session duration</div><div class="settings-sub" id="sessionDurationSub">Hours per game slot</div></div>
+          <input class="settings-input" id="settingSessionDuration" type="number" value="2" min="1" max="6" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="cooldownLabel">Cooldown period</div><div class="settings-sub" id="cooldownSub">Minutes to undo booking</div></div>
+          <input class="settings-input" id="settingCooldown" type="number" value="30" min="5" max="60" style="width:60px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="waNotifLabel">WhatsApp notifications</div><div class="settings-sub" id="waNotifSub">Auto-send on table full</div></div>
+          <button class="toggle on" id="waToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="sessionFeeLabel">Session fee (per table)</div><div class="settings-sub" id="sessionFeeSub">Used for audit & billing</div></div>
+          <input class="settings-input" id="settingSessionFee" type="number" value="40" style="width:70px">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="platformFeeLabel">Platform fee %</div><div class="settings-sub" id="platformFeeSub">Developer charge per session</div></div>
+          <input class="settings-input" id="settingPlatformFee" type="number" value="5" min="1" max="20" style="width:60px">
+        </div>
+      </div>
+      <button class="cta-btn" style="margin-top:14px" id="saveSettingsBtn">Save settings</button>
+    </div>
+  </div>
+
+  <!-- AUDIT SCREEN -->
+  <div class="screen" id="screen-audit">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="auditRevenueTitle">Audit & Revenue</div>
+        <div class="topbar-sub" id="auditSubTitle">Dragon Palace · April 2025</div>
+      </div>
+      <span class="badge badge-blue" id="auditAdminBadge">Admin</span>
+    </div>
+    <div class="content">
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-num">47</div><div class="metric-label" id="metricFullTables">Full tables booked</div></div>
+        <div class="metric-card"><div class="metric-num">188</div><div class="metric-label" id="metricPlayerSessions">Player sessions</div></div>
+        <div class="metric-card"><div class="metric-num">£1,880</div><div class="metric-label" id="metricGrossFees">Gross table fees</div></div>
+        <div class="metric-card"><div class="metric-num">£94</div><div class="metric-label" id="metricPlatformFee">Platform fee (5%)</div></div>
+      </div>
+      <div class="section-title" id="confirmedTablesTitle">Confirmed tables - this week</div>
+      <div class="audit-row">
+        <div><div class="audit-left">Thu 17 Apr · 2:00 PM · Table 3</div><div class="audit-sub">Wei L · Alex K · Shu M · Jade L</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Thu 17 Apr · 4:00 PM · Table 1</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Wed 16 Apr · 6:00 PM · Table 2</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div class="audit-row">
+        <div><div class="audit-left">Wed 16 Apr · 2:00 PM · Table 4</div><div class="audit-sub">4 players confirmed</div></div>
+        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
+      </div>
+      <div style="margin-top:14px;padding:14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+        <div class="section-title" id="unlockLogTitle">Unlock log (admin actions)</div>
+        <div class="info-row"><span class="info-key">Tony W. — 4:00 PM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
+        <div class="info-row"><span class="info-key">Mei C. — 10:00 AM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
+        <div class="info-row"><span class="info-key" id="auditExportedLabel">Audit exported</span><span class="badge badge-green" id="csvReadyBadge">&#x2713; CSV ready</span></div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="showScreen('admin')" id="auditBackAdminBtn">&#x2190; Admin</button>
+      <button class="nav-btn" style="flex:2;color:#1D9E75" id="exportCsvBtn">Export CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============ SESSION & STATE ============
+var session={
+  user:null,
+  venues:[],
+  timeslots:{},
+  bookings:[],
+  players:[],
+  messages:[],
+  auditLog:[],
+  currentVenueId:null,
+  selectedTimeslotId:null,
+  selectedBookingId:null,
+  token:null
+};
+
+const API_BASE='http://127.0.0.1:8000/api/v1';
+
+// ============ API HELPERS ============
+async function apiCall(method,endpoint,body=null){
+  var opts={method:method,headers:{'Content-Type':'application/json'}};
+  if(session.token)opts.headers['Authorization']='Bearer '+session.token;
+  if(body)opts.body=JSON.stringify(body);
+  try{
+    var r=await fetch(API_BASE+endpoint,opts);
+    if(!r.ok){
+      var err=await r.json();
+      throw new Error(err.detail||'API error: '+r.status);
+    }
+    return await r.json();
+  }catch(e){
+    console.error(e);
+    alert('Error: '+e.message);
+    return null;
+  }
+}
+
+function formatTime(raw){
+  if(!raw)return '--:--';
+  var s=String(raw);
+  if(s.length>=5)return s.substring(0,5);
+  return s;
+}
+
+function initials(name){
+  if(!name)return '?';
+  return name.split(' ').slice(0,2).map(function(p){return p[0]||'';}).join('').toUpperCase();
+}
+
+// ============ AUTH ============
+async function handleSignIn(){
+  var phone=document.getElementById('mobileInput').value.trim();
+  var pwd=document.getElementById('passwordInput').value;
+  if(!phone||!pwd){alert('Please enter credentials');return}
+  
+  var data=await apiCall('POST','/auth/login',{phone:phone,password:pwd});
+  if(!data)return;
+  
+  session.user=data.user;
+  session.token=data.token;
+  session.currentVenueId=null;
+  
+  // RBAC: Route by role
+  if(session.user.role==='platform_owner'){
+    await loadVenueAdmin();
+    showScreen('admin');
+  }
+  else if(session.user.role==='business_owner'){
+    await loadVenueAdmin();
+    showScreen('admin');
+  }else{
+    await loadPlayerData();
+    showScreen('player');
+  }
+}
+
+function handleSignOut(){
+  session.user=null;
+  session.token=null;
+  document.getElementById('passwordInput').value='';
+  session.timeslots={};
+  session.bookings=[];
+  session.players=[];
+  session.messages=[];
+  session.auditLog=[];
+  session.currentVenueId=null;
+  session.selectedTimeslotId=null;
+  session.selectedBookingId=null;
+  showScreen('login');
+}
+
+// ============ PLAYER FLOWS ============
+async function loadPlayerData(){
+  if(!session.user||session.user.role!=='player')return;
+  var venues=await apiCall('GET','/venues');
+  if(!venues)return;
+  session.venues=venues;
+
+  if(venues.length>0){
+    session.currentVenueId=venues[0].id;
+    await loadPlayerTimeslots();
+  }
+}
+
+async function loadPlayerTimeslots(){
+  if(!session.currentVenueId)return;
+  var today=new Date().toISOString().split('T')[0];
+  var slots=await apiCall('GET','/venues/'+session.currentVenueId+'/timeslots?day='+today);
+  if(!slots)return;
+  var bookings=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings?day='+today);
+  session.timeslots[session.currentVenueId]=slots;
+  session.bookings=bookings||[];
+
+  var myActive=session.bookings.find(function(b){
+    return b.player_id===session.user.id && b.status!=='cancelled';
+  });
+  session.selectedBookingId=myActive?myActive.id:null;
+
+  renderPlayerScreen();
+}
+
+function renderPlayerScreen(){
+  var slots=session.timeslots[session.currentVenueId]||[];
+  var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
+  var grid=document.querySelector('.slot-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  
+  slots.forEach(function(slot){
+    var bookingCount=activeBookings.filter(function(b){return b.timeslot_id===slot.id;}).length;
+    var card=document.createElement('div');
+    card.className='slot-card '+(bookingCount>=4||slot.status==='full'?'full':'');
+    var badge='';
+    if(bookingCount>=4||slot.status==='full')badge='<span class="badge badge-gray">Locked</span>';
+    else if(bookingCount===3)badge='<span class="badge badge-red">1 seat left!</span>';
+
+    var myBooking=activeBookings.find(function(b){return b.timeslot_id===slot.id && b.player_id===session.user.id;});
+    if(myBooking)card.classList.add('mine');
+
+    card.innerHTML='<div class="slot-time">'+formatTime(slot.start_time)+'</div><div class="slot-seats">'+bookingCount+' of 4 joined</div><div class="seat-dots">'+
+      '<div class="dot '+(bookingCount>0?'filled':'')+'"></div>'+
+      '<div class="dot '+(bookingCount>1?'filled':'')+'"></div>'+
+      '<div class="dot '+(bookingCount>2?'filled':'')+'"></div>'+
+      '<div class="dot '+(bookingCount>3?'filled':'')+'"></div>'+
+      '</div>'+(badge?'<div style="margin-top:6px">'+badge+'</div>':'');
+
+    if(bookingCount<4 && slot.status!=='full'){
+      card.style.cursor='pointer';
+      card.onclick=function(){showTimeslotDetail(slot)};
+    }
+    grid.appendChild(card);
+  });
+}
+
+function showTimeslotDetail(slot){
+  session.selectedTimeslotId=slot.id;
+  var confirmTopbar=document.querySelector('#screen-confirm .topbar-title');
+  var confirmSub=document.querySelector('#screen-confirm .topbar-sub');
+  if(confirmTopbar)confirmTopbar.textContent=formatTime(slot.start_time)+' — '+formatTime(slot.end_time);
+  if(confirmSub)confirmSub.textContent=new Date().toLocaleDateString()+' · Table '+slot.table_number;
+
+  var selectedBooking=session.bookings.find(function(b){
+    return b.timeslot_id===slot.id && b.player_id===session.user.id && b.status!=='cancelled';
+  });
+  session.selectedBookingId=selectedBooking?selectedBooking.id:null;
+
+  showScreen('confirm');
+}
+
+async function claimSeat(timeslotId){
+  if(!timeslotId){
+    alert('Please select a timeslot first.');
+    return;
+  }
+  var data=await apiCall('POST','/timeslots/'+timeslotId+'/book',{player_id:session.user.id});
+  if(!data)return;
+  session.selectedBookingId=data.id;
+  alert('Seat claimed!');
+  await loadPlayerTimeslots();
+  showScreen('player');
+}
+
+async function undoBooking(bookingId){
+  if(!bookingId){
+    alert('No active booking to undo.');
+    return;
+  }
+  var data=await apiCall('DELETE','/bookings/'+bookingId+'?actor_id='+encodeURIComponent(session.user.id),null);
+  if(!data)return;
+  session.selectedBookingId=null;
+  alert('Booking cancelled.');
+  await loadPlayerTimeslots();
+  showScreen('player');
+}
+
+// ============ ADMIN FLOWS ============
+async function loadVenueAdmin(){
+  var venues=await apiCall('GET','/venues');
+  if(!venues||venues.length===0)return;
+  session.venues=venues;
+
+  var adminVenue=null;
+  if(session.user.role==='business_owner'){
+    adminVenue=venues.find(function(v){return v.owner_id===session.user.id});
+  }else if(session.user.role==='platform_owner'){
+    adminVenue=venues[0];
+  }
+  if(adminVenue)session.currentVenueId=adminVenue.id;
+  if(!session.currentVenueId){
+    alert('No venue available for this admin user.');
+    return;
+  }
+  
+  await loadAdminData();
+}
+
+async function loadAdminData(){
+  if(!session.currentVenueId)return;
+
+  var today=new Date().toISOString().split('T')[0];
+  var slots=await apiCall('GET','/venues/'+session.currentVenueId+'/timeslots?day='+today);
+  if(slots)session.timeslots[session.currentVenueId]=slots;
+
+  var bookings=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings?day='+today);
+  if(bookings)session.bookings=bookings;
+
+  var players=await apiCall('GET','/venues/'+session.currentVenueId+'/players');
+  if(players)session.players=players;
+  
+  var messages=await apiCall('GET','/venues/'+session.currentVenueId+'/messages');
+  if(messages)session.messages=messages;
+  
+  var audit=await apiCall('GET','/venues/'+session.currentVenueId+'/audit');
+  if(audit)session.auditLog=audit;
+
+  var selectedVenue=(session.venues||[]).find(function(v){return v.id===session.currentVenueId;});
+  if(selectedVenue){
+    var open=document.getElementById('settingOpeningTime');
+    var close=document.getElementById('settingClosingTime');
+    var tc=document.getElementById('settingTableCount');
+    var dur=document.getElementById('settingSessionDuration');
+    var cd=document.getElementById('settingCooldown');
+    var fee=document.getElementById('settingSessionFee');
+    var pf=document.getElementById('settingPlatformFee');
+    if(open)open.value=formatTime(selectedVenue.opening_time);
+    if(close)close.value=formatTime(selectedVenue.closing_time);
+    if(tc)tc.value=selectedVenue.table_count;
+    if(dur)dur.value=selectedVenue.session_duration_hrs;
+    if(cd)cd.value=selectedVenue.cooldown_minutes;
+    if(fee)fee.value=selectedVenue.session_fee;
+    if(pf)pf.value=selectedVenue.platform_fee_pct;
+  }
+  
+  renderAdminScreen();
+}
+
+function renderAdminScreen(){
+  renderScheduleTab();
+  renderCustomersTab();
+  renderMessagesTab();
+  renderAuditScreen();
+}
+
+function renderScheduleTab(){
+  var slots=session.timeslots[session.currentVenueId]||[];
+  var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
+  var scheduleRows=document.getElementById('scheduleRows');
+  var lockedRows=document.getElementById('lockedBookingsRows');
+  if(!scheduleRows||!lockedRows)return;
+
+  var html='';
+  slots.forEach(function(slot){
+    var slotBookings=activeBookings.filter(function(b){return b.timeslot_id===slot.id;});
+    var count=slotBookings.length;
+    var status='';
+    var bcClass='amber';
+    if(count===4){status='Full';bcClass='green';}
+    else if(count===3){status='3/4';bcClass='red';}
+    else{status=count+'/4';bcClass='amber';}
+
+    html+='<div class="table-row"><div class="table-time">'+formatTime(slot.start_time)+'</div>'+
+      '<div class="seat-bar">'+
+      '<div class="seat-blk '+(count>0?'taken':'')+'"></div>'+
+      '<div class="seat-blk '+(count>1?'taken':'')+'"></div>'+
+      '<div class="seat-blk '+(count>2?'taken':'')+'"></div>'+
+      '<div class="seat-blk '+(count>3?'taken':'')+'"></div>'+
+      '</div><span class="badge badge-'+bcClass+'">'+status+'</span>'+
+      '<span class="action-chip" onclick="sendTableNudge(\''+slot.id+'\')">Nudge</span></div>';
+  });
+
+  scheduleRows.innerHTML=html||'<div class="audit-sub">No timeslots today.</div>';
+
+  var locked=session.bookings.filter(function(b){return b.status==='locked';});
+  var lockedHtml='';
+  locked.forEach(function(b){
+    var p=session.players.find(function(x){return x.player_id===b.player_id;});
+    lockedHtml+='<div class="customer-row"><div class="avatar">'+initials(p?p.player_name:'?')+'</div>'+
+      '<div class="cust-info"><div class="cust-name">'+(p?p.player_name:b.player_id.substring(0,8))+'</div>'+
+      '<div class="cust-meta">'+formatTime(b.start_time)+' · Table '+b.table_number+' · locked</div></div>'+
+      '<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="unlockBookingAdmin(\''+b.id+'\')">Unlock</button></div>';
+  });
+  lockedRows.innerHTML=lockedHtml||'<div class="audit-sub">No locked players.</div>';
+}
+
+function renderCustomersTab(){
+  var wrap=document.getElementById('customersRows');
+  if(!wrap)return;
+  var rows='';
+  session.players.forEach(function(p){
+    rows+='<div class="customer-row"><div class="avatar">'+initials(p.player_name)+'</div>'+
+      '<div class="cust-info"><div class="cust-name">'+p.player_name+'</div><div class="cust-meta">'+p.player_phone+' · '+p.status+'</div></div>'+
+      (p.status==='pending'
+        ?'<button class="action-chip" onclick="approvePlayer(\''+p.player_id+'\')">Approve</button>'
+        :'<button class="mini-wa" onclick="window.open(\'https://wa.me/'+p.player_phone.replace(/[^0-9]/g,\'\')+'\',\'_blank\')">W</button>')+
+      '</div>';
+  });
+  wrap.innerHTML=rows||'<div class="audit-sub">No players found.</div>';
+}
+
+function renderMessagesTab(){
+  var wrap=document.getElementById('messageRows');
+  if(!wrap)return;
+  var msgs=session.messages||[];
+  var html='';
+  msgs.slice(0,5).forEach(function(msg){
+    html+='<div class="msg-row"><div class="msg-icon">&#x2709;</div><div class="msg-body">'+
+      '<div class="msg-title">'+msg.message_type+'</div>'+
+      '<div class="msg-text">'+msg.content+'</div>'+
+      '<div class="msg-time">'+new Date(msg.sent_at).toLocaleString()+' · '+msg.recipient_count+' recipients · '+msg.channel+'</div></div></div>';
+  });
+  wrap.innerHTML=html||'<div class="audit-sub">No recent messages.</div>';
+}
+
+async function sendMessage(messageType,content,recipientCount){
+  if(!session.currentVenueId||!session.user)return;
+  var payload={
+    sent_by:session.user.id,
+    message_type:messageType,
+    content:content,
+    recipient_count:recipientCount,
+    channel:'whatsapp_link'
+  };
+  var sent=await apiCall('POST','/venues/'+session.currentVenueId+'/messages',payload);
+  if(!sent)return;
+  await loadAdminData();
+}
+
+async function sendTableNudge(timeslotId){
+  var count=session.players.filter(function(p){return p.status==='approved';}).length || 1;
+  await sendMessage('reminder','Friendly reminder: seats are open for upcoming tables. Tap to book now.',count);
+}
+
+async function sendBroadcast(){
+  var count=session.players.filter(function(p){return p.status==='approved';}).length || 1;
+  await sendMessage('broadcast','New and upcoming sessions are now available. Please reserve your seat early.',count);
+}
+
+async function composeMessage(){
+  var text=window.prompt('Message to approved players:');
+  if(!text)return;
+  var count=session.players.filter(function(p){return p.status==='approved';}).length || 1;
+  await sendMessage('broadcast',text,count);
+}
+
+async function approvePlayer(playerId){
+  if(!session.currentVenueId||!session.user)return;
+  var approved=await apiCall('PATCH','/venues/'+session.currentVenueId+'/players/'+playerId+'/approve?approver_id='+encodeURIComponent(session.user.id),null);
+  if(!approved)return;
+  await loadAdminData();
+}
+
+async function unlockBookingAdmin(bookingId){
+  if(!session.user)return;
+  var unlocked=await apiCall('PATCH','/bookings/'+bookingId+'/unlock?admin_id='+encodeURIComponent(session.user.id),null);
+  if(!unlocked)return;
+  await loadAdminData();
+}
+
+async function saveSettings(){
+  if(!session.currentVenueId||!session.user)return;
+  var payload={
+    opening_time:document.getElementById('settingOpeningTime').value,
+    closing_time:document.getElementById('settingClosingTime').value,
+    table_count:Number(document.getElementById('settingTableCount').value),
+    session_duration_hrs:Number(document.getElementById('settingSessionDuration').value),
+    cooldown_minutes:Number(document.getElementById('settingCooldown').value),
+    session_fee:Number(document.getElementById('settingSessionFee').value),
+    platform_fee_pct:Number(document.getElementById('settingPlatformFee').value)
+  };
+  var updated=await apiCall('PATCH','/venues/'+session.currentVenueId+'?admin_id='+encodeURIComponent(session.user.id),payload);
+  if(!updated)return;
+  alert('Settings saved.');
+  await loadAdminData();
+}
+
+function exportAuditCsv(){
+  var rows=['created_at,action_type,reference_id,session_fee,platform_fee,performed_by'];
+  (session.auditLog||[]).forEach(function(a){
+    rows.push([a.created_at,a.action_type,a.reference_id||'',a.session_fee||'',a.platform_fee||'',a.performed_by].join(','));
+  });
+  var blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='audit-export.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ============ SCREEN NAVIGATION ============
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.snav').forEach(b=>{if(b.dataset.screen===id)b.classList.add('active')});
+
+  // RBAC: Hide screens user cannot access
+  var navPlayer=document.getElementById('navPlayer');
+  var navAdmin=document.getElementById('navAdmin');
+  var navAudit=document.getElementById('navAudit');
+  var navBooking=document.getElementById('navBooking');
+  if(!session.user){
+    if(navPlayer)navPlayer.style.display='none';
+    if(navAdmin)navAdmin.style.display='none';
+    if(navAudit)navAudit.style.display='none';
+    if(navBooking)navBooking.style.display='none';
+  }else if(session.user.role==='player'){
+    if(navPlayer)navPlayer.style.display='';
+    if(navBooking)navBooking.style.display='';
+    if(navAdmin)navAdmin.style.display='none';
+    if(navAudit)navAudit.style.display='none';
+  }else{
+    if(navPlayer)navPlayer.style.display='none';
+    if(navBooking)navBooking.style.display='none';
+    if(navAdmin)navAdmin.style.display='';
+    if(navAudit)navAudit.style.display='';
+  }
+}
+
+function setDevice(device,el){
+  document.body.dataset.device=device;
+  document.querySelectorAll('#deviceSwitch .toolbar-chip').forEach(btn=>btn.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+function setFontSize(scale,el){
+  document.documentElement.style.setProperty('--font-scale',scale);
+  document.querySelectorAll('#fontSwitch .toolbar-chip').forEach(btn=>btn.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+function selectRole(r){
+  document.getElementById('role-player').classList.toggle('selected',r==='player');
+  document.getElementById('role-admin').classList.toggle('selected',r==='admin');
+}
+
+function showAdminTab(tab,el){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ap-'+tab).classList.add('active');
+  el.classList.add('active');
+}
+
+// ============ AUDIT SCREEN ============
+function renderAuditScreen(){
+  var audit=session.auditLog||[];
+  var totalFees=0,totalPlatformFee=0;
+  audit.forEach(function(a){
+    totalFees+=(a.session_fee||0);
+    totalPlatformFee+=(a.platform_fee||0);
+  });
+  
+  var auditPanel=document.getElementById('screen-audit');
+  if(auditPanel){
+    var metricsGrid=auditPanel.querySelector('.metric-grid');
+    if(metricsGrid){
+      metricsGrid.innerHTML='<div class="metric-card"><div class="metric-num">'+audit.length+'</div><div class="metric-label">Full tables booked</div></div>'+
+        '<div class="metric-card"><div class="metric-num">0</div><div class="metric-label">Player sessions</div></div>'+
+        '<div class="metric-card"><div class="metric-num">£'+totalFees.toFixed(2)+'</div><div class="metric-label">Gross table fees</div></div>'+
+        '<div class="metric-card"><div class="metric-num">£'+totalPlatformFee.toFixed(2)+'</div><div class="metric-label">Platform fee</div></div>';
+    }
+  }
+}
+
+var translations={
+  'en':{
+    srTitle:'Mahjong booking system interactive mockup - navigate between Login, Player view, Admin view, Booking confirmation, and Audit screens',
+    navLogin:'Login',navPlayer:'Player',navBooking:'Booking',navAdmin:'Admin',navAudit:'Audit',
+    logoSub:'Book your table. Play with confidence.',
+    rolePlayerLabel:'Player',rolePlayerSub:'Book a timeslot',roleAdminLabel:'Business',roleAdminSub:'Manage tables',
+    mobileLabel:'Mobile / WhatsApp number',mobilePlaceholder:'+44 7700 900123',passwordLabel:'PIN / Password',signInBtn:'Sign in',
+    newPlayerHint:'New player? Contact the business to register.',
+    playerSubTitle:'Thu 17 Apr - Select a timeslot',playerBadge:'Player',
+    playerNotice:'Table at <strong>2:00 PM</strong> now has 3/4 players - only 1 seat left! Tap to claim it.',
+    availableSlotsTitle:'Available timeslots',historyTitle:'My session history',lastPlayedLabel:'Last played',sessionsMonthLabel:'Sessions this month',statusLabel:'Status',statusActive:'Active',signOutBtn:'<- Sign out',
+    backBtn:'<- Back',seatLockedText:'Seat locked after 30 min cooldown',playersTableTitle:'Players at this table',claimSeatBtn:'Claim this seat',undoBookingBtn:'Undo my booking (28 min left)',
+    adminSubTitle:'Admin · Thu 17 Apr',adminBadge:'Admin',tabSchedule:'Schedule',tabCustomers:'Customers',tabMessages:'Messages',tabSettings:'Settings',
+    todayTablesTitle:'Today\'s tables',lockedPlayersTitle:'Locked-in players needing admin unlock',registeredPlayersTitle:'Registered players (12)',
+    addPlayerTitle:'Add new player',addPlayerSub:'Register via mobile number',broadcastBtn:'Broadcast to all players',
+    recentMessagesTitle:'Recent messages sent',composeBtn:'Compose new message',
+    businessSettingsTitle:'Business settings',openingTimeLabel:'Opening time',openingTimeSub:'First slot of the day',closingTimeLabel:'Closing time',closingTimeSub:'Last slot ends by',
+    tablesAvailableLabel:'Tables available',tablesAvailableSub:'Concurrent games hosted',sessionDurationLabel:'Session duration',sessionDurationSub:'Hours per game slot',
+    cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'WhatsApp notifications',waNotifSub:'Auto-send on table full',
+    sessionFeeLabel:'Session fee (per table)',sessionFeeSub:'Used for audit and billing',platformFeeLabel:'Platform fee %',platformFeeSub:'Developer charge per session',saveSettingsBtn:'Save settings',
+    auditRevenueTitle:'Audit and Revenue',auditSubTitle:'Dragon Palace · April 2025',auditAdminBadge:'Admin',metricFullTables:'Full tables booked',metricPlayerSessions:'Player sessions',metricGrossFees:'Gross table fees',metricPlatformFee:'Platform fee (5%)',
+    confirmedTablesTitle:'Confirmed tables - this week',unlockLogTitle:'Unlock log (admin actions)',auditExportedLabel:'Audit exported',csvReadyBadge:'✓ CSV ready',auditBackAdminBtn:'<- Admin',exportCsvBtn:'Export CSV'
+  },
+  'zh-Hant':{
+    srTitle:'麻將訂位系統互動原型 - 可在登入、玩家、訂位、商家與審計畫面切換',
+    navLogin:'登入',navPlayer:'玩家',navBooking:'訂位',navAdmin:'商家',navAudit:'審計',
+    logoSub:'快速訂桌，安心開局。',
+    rolePlayerLabel:'玩家',rolePlayerSub:'選擇時段訂位',roleAdminLabel:'商家',roleAdminSub:'管理場次與桌位',
+    mobileLabel:'手機 / WhatsApp 號碼',mobilePlaceholder:'+44 7700 900123',passwordLabel:'PIN / 密碼',signInBtn:'登入',
+    newPlayerHint:'新玩家？請聯絡商家完成註冊。',
+    playerSubTitle:'4月17日 週四 - 選擇可玩時段',playerBadge:'玩家',
+    playerNotice:'<strong>2:00 PM</strong> 場次目前 3/4 人 - 剩最後 1 位，立即加入。',
+    availableSlotsTitle:'可預約時段',historyTitle:'我的對局紀錄',lastPlayedLabel:'上次遊玩',sessionsMonthLabel:'本月場次',statusLabel:'狀態',statusActive:'啟用中',signOutBtn:'<- 登出',
+    backBtn:'<- 返回',seatLockedText:'30 分鐘後座位將鎖定',playersTableTitle:'本桌玩家',claimSeatBtn:'我要這個位子',undoBookingBtn:'取消本次預約 (剩 28 分)',
+    adminSubTitle:'商家 · 4月17日 週四',adminBadge:'商家',tabSchedule:'排程',tabCustomers:'客戶',tabMessages:'訊息',tabSettings:'設定',
+    todayTablesTitle:'今日桌況',lockedPlayersTitle:'已鎖定且需商家解鎖',registeredPlayersTitle:'已註冊玩家 (12)',
+    addPlayerTitle:'新增玩家',addPlayerSub:'用手機號碼註冊',broadcastBtn:'廣播給所有玩家',
+    recentMessagesTitle:'近期已發送訊息',composeBtn:'撰寫新訊息',
+    businessSettingsTitle:'店家設定',openingTimeLabel:'營業開始',openingTimeSub:'每日第一個場次時間',closingTimeLabel:'營業結束',closingTimeSub:'最後場次結束時間',
+    tablesAvailableLabel:'可用桌數',tablesAvailableSub:'同時可進行的牌局',sessionDurationLabel:'場次時長',sessionDurationSub:'每場遊戲小時數',
+    cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'WhatsApp 通知',waNotifSub:'滿桌時自動發送',
+    sessionFeeLabel:'每桌場次費',sessionFeeSub:'用於審計與計費',platformFeeLabel:'平台服務費 %',platformFeeSub:'每場抽成比例',saveSettingsBtn:'儲存設定',
+    auditRevenueTitle:'審計與營收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'滿桌場次',metricPlayerSessions:'玩家出席次數',metricGrossFees:'總桌費',metricPlatformFee:'平台費 (5%)',
+    confirmedTablesTitle:'本週已確認滿桌',unlockLogTitle:'解鎖紀錄 (商家操作)',auditExportedLabel:'審計已匯出',csvReadyBadge:'✓ CSV 已就緒',auditBackAdminBtn:'<- 商家',exportCsvBtn:'匯出 CSV'
+  },
+  'zh-Hans':{
+    srTitle:'麻将订位系统互动原型 - 可在登录、玩家、订位、商家与审计画面切换',
+    navLogin:'登录',navPlayer:'玩家',navBooking:'订位',navAdmin:'商家',navAudit:'审计',
+    logoSub:'快速订桌，安心开局。',
+    rolePlayerLabel:'玩家',rolePlayerSub:'选择时段订位',roleAdminLabel:'商家',roleAdminSub:'管理场次与桌位',
+    mobileLabel:'手机 / WhatsApp 号码',mobilePlaceholder:'+44 7700 900123',passwordLabel:'PIN / 密码',signInBtn:'登录',
+    newPlayerHint:'新玩家？请联系商家完成注册。',
+    playerSubTitle:'4月17日 周四 - 选择可玩时段',playerBadge:'玩家',
+    playerNotice:'<strong>2:00 PM</strong> 场次目前 3/4 人 - 剩最后 1 位，立即加入。',
+    availableSlotsTitle:'可预约时段',historyTitle:'我的对局记录',lastPlayedLabel:'上次游玩',sessionsMonthLabel:'本月场次',statusLabel:'状态',statusActive:'启用中',signOutBtn:'<- 退出登录',
+    backBtn:'<- 返回',seatLockedText:'30 分钟后座位将锁定',playersTableTitle:'本桌玩家',claimSeatBtn:'我要这个座位',undoBookingBtn:'取消本次预约 (剩 28 分)',
+    adminSubTitle:'商家 · 4月17日 周四',adminBadge:'商家',tabSchedule:'排程',tabCustomers:'客户',tabMessages:'消息',tabSettings:'设置',
+    todayTablesTitle:'今日桌况',lockedPlayersTitle:'已锁定且需商家解锁',registeredPlayersTitle:'已注册玩家 (12)',
+    addPlayerTitle:'新增玩家',addPlayerSub:'用手机号注册',broadcastBtn:'群发给所有玩家',
+    recentMessagesTitle:'近期已发送消息',composeBtn:'撰写新消息',
+    businessSettingsTitle:'店家设置',openingTimeLabel:'营业开始',openingTimeSub:'每日第一个场次时间',closingTimeLabel:'营业结束',closingTimeSub:'最后场次结束时间',
+    tablesAvailableLabel:'可用桌数',tablesAvailableSub:'同时可进行的牌局',sessionDurationLabel:'场次时长',sessionDurationSub:'每场游戏小时数',
+    cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'WhatsApp 通知',waNotifSub:'满桌时自动发送',
+    sessionFeeLabel:'每桌场次费',sessionFeeSub:'用于审计与计费',platformFeeLabel:'平台服务费 %',platformFeeSub:'每场抽成比例',saveSettingsBtn:'保存设置',
+    auditRevenueTitle:'审计与营收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'满桌场次',metricPlayerSessions:'玩家出席次数',metricGrossFees:'总桌费',metricPlatformFee:'平台费 (5%)',
+    confirmedTablesTitle:'本周已确认满桌',unlockLogTitle:'解锁记录 (商家操作)',auditExportedLabel:'审计已导出',csvReadyBadge:'✓ CSV 已就绪',auditBackAdminBtn:'<- 商家',exportCsvBtn:'导出 CSV'
+  }
+};
+
+function applyLanguage(lang){
+  var t=translations[lang]||translations.en;
+  document.documentElement.lang=lang;
+  Object.keys(t).forEach(function(key){
+    var el=document.getElementById(key);
+    if(!el)return;
+    if(key==='playerNotice'){
+      el.innerHTML=t[key];
+    }else if(key==='mobilePlaceholder'){
+      document.getElementById('mobileInput').setAttribute('placeholder',t[key]);
+    }else{
+      el.textContent=t[key];
+    }
+  });
+}
+
+function setLanguage(lang,el){
+  applyLanguage(lang);
+  document.querySelectorAll('#langSwitch .toolbar-chip').forEach(btn=>btn.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// ============ INITIALIZATION ============
+applyLanguage('zh-Hant');
+
+var timerInterval=null;
+function startTimer(seconds){
+  if(timerInterval)clearInterval(timerInterval);
+  var t=seconds;
+  timerInterval=setInterval(function(){
+    if(t>0)t--;
+    var m=Math.floor(t/60),s=t%60;
+    var el=document.getElementById('timerVal');
+    if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(t===0)clearInterval(timerInterval);
+  },1000);
+}
+
+// Demo timer on page load
+document.addEventListener('DOMContentLoaded',function(){
+  startTimer(28*60+45);
+  var claimBtn=document.getElementById('claimSeatBtn');
+  var undoBtn=document.getElementById('undoBookingBtn');
+  var broadcastBtn=document.getElementById('broadcastBtn');
+  var composeBtn=document.getElementById('composeBtn');
+  var saveSettingsBtn=document.getElementById('saveSettingsBtn');
+  var exportCsvBtn=document.getElementById('exportCsvBtn');
+  if(claimBtn){
+    claimBtn.onclick=function(){
+      claimSeat(session.selectedTimeslotId);
+    };
+  }
+  if(undoBtn){
+    undoBtn.onclick=function(){
+      undoBooking(session.selectedBookingId);
+    };
+  }
+  if(broadcastBtn){
+    broadcastBtn.onclick=function(){
+      sendBroadcast();
+    };
+  }
+  if(composeBtn){
+    composeBtn.onclick=function(){
+      composeMessage();
+    };
+  }
+  if(saveSettingsBtn){
+    saveSettingsBtn.onclick=function(){
+      saveSettings();
+    };
+  }
+  if(exportCsvBtn){
+    exportCsvBtn.onclick=function(){
+      exportAuditCsv();
+    };
+  }
+  showScreen('login');
+});
+</script>
+</body>
+</html>
