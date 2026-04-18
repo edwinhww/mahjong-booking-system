@@ -51,6 +51,7 @@ def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_coun
         return 0
 
     slot_by_id = {slot.id: slot for slot in timeslots}
+    retained_slots_sorted = sorted(retained_slots, key=lambda slot: (slot.date, slot.start_time, slot.end_time, slot.table_number))
     target_groups: dict[tuple, list[Timeslot]] = {}
     for slot in retained_slots:
         key = (slot.date, slot.start_time, slot.end_time)
@@ -70,6 +71,7 @@ def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_coun
     ).all()
 
     occupancy = {slot.id: 0 for slot in retained_slots}
+    players_in_slot: dict[str, set[str]] = {slot.id: set() for slot in retained_slots}
     dropped_booking_rows: list[tuple[Booking, User]] = []
     for booking, player in active_bookings:
         slot = slot_by_id.get(booking.timeslot_id)
@@ -78,6 +80,7 @@ def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_coun
         if slot.table_number <= new_table_count:
             if slot.id in occupancy:
                 occupancy[slot.id] += 1
+                players_in_slot[slot.id].add(booking.player_id)
         else:
             dropped_booking_rows.append((booking, player))
 
@@ -86,24 +89,49 @@ def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_coun
         source_slot = slot_by_id.get(booking.timeslot_id)
         if not source_slot:
             continue
+
+        target_slot = None
         key = (source_slot.date, source_slot.start_time, source_slot.end_time)
         candidate_slots = target_groups.get(key, [])
-        if not candidate_slots:
-            raise HTTPException(status_code=409, detail="Cannot reduce concurrent games: no remaining tables for one or more affected timeslots")
+        if candidate_slots:
+            candidate_slots = sorted(candidate_slots, key=lambda slot: (occupancy.get(slot.id, 0), slot.table_number))
+            target_slot = next(
+                (
+                    slot
+                    for slot in candidate_slots
+                    if occupancy.get(slot.id, 0) < 4 and booking.player_id not in players_in_slot.get(slot.id, set())
+                ),
+                None,
+            )
 
-        candidate_slots = sorted(candidate_slots, key=lambda slot: (occupancy.get(slot.id, 0), slot.table_number))
-        target_slot = next((slot for slot in candidate_slots if occupancy.get(slot.id, 0) < 4), None)
+        # If the same timeslot is full, move to the next available slot in chronological order.
         if not target_slot:
-            raise HTTPException(status_code=409, detail="Cannot reduce concurrent games: T1-TN does not have enough seats to absorb dropped tables")
+            source_rank = (source_slot.date, source_slot.start_time, source_slot.end_time, source_slot.table_number)
+            later_slots = [slot for slot in retained_slots_sorted if (slot.date, slot.start_time, slot.end_time, slot.table_number) > source_rank]
+            target_slot = next(
+                (
+                    slot
+                    for slot in later_slots
+                    if occupancy.get(slot.id, 0) < 4 and booking.player_id not in players_in_slot.get(slot.id, set())
+                ),
+                None,
+            )
+
+        if not target_slot:
+            raise HTTPException(
+                status_code=409,
+                detail="Cannot reduce concurrent games: no later slots available with capacity for all affected players",
+            )
 
         booking.timeslot_id = target_slot.id
         occupancy[target_slot.id] = occupancy.get(target_slot.id, 0) + 1
+        players_in_slot[target_slot.id].add(booking.player_id)
         moved_count += 1
 
         draft_text = (
             f"Draft: Table reassignment for {player.name} ({player.phone}). "
             f"Session {source_slot.date.isoformat()} {source_slot.start_time.strftime('%H:%M')}-{source_slot.end_time.strftime('%H:%M')} "
-            f"moved from T{source_slot.table_number} to T{target_slot.table_number}. "
+            f"moved from T{source_slot.table_number} to {target_slot.date.isoformat()} {target_slot.start_time.strftime('%H:%M')}-{target_slot.end_time.strftime('%H:%M')} T{target_slot.table_number}. "
             f"Please send WhatsApp confirmation to the player."
         )
         db.add(
