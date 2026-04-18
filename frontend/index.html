@@ -1146,6 +1146,11 @@ function renderAdminScreen(){
 
 function renderScheduleTab(){
   var slots=session.timeslots[session.currentVenueId]||[];
+  var selectedVenue=(session.venues||[]).find(function(venue){return venue.id===session.currentVenueId;});
+  var configuredTableCount=selectedVenue?Number(selectedVenue.table_count||0):0;
+  if(configuredTableCount>0){
+    slots=slots.filter(function(slot){return Number(slot.table_number||0)<=configuredTableCount;});
+  }
   var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
   var scheduleRows=document.getElementById('scheduleRows');
   var lockedRows=document.getElementById('lockedBookingsRows');

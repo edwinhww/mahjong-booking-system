@@ -5,7 +5,21 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import AuditActionType, AuditLog, User, UserRole, Venue, VenuePlayer, VenuePlayerStatus
+from app.models import (
+    AuditActionType,
+    AuditLog,
+    Booking,
+    BookingStatus,
+    Message,
+    MessageChannel,
+    MessageType,
+    Timeslot,
+    User,
+    UserRole,
+    Venue,
+    VenuePlayer,
+    VenuePlayerStatus,
+)
 from app.schemas import VenueCreate, VenueJoinRequest, VenuePlayerDetailRead, VenuePlayerRead, VenueRead, VenueUpdate
 from app.services.action_audit import log_action
 
@@ -21,6 +35,89 @@ def _require_venue_admin(db: Session, venue: Venue, admin_id: str) -> User:
     if admin.role == UserRole.business_owner and venue.owner_id != admin.id:
         raise HTTPException(status_code=403, detail="Admin does not own this venue")
     return admin
+
+
+def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_count: int, admin_id: str) -> int:
+    if new_table_count >= venue.table_count:
+        return 0
+
+    timeslots = db.execute(select(Timeslot).where(Timeslot.venue_id == venue.id)).scalars().all()
+    if not timeslots:
+        return 0
+
+    retained_slots = [slot for slot in timeslots if slot.table_number <= new_table_count]
+    dropped_slots = [slot for slot in timeslots if slot.table_number > new_table_count]
+    if not dropped_slots:
+        return 0
+
+    slot_by_id = {slot.id: slot for slot in timeslots}
+    target_groups: dict[tuple, list[Timeslot]] = {}
+    for slot in retained_slots:
+        key = (slot.date, slot.start_time, slot.end_time)
+        target_groups.setdefault(key, []).append(slot)
+    for group in target_groups.values():
+        group.sort(key=lambda slot: slot.table_number)
+
+    active_bookings = db.execute(
+        select(Booking, User)
+        .join(Timeslot, Timeslot.id == Booking.timeslot_id)
+        .join(User, User.id == Booking.player_id)
+        .where(
+            Timeslot.venue_id == venue.id,
+            Booking.status != BookingStatus.cancelled,
+        )
+        .order_by(Timeslot.date.asc(), Timeslot.start_time.asc(), Booking.booked_at.asc())
+    ).all()
+
+    occupancy = {slot.id: 0 for slot in retained_slots}
+    dropped_booking_rows: list[tuple[Booking, User]] = []
+    for booking, player in active_bookings:
+        slot = slot_by_id.get(booking.timeslot_id)
+        if not slot:
+            continue
+        if slot.table_number <= new_table_count:
+            if slot.id in occupancy:
+                occupancy[slot.id] += 1
+        else:
+            dropped_booking_rows.append((booking, player))
+
+    moved_count = 0
+    for booking, player in dropped_booking_rows:
+        source_slot = slot_by_id.get(booking.timeslot_id)
+        if not source_slot:
+            continue
+        key = (source_slot.date, source_slot.start_time, source_slot.end_time)
+        candidate_slots = target_groups.get(key, [])
+        if not candidate_slots:
+            raise HTTPException(status_code=409, detail="Cannot reduce concurrent games: no remaining tables for one or more affected timeslots")
+
+        candidate_slots = sorted(candidate_slots, key=lambda slot: (occupancy.get(slot.id, 0), slot.table_number))
+        target_slot = next((slot for slot in candidate_slots if occupancy.get(slot.id, 0) < 4), None)
+        if not target_slot:
+            raise HTTPException(status_code=409, detail="Cannot reduce concurrent games: T1-TN does not have enough seats to absorb dropped tables")
+
+        booking.timeslot_id = target_slot.id
+        occupancy[target_slot.id] = occupancy.get(target_slot.id, 0) + 1
+        moved_count += 1
+
+        draft_text = (
+            f"Draft: Table reassignment for {player.name} ({player.phone}). "
+            f"Session {source_slot.date.isoformat()} {source_slot.start_time.strftime('%H:%M')}-{source_slot.end_time.strftime('%H:%M')} "
+            f"moved from T{source_slot.table_number} to T{target_slot.table_number}. "
+            f"Please send WhatsApp confirmation to the player."
+        )
+        db.add(
+            Message(
+                venue_id=venue.id,
+                sent_by=admin_id,
+                message_type=MessageType.reminder,
+                content=draft_text,
+                recipient_count=1,
+                channel=MessageChannel.in_app,
+            )
+        )
+
+    return moved_count
 
 
 @router.get("", response_model=list[VenueRead])
@@ -193,8 +290,14 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
             status=venue.status,
         )
 
+    old_table_count = venue.table_count
+
     for field, value in update_data.items():
         setattr(venue, field, value)
+
+    moved_count = 0
+    if "table_count" in update_data and update_data["table_count"] < old_table_count:
+        moved_count = _reallocate_dropped_table_bookings(db, venue, int(update_data["table_count"]), admin_id)
 
     db.add(
         AuditLog(
@@ -211,7 +314,7 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
         venue_id=venue_id,
         target_type="venue",
         target_id=venue.id,
-        metadata={"fields": list(update_data.keys())},
+        metadata={"fields": list(update_data.keys()), "reallocated_bookings": moved_count},
     )
     db.commit()
     db.refresh(venue)
