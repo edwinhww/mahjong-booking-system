@@ -1,4 +1,4 @@
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect, select, text
 from sqlalchemy.orm import Session
 
 from app.database import engine
@@ -60,7 +60,7 @@ def ensure_schema() -> None:
 
 
 def _bootstrap_demo_users() -> None:
-    """Create demo users for testing if they don't already exist."""
+    """Create demo users and a working demo venue setup if missing."""
     from app.database import SessionLocal
 
     db = SessionLocal()
@@ -115,8 +115,8 @@ def _bootstrap_demo_users() -> None:
 
         # Demo venue owned by business owner
         if owner:
-            existing_venue = db.query(Venue).filter(Venue.owner_id == owner.id).first()
-            if not existing_venue:
+            venue = db.query(Venue).filter(Venue.owner_id == owner.id).first()
+            if not venue:
                 venue = Venue(
                     owner_id=owner.id,
                     name="Dragon Palace MJ",
@@ -132,35 +132,63 @@ def _bootstrap_demo_users() -> None:
                 db.add(venue)
                 db.flush()
 
-                # Venue profile
-                db.add(VenueProfile(venue_id=venue.id))
-
-                # Link player to venue as approved
-                if player:
-                    db.add(VenuePlayer(
+            # Ensure profile exists and has required contact value.
+            profile = db.scalar(select(VenueProfile).where(VenueProfile.venue_id == venue.id))
+            if not profile:
+                db.add(
+                    VenueProfile(
                         venue_id=venue.id,
-                        player_id=player.id,
-                        status=VenuePlayerStatus.approved,
-                    ))
+                        business_whatsapp=owner.phone,
+                    )
+                )
 
-                # Generate timeslots for today and tomorrow (4 tables, slots at 10,12,14,16,18,20)
-                for day_offset in range(2):
-                    slot_date = date.today() + timedelta(days=day_offset)
-                    for hour in [10, 12, 14, 16, 18, 20]:
-                        start = time(hour, 0)
-                        end = time(hour + 2, 0)
-                        for table_num in range(1, 5):
-                            db.add(Timeslot(
-                                venue_id=venue.id,
-                                date=slot_date,
-                                start_time=start,
-                                end_time=end,
-                                table_number=table_num,
-                                status=TimeslotStatus.open,
-                            ))
+            # Link player to venue as approved.
+            if player:
+                existing_member = db.scalar(
+                    select(VenuePlayer).where(
+                        VenuePlayer.venue_id == venue.id,
+                        VenuePlayer.player_id == player.id,
+                    )
+                )
+                if not existing_member:
+                    db.add(
+                        VenuePlayer(
+                            venue_id=venue.id,
+                            player_id=player.id,
+                            status=VenuePlayerStatus.approved,
+                        )
+                    )
 
-                db.commit()
-    except Exception:
+            # Generate missing timeslots for today and tomorrow (4 tables at 10/12/14/16/18/20).
+            for day_offset in range(2):
+                slot_date = date.today() + timedelta(days=day_offset)
+                for hour in [10, 12, 14, 16, 18, 20]:
+                    start = time(hour, 0)
+                    end = time(hour + 2, 0)
+                    for table_num in range(1, 5):
+                        exists = db.scalar(
+                            select(Timeslot).where(
+                                Timeslot.venue_id == venue.id,
+                                Timeslot.date == slot_date,
+                                Timeslot.start_time == start,
+                                Timeslot.table_number == table_num,
+                            )
+                        )
+                        if not exists:
+                            db.add(
+                                Timeslot(
+                                    venue_id=venue.id,
+                                    date=slot_date,
+                                    start_time=start,
+                                    end_time=end,
+                                    table_number=table_num,
+                                    status=TimeslotStatus.open,
+                                )
+                            )
+
+            db.commit()
+    except Exception as exc:
+        print(f"Demo bootstrap failed: {exc}")
         db.rollback()
     finally:
         db.close()
