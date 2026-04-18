@@ -98,6 +98,32 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
 .metric-num{font-size:calc(24px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
 .metric-label{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
+.service-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.service-card img{width:56px;height:56px;border-radius:var(--border-radius-md);object-fit:cover;background:#eee;flex-shrink:0}
+.service-card-img-placeholder{width:56px;height:56px;border-radius:var(--border-radius-md);background:#F1EFE8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.service-card-body{flex:1;min-width:0}
+.service-card-name{font-size:calc(14px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.service-card-meta{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
+.service-card-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.order-row{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;margin-bottom:8px}
+.order-row-head{display:flex;justify-content:space-between;align-items:baseline}
+.order-row-name{font-size:calc(13px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.order-row-date{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
+.order-row-items{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:3px;line-height:1.45}
+.order-row-total{font-size:calc(13px * var(--font-scale));font-weight:500;color:#3B6D11;margin-top:4px}
+.addon-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.addon-item:last-child{border-bottom:none}
+.addon-img{width:44px;height:44px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0}
+.addon-img-ph{width:44px;height:44px;border-radius:var(--border-radius-md);background:#F1EFE8;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.addon-body{flex:1}
+.addon-name{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
+.addon-price{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-top:1px}
+.qty-ctrl{display:flex;align-items:center;gap:6px}
+.qty-btn{width:28px;height:28px;border:0.5px solid var(--color-border-secondary);border-radius:50%;background:var(--color-background-primary);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--color-text-primary)}
+.qty-val{font-size:calc(14px * var(--font-scale));min-width:18px;text-align:center;font-weight:500}
+.audit-log-row{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:6px}
+.audit-log-type{font-size:calc(12px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.audit-log-meta{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
 .msg-row{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
 .msg-row:last-child{border-bottom:none}
 .msg-icon{width:36px;height:36px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
@@ -175,7 +201,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <button class="snav" data-screen="player" onclick="showScreen('player')" id="navPlayer">Player</button>
     <button class="snav" data-screen="confirm" onclick="showScreen('confirm')" id="navBooking">Booking</button>
     <button class="snav" data-screen="admin" onclick="showScreen('admin')" id="navAdmin">Admin</button>
-    <button class="snav" data-screen="audit" onclick="showScreen('audit')" id="navAudit">Audit</button>
+    <button class="snav" data-screen="audit" onclick="showScreen('audit')" id="navAudit">Revenue</button>
   </div>
 </div>
 
@@ -324,6 +350,25 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     </div>
   </div>
 
+  <!-- ADD-ONS SCREEN -->
+  <div class="screen" id="screen-addons">
+    <div class="topbar">
+      <button class="nav-btn" style="padding:5px 10px;font-size:12px" id="addonsBackBtn">&#x2190; Back</button>
+      <div style="flex:1;padding-left:10px">
+        <div class="topbar-title" id="addonsTitle">Add-ons &amp; Extras</div>
+        <div class="topbar-sub" id="addonsSub">Optional items for your session</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="section-title">Available extras</div>
+      <div id="addonsList"><div class="audit-sub">Loading...</div></div>
+    </div>
+    <div class="bottom-bar" style="flex-direction:column;gap:6px">
+      <div style="text-align:center;font-size:12px;color:var(--color-text-secondary)" id="addonsTotal">No extras selected</div>
+      <button class="cta-btn" id="addonsConfirmBtn">Continue to confirm</button>
+    </div>
+  </div>
+
   <!-- ADMIN SCREEN -->
   <div class="screen" id="screen-admin">
     <div class="topbar">
@@ -337,6 +382,9 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="atab active" onclick="showAdminTab('schedule',this)" id="tabSchedule">Schedule</div>
       <div class="atab" onclick="showAdminTab('customers',this)" id="tabCustomers">Customers</div>
       <div class="atab" onclick="showAdminTab('messages',this)" id="tabMessages">Messages</div>
+      <div class="atab" onclick="showAdminTab('services',this)" id="tabServices">Services</div>
+      <div class="atab" onclick="showAdminTab('orders',this)" id="tabOrders">Orders</div>
+      <div class="atab" onclick="showAdminTab('adminaudit',this)" id="tabAdminAudit">Audit</div>
       <div class="atab" onclick="showAdminTab('settings',this)" id="tabSettings">Settings</div>
     </div>
 
@@ -347,19 +395,19 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="table-time">10:00 AM</div>
         <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
         <span class="badge badge-amber">2/4</span>
-        <span class="action-chip" onclick="alert('WhatsApp nudge sent to your player list!')">Nudge</span>
+        <span class="action-chip" onclick="sendTableNudge(null)">Nudge</span>
       </div>
       <div class="table-row">
         <div class="table-time">12:00 PM</div>
         <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div></div>
         <span class="badge badge-red">3/4</span>
-        <span class="action-chip" onclick="alert('Broadcast: 1 seat left at 12 PM!')">Blast</span>
+        <span class="action-chip" onclick="sendBroadcast()">Blast</span>
       </div>
       <div class="table-row">
         <div class="table-time">2:00 PM</div>
         <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
         <span class="badge badge-green">Full</span>
-        <span class="action-chip" onclick="alert('Table confirmed. All 4 players notified via WhatsApp.')">Notify</span>
+        <span class="action-chip" onclick="sendBroadcast()">Notify</span>
       </div>
       <div class="table-row">
         <div class="table-time">4:00 PM</div>
@@ -371,7 +419,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="table-time">6:00 PM</div>
         <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
         <span class="badge badge-gray">1/4</span>
-        <span class="action-chip" onclick="alert('Nudge sent!')">Nudge</span>
+        <span class="action-chip" onclick="sendTableNudge(null)">Nudge</span>
       </div>
       </div>
       <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)">
@@ -380,7 +428,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="customer-row">
           <div class="avatar">TW</div>
           <div class="cust-info"><div class="cust-name">Tony W.</div><div class="cust-meta">4:00 PM slot · locked 2h ago</div></div>
-          <button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="alert('Tony W. unlocked. Seat freed.')">Unlock</button>
+          <button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="showToast('Admin unlock requires live data. Log in first.','warn')">Unlock</button>
         </div>
         </div>
       </div>
@@ -392,22 +440,22 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="customer-row">
         <div class="avatar">WL</div>
         <div class="cust-info"><div class="cust-name">Wei Lin</div><div class="cust-meta">+44 7700 900456 · 6 sessions</div></div>
-        <button class="mini-wa" onclick="alert('WhatsApp opened for Wei Lin')">W</button>
+        <button class="mini-wa" onclick="window.open('https://wa.me/447700900456','_blank')">W</button>
       </div>
       <div class="customer-row">
         <div class="avatar">AK</div>
         <div class="cust-info"><div class="cust-name">Alex K.</div><div class="cust-meta">+44 7700 900123 · 14 sessions</div></div>
-        <button class="mini-wa" onclick="alert('WhatsApp opened for Alex K.')">W</button>
+        <button class="mini-wa" onclick="window.open('https://wa.me/447700900123','_blank')">W</button>
       </div>
       <div class="customer-row">
         <div class="avatar">SM</div>
         <div class="cust-info"><div class="cust-name">Shu Ming</div><div class="cust-meta">+44 7700 900789 · 9 sessions</div></div>
-        <button class="mini-wa" onclick="alert('WhatsApp opened for Shu Ming')">W</button>
+        <button class="mini-wa" onclick="window.open('https://wa.me/447700900789','_blank')">W</button>
       </div>
       <div class="customer-row">
         <div class="avatar">JL</div>
         <div class="cust-info"><div class="cust-name">Jade L.</div><div class="cust-meta">+44 7700 900321 · 3 sessions</div></div>
-        <button class="mini-wa" onclick="alert('WhatsApp opened for Jade L.')">W</button>
+        <button class="mini-wa" onclick="window.open('https://wa.me/447700900321','_blank')">W</button>
       </div>
       <div class="customer-row">
         <div class="avatar" style="background:#F1EFE8;color:#888">+</div>
@@ -492,6 +540,58 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       </div>
       <button class="cta-btn" style="margin-top:14px" id="saveSettingsBtn">Save settings</button>
     </div>
+
+    <!-- SERVICES PANEL -->
+    <div class="admin-panel" id="ap-services">
+      <div class="section-title" id="servicesTitle">Service items</div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
+        <div class="section-title">Add new item</div>
+        <div style="margin-bottom:8px">
+          <div class="login-label">Name</div>
+          <input class="login-input" id="svcName" placeholder="e.g. Snack pack">
+        </div>
+        <div style="margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div class="login-label">Category</div>
+            <input class="login-input" id="svcCategory" placeholder="food / drink">
+          </div>
+          <div>
+            <div class="login-label">Cost (£)</div>
+            <input class="login-input" id="svcCost" type="number" min="0" step="0.01" placeholder="5.00">
+          </div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div class="login-label">Description</div>
+          <input class="login-input" id="svcDesc" placeholder="Short description (optional)">
+        </div>
+        <div style="margin-bottom:10px">
+          <div class="login-label">Image (optional)</div>
+          <input type="file" id="svcImageFile" accept="image/*" style="font-size:13px;width:100%;padding:6px 0">
+          <div id="svcImagePreview" style="margin-top:6px"></div>
+        </div>
+        <button class="cta-btn" id="addServiceBtn">Add service item</button>
+      </div>
+      <div id="servicesList"><div class="audit-sub">No service items yet.</div></div>
+    </div>
+
+    <!-- ORDERS PANEL -->
+    <div class="admin-panel" id="ap-orders">
+      <div class="section-title" id="ordersTitle">Order history</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <input class="login-input" id="orderSearch" placeholder="Player name or phone" style="flex:1;min-width:110px">
+        <input class="login-input" id="orderFromDate" type="date" style="width:128px">
+        <input class="login-input" id="orderToDate" type="date" style="width:128px">
+        <button class="action-chip" id="orderFilterBtn" style="align-self:flex-end;height:42px">Filter</button>
+      </div>
+      <div id="orderHistoryList"><div class="audit-sub">Press Filter to load orders.</div></div>
+    </div>
+
+    <!-- ADMIN AUDIT PANEL -->
+    <div class="admin-panel" id="ap-adminaudit">
+      <div class="section-title" id="adminAuditTitle">Action audit log</div>
+      <div id="adminAuditList"><div class="audit-sub">Loading...</div></div>
+    </div>
+
   </div>
 
   <!-- AUDIT SCREEN -->
@@ -543,6 +643,19 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
 </div>
 
 <script>
+// ============ TOASTER ============
+function showToast(msg,type,duration){
+  type=type||'success';duration=duration||3200;
+  var c=document.getElementById('toastContainer');
+  if(!c)return;
+  var t=document.createElement('div');
+  var bg=type==='error'?'#A32D2D':type==='warn'?'#854F0B':'#1D9E75';
+  t.style.cssText='background:'+bg+';color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;line-height:1.45;box-shadow:0 4px 16px rgba(0,0,0,0.22);pointer-events:auto;opacity:1;transition:opacity 0.35s;max-width:340px;word-wrap:break-word';
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';setTimeout(function(){if(c.contains(t))c.removeChild(t);},380);},duration);
+}
+
 // ============ SESSION & STATE ============
 var session={
   user:null,
@@ -552,6 +665,8 @@ var session={
   players:[],
   messages:[],
   auditLog:[],
+  services:[],
+  addonSelections:{},
   currentVenueId:null,
   selectedTimeslotId:null,
   selectedBookingId:null,
@@ -576,7 +691,7 @@ async function apiCall(method,endpoint,body=null){
     return await r.json();
   }catch(e){
     console.error(e);
-    alert('Error: '+e.message);
+    showToast('Error: '+e.message,'error');
     return null;
   }
 }
@@ -597,7 +712,7 @@ function initials(name){
 async function handleSignIn(){
   var phone=document.getElementById('mobileInput').value.trim();
   var pwd=document.getElementById('passwordInput').value;
-  if(!phone||!pwd){alert('Please enter credentials');return}
+  if(!phone||!pwd){showToast('Please enter credentials','warn');return}
   
   var data=await apiCall('POST','/auth/login',{phone:phone,password:pwd});
   if(!data)return;
@@ -698,43 +813,38 @@ function renderPlayerScreen(){
   });
 }
 
-function showTimeslotDetail(slot){
+async function showTimeslotDetail(slot){
   session.selectedTimeslotId=slot.id;
-  var confirmTopbar=document.querySelector('#screen-confirm .topbar-title');
-  var confirmSub=document.querySelector('#screen-confirm .topbar-sub');
-  if(confirmTopbar)confirmTopbar.textContent=formatTime(slot.start_time)+' — '+formatTime(slot.end_time);
-  if(confirmSub)confirmSub.textContent=new Date().toLocaleDateString()+' · Table '+slot.table_number;
-
-  var selectedBooking=session.bookings.find(function(b){
-    return b.timeslot_id===slot.id && b.player_id===session.user.id && b.status!=='cancelled';
-  });
-  session.selectedBookingId=selectedBooking?selectedBooking.id:null;
-
-  showScreen('confirm');
+  // Load services so add-ons screen is populated
+  if(session.currentVenueId && !session.services.length){
+    var svcs=await apiCall('GET','/venues/'+session.currentVenueId+'/services?active_only=true');
+    if(svcs)session.services=svcs;
+  }
+  showAddOnsScreen(slot);
 }
 
 async function claimSeat(timeslotId){
   if(!timeslotId){
-    alert('Please select a timeslot first.');
+    showToast('Please select a timeslot first.','warn');
     return;
   }
-  var data=await apiCall('POST','/timeslots/'+timeslotId+'/book',{player_id:session.user.id});
+  var data=await apiCall('POST','/timeslots/'+timeslotId+'/book-with-order',{player_id:session.user.id,order_items:[]});
   if(!data)return;
-  session.selectedBookingId=data.id;
-  alert('Seat claimed!');
+  session.selectedBookingId=data.booking.id;
+  showToast('Seat claimed! See you at the table.');
   await loadPlayerTimeslots();
   showScreen('player');
 }
 
 async function undoBooking(bookingId){
   if(!bookingId){
-    alert('No active booking to undo.');
+    showToast('No active booking to undo.','warn');
     return;
   }
   var data=await apiCall('DELETE','/bookings/'+bookingId+'?actor_id='+encodeURIComponent(session.user.id),null);
   if(!data)return;
   session.selectedBookingId=null;
-  alert('Booking cancelled.');
+  showToast('Booking cancelled.');
   await loadPlayerTimeslots();
   showScreen('player');
 }
@@ -753,7 +863,7 @@ async function loadVenueAdmin(){
   }
   if(adminVenue)session.currentVenueId=adminVenue.id;
   if(!session.currentVenueId){
-    alert('No venue available for this admin user.');
+    showToast('No venue available for this admin user.','error');
     return;
   }
   
@@ -778,6 +888,9 @@ async function loadAdminData(){
   
   var audit=await apiCall('GET','/venues/'+session.currentVenueId+'/audit');
   if(audit)session.auditLog=audit;
+
+  var services=await apiCall('GET','/venues/'+session.currentVenueId+'/services');
+  if(services)session.services=services;
 
   var selectedVenue=(session.venues||[]).find(function(v){return v.id===session.currentVenueId;});
   if(selectedVenue){
@@ -804,7 +917,9 @@ function renderAdminScreen(){
   renderScheduleTab();
   renderCustomersTab();
   renderMessagesTab();
+  renderServicesTab();
   renderAuditScreen();
+  loadAndRenderAdminAudit();
 }
 
 function renderScheduleTab(){
@@ -907,10 +1022,7 @@ async function sendBroadcast(){
 }
 
 async function composeMessage(){
-  var text=window.prompt('Message to approved players:');
-  if(!text)return;
-  var count=session.players.filter(function(p){return p.status==='approved';}).length || 1;
-  await sendMessage('broadcast',text,count);
+  showComposeModal();
 }
 
 async function approvePlayer(playerId){
@@ -940,7 +1052,14 @@ async function saveSettings(){
   };
   var updated=await apiCall('PATCH','/venues/'+session.currentVenueId+'?admin_id='+encodeURIComponent(session.user.id),payload);
   if(!updated)return;
-  alert('Settings saved.');
+
+  // Keep local venue cache in sync; otherwise loadAdminData() repopulates stale values.
+  var venueIdx=(session.venues||[]).findIndex(function(v){return v.id===session.currentVenueId;});
+  if(venueIdx>=0){
+    session.venues[venueIdx]=Object.assign({},session.venues[venueIdx],updated);
+  }
+
+  showToast('Settings saved.');
   await loadAdminData();
 }
 
@@ -958,6 +1077,263 @@ function exportAuditCsv(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+// ============ SERVICES ============
+async function loadServices(){
+  if(!session.currentVenueId)return;
+  var items=await apiCall('GET','/venues/'+session.currentVenueId+'/services');
+  if(items)session.services=items;
+}
+
+function renderServicesTab(){
+  var wrap=document.getElementById('servicesList');
+  if(!wrap)return;
+  var items=session.services||[];
+  if(!items.length){wrap.innerHTML='<div class="audit-sub">No service items yet.</div>';return;}
+  var html='';
+  items.forEach(function(s){
+    var imgHtml=s.image_url
+      ?'<img class="service-card-img" src="'+s.image_url+'" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0" onerror="this.style.display=\'none\'">'
+      :'<div class="service-card-img-placeholder">&#x1F4E6;</div>';
+    html+='<div class="service-card">'+imgHtml+
+      '<div class="service-card-body">'+
+        '<div class="service-card-name">'+s.name+'</div>'+
+        '<div class="service-card-meta">'+s.category+'  ·  £'+(+s.cost).toFixed(2)+'</div>'+
+        (s.description?'<div class="service-card-meta" style="margin-top:2px">'+s.description+'</div>':'')+
+        '<div class="service-card-actions">'+
+          '<button class="action-chip '+(s.is_active?'':'')+'\" style="'+(s.is_active?'background:#EAF3DE;color:#3B6D11;border-color:#9FE1CB':'')+'\" onclick="toggleServiceActive(\''+s.id+'\','+(!s.is_active)+')">'+
+            (s.is_active?'Active — tap to pause':'Inactive — tap to activate')+
+          '</button>'+
+          '<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="deleteService(\''+s.id+'\')">Delete</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
+var _uploadedServiceImageUrl=null;
+
+async function handleServiceImageChange(){
+  var fileInput=document.getElementById('svcImageFile');
+  var preview=document.getElementById('svcImagePreview');
+  if(!fileInput||!fileInput.files||!fileInput.files[0])return;
+  var file=fileInput.files[0];
+  var formData=new FormData();
+  formData.append('file',file);
+  try{
+    var r=await fetch(API_BASE+'/venues/uploads/service-image',{method:'POST',body:formData,headers:session.token?{'Authorization':'Bearer '+session.token}:{}});
+    if(!r.ok)throw new Error('Upload failed');
+    var data=await r.json();
+    _uploadedServiceImageUrl=data.image_url;
+    if(preview)preview.innerHTML='<img src="'+data.image_url+'" style="max-width:80px;border-radius:8px;margin-top:4px">';
+    showToast('Image uploaded');
+  }catch(e){showToast('Image upload failed: '+e.message,'error');}
+}
+
+async function addService(){
+  if(!session.currentVenueId||!session.user)return;
+  var name=(document.getElementById('svcName').value||'').trim();
+  var cat=(document.getElementById('svcCategory').value||'').trim()||'general';
+  var cost=parseFloat(document.getElementById('svcCost').value)||0;
+  var desc=(document.getElementById('svcDesc').value||'').trim();
+  if(!name){showToast('Please enter a service name','warn');return;}
+  var payload={name:name,category:cat,cost:cost,description:desc,is_active:true,image_url:_uploadedServiceImageUrl||null};
+  var created=await apiCall('POST','/venues/'+session.currentVenueId+'/services?admin_id='+encodeURIComponent(session.user.id),payload);
+  if(!created)return;
+  _uploadedServiceImageUrl=null;
+  document.getElementById('svcName').value='';
+  document.getElementById('svcCategory').value='';
+  document.getElementById('svcCost').value='';
+  document.getElementById('svcDesc').value='';
+  document.getElementById('svcImageFile').value='';
+  document.getElementById('svcImagePreview').innerHTML='';
+  showToast('Service item added');
+  await loadServices();
+  renderServicesTab();
+}
+
+async function toggleServiceActive(serviceId,newActive){
+  if(!session.currentVenueId||!session.user)return;
+  var updated=await apiCall('PATCH','/venues/'+session.currentVenueId+'/services/'+serviceId+'?admin_id='+encodeURIComponent(session.user.id),{is_active:newActive});
+  if(!updated)return;
+  showToast(newActive?'Service activated':'Service paused');
+  await loadServices();
+  renderServicesTab();
+}
+
+async function deleteService(serviceId){
+  if(!session.currentVenueId||!session.user)return;
+  var r=await apiCall('DELETE','/venues/'+session.currentVenueId+'/services/'+serviceId+'?admin_id='+encodeURIComponent(session.user.id));
+  if(!r)return;
+  showToast('Service item deleted');
+  await loadServices();
+  renderServicesTab();
+}
+
+// ============ ORDER HISTORY ============
+async function loadOrderHistory(){
+  if(!session.currentVenueId||!session.user)return;
+  var search=(document.getElementById('orderSearch').value||'').trim();
+  var from=document.getElementById('orderFromDate').value||'';
+  var to=document.getElementById('orderToDate').value||'';
+  var qs='?business_owner_id='+encodeURIComponent(session.user.id);
+  if(search)qs+='&search='+encodeURIComponent(search);
+  if(from)qs+='&from_date='+encodeURIComponent(from);
+  if(to)qs+='&to_date='+encodeURIComponent(to);
+  var rows=await apiCall('GET','/venues/'+session.currentVenueId+'/order-history'+qs);
+  renderOrdersTab(rows||[]);
+}
+
+function renderOrdersTab(rows){
+  var wrap=document.getElementById('orderHistoryList');
+  if(!wrap)return;
+  if(!rows.length){wrap.innerHTML='<div class="audit-sub">No orders found.</div>';return;}
+  var html='';
+  rows.forEach(function(r){
+    var dt=r.booking_date?new Date(r.booking_date).toLocaleDateString():(r.created_at?new Date(r.created_at).toLocaleDateString():'—');
+    html+='<div class="order-row">'+
+      '<div class="order-row-head">'+
+        '<span class="order-row-name">'+r.player_name+'</span>'+
+        '<span class="order-row-date">'+dt+'</span>'+
+      '</div>'+
+      (r.player_phone?'<div class="order-row-items">'+r.player_phone+'</div>':'')+
+      (r.items_summary?'<div class="order-row-items">'+r.items_summary+'</div>':'')+
+      '<div class="order-row-total">£'+(+r.total_cost).toFixed(2)+'  <span style="font-weight:400;font-size:11px;color:var(--color-text-secondary)">'+r.order_status+'</span></div>'+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
+// ============ ADMIN AUDIT TAB ============
+async function loadAndRenderAdminAudit(){
+  if(!session.currentVenueId)return;
+  var data=await apiCall('GET','/venues/'+session.currentVenueId+'/audit');
+  if(!data)return;
+  var wrap=document.getElementById('adminAuditList');
+  if(!wrap)return;
+  if(!data.length){wrap.innerHTML='<div class="audit-sub">No audit events found.</div>';return;}
+  var html='';
+  data.forEach(function(a){
+    html+='<div class="audit-log-row">'+
+      '<div class="audit-log-type">'+a.action_type+'</div>'+
+      '<div class="audit-log-meta">'+
+        (a.performed_by?a.performed_by+' · ':'')+
+        (a.target_type?a.target_type+' · ':'')+
+        new Date(a.created_at).toLocaleString()+
+      '</div>'+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
+// ============ COMPOSE MODAL ============
+function showComposeModal(){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:8000;display:flex;align-items:flex-end;';
+  var modal=document.createElement('div');
+  modal.style.cssText='background:#fff;border-radius:18px 18px 0 0;padding:20px;width:100%;max-width:420px;margin:0 auto';
+  modal.innerHTML='<div style="font-size:16px;font-weight:600;margin-bottom:12px">Compose broadcast</div>'+
+    '<textarea id="composeText" style="width:100%;border:0.5px solid #D9D8D3;border-radius:10px;padding:10px;font-size:14px;min-height:100px;resize:vertical" placeholder="Message to all approved players..."></textarea>'+
+    '<div style="display:flex;gap:8px;margin-top:12px">'+
+      '<button id="composeSendBtn" style="flex:2;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">Send</button>'+
+      '<button id="composeCancelBtn" style="flex:1;padding:12px;background:#F1EFE8;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer">Cancel</button>'+
+    '</div>';
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  overlay.querySelector('#composeCancelBtn').onclick=function(){document.body.removeChild(overlay);};
+  overlay.querySelector('#composeSendBtn').onclick=async function(){
+    var text=(document.getElementById('composeText').value||'').trim();
+    if(!text){showToast('Please enter a message','warn');return;}
+    var count=session.players.filter(function(p){return p.status==='approved';}).length||1;
+    document.body.removeChild(overlay);
+    await sendMessage('broadcast',text,count);
+    showToast('Broadcast sent to '+count+' player(s)');
+  };
+}
+
+// ============ ADD-ONS / PLAYER BOOKING FLOW ============
+function showAddOnsScreen(slot){
+  session.selectedTimeslotId=slot.id;
+  session.addonSelections={};
+  var title=document.getElementById('addonsTitle');
+  var sub=document.getElementById('addonsSub');
+  if(title)title.textContent=formatTime(slot.start_time)+' — Add-ons';
+  if(sub)sub.textContent='Optional extras for your session';
+  renderAddOnsList();
+  updateAddonTotal();
+  showScreen('addons');
+}
+
+function renderAddOnsList(){
+  var wrap=document.getElementById('addonsList');
+  if(!wrap)return;
+  var services=(session.services||[]).filter(function(s){return s.is_active;});
+  if(!services.length){
+    wrap.innerHTML='<div class="notif-bar"><span style="font-size:16px">&#x2139;</span><div class="notif-text">No extras available — tap Continue to book your seat.</div></div>';
+    return;
+  }
+  var html='<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0 14px">';
+  services.forEach(function(s){
+    var qty=session.addonSelections[s.id]||0;
+    var imgHtml=s.image_url
+      ?'<img class="addon-img" src="'+s.image_url+'" onerror="this.style.display=\'none\'">'
+      :'<div class="addon-img-ph">&#x1F4E6;</div>';
+    html+='<div class="addon-item">'+imgHtml+
+      '<div class="addon-body"><div class="addon-name">'+s.name+'</div><div class="addon-price">£'+(+s.cost).toFixed(2)+(s.description?' · '+s.description:'')+'</div></div>'+
+      '<div class="qty-ctrl">'+
+        '<button class="qty-btn" onclick="changeAddonQty(\''+s.id+'\',-1)">&#x2212;</button>'+
+        '<span class="qty-val" id="qty-'+s.id+'">'+qty+'</span>'+
+        '<button class="qty-btn" onclick="changeAddonQty(\''+s.id+'\',1)">&#x2B;</button>'+
+      '</div>'+
+    '</div>';
+  });
+  html+='</div>';
+  wrap.innerHTML=html;
+}
+
+function changeAddonQty(serviceId,delta){
+  var cur=session.addonSelections[serviceId]||0;
+  var next=Math.max(0,cur+delta);
+  session.addonSelections[serviceId]=next;
+  var el=document.getElementById('qty-'+serviceId);
+  if(el)el.textContent=next;
+  updateAddonTotal();
+}
+
+function updateAddonTotal(){
+  var totalEl=document.getElementById('addonsTotal');
+  if(!totalEl)return;
+  var services=session.services||[];
+  var total=0;var hasItems=false;
+  Object.keys(session.addonSelections).forEach(function(sid){
+    var qty=session.addonSelections[sid]||0;
+    if(!qty)return;
+    var svc=services.find(function(s){return s.id===sid;});
+    if(svc){total+=qty*(+svc.cost);hasItems=true;}
+  });
+  totalEl.textContent=hasItems?'Extras total: £'+total.toFixed(2):'No extras selected (seat booking only)';
+}
+
+async function confirmAddOnsAndClaim(){
+  var timeslotId=session.selectedTimeslotId;
+  if(!timeslotId){showToast('No timeslot selected','warn');return;}
+  var orderItems=[];
+  var services=session.services||[];
+  Object.keys(session.addonSelections).forEach(function(sid){
+    var qty=session.addonSelections[sid]||0;
+    if(!qty)return;
+    var svc=services.find(function(s){return s.id===sid;});
+    if(svc)orderItems.push({service_item_id:sid,quantity:qty});
+  });
+  var payload={player_id:session.user.id,order_items:orderItems};
+  var data=await apiCall('POST','/timeslots/'+timeslotId+'/book-with-order',payload);
+  if(!data)return;
+  session.selectedBookingId=data.booking.id;
+  showToast('Seat claimed! See you at the table.');
+  await loadPlayerTimeslots();
+  showScreen('player');
 }
 
 // ============ SCREEN NAVIGATION ============
@@ -982,12 +1358,25 @@ function showScreen(id){
     if(navBooking)navBooking.style.display='';
     if(navAdmin)navAdmin.style.display='none';
     if(navAudit)navAudit.style.display='none';
+  }else if(session.user.role==='business_owner'){
+    if(navPlayer)navPlayer.style.display='none';
+    if(navBooking)navBooking.style.display='none';
+    if(navAdmin)navAdmin.style.display='';
+    if(navAudit)navAudit.style.display='none';
+    // Hide Audit tab in admin for business_owner
+    var tabAudit=document.getElementById('tabAdminAudit');
+    if(tabAudit)tabAudit.style.display='none';
   }else{
+    // platform_owner
     if(navPlayer)navPlayer.style.display='none';
     if(navBooking)navBooking.style.display='none';
     if(navAdmin)navAdmin.style.display='';
     if(navAudit)navAudit.style.display='';
+    var tabAudit2=document.getElementById('tabAdminAudit');
+    if(tabAudit2)tabAudit2.style.display='';
   }
+  // addons screen not shown in nav bar
+  if(id==='addons'){document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));}
 }
 
 function setDevice(device,el){
@@ -1012,6 +1401,8 @@ function showAdminTab(tab,el){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
   document.getElementById('ap-'+tab).classList.add('active');
   el.classList.add('active');
+  if(tab==='adminaudit')loadAndRenderAdminAudit();
+  if(tab==='orders'){var wrap=document.getElementById('orderHistoryList');if(wrap&&wrap.innerHTML.indexOf('Press Filter')>=0)loadOrderHistory();}
 }
 
 // ============ AUDIT SCREEN ============
@@ -1256,8 +1647,29 @@ document.addEventListener('DOMContentLoaded',function(){
       exportAuditCsv();
     };
   }
+
+  // Add-ons screen bindings
+  var addonsBackBtn=document.getElementById('addonsBackBtn');
+  var addonsConfirmBtn=document.getElementById('addonsConfirmBtn');
+  if(addonsBackBtn){addonsBackBtn.onclick=function(){showScreen('player');};}
+  if(addonsConfirmBtn){addonsConfirmBtn.onclick=function(){confirmAddOnsAndClaim();};}
+
+  // Image upload
+  var svcImageFile=document.getElementById('svcImageFile');
+  if(svcImageFile){svcImageFile.addEventListener('change',handleServiceImageChange);}
+
+  // Add service button
+  var addServiceBtn=document.getElementById('addServiceBtn');
+  if(addServiceBtn){addServiceBtn.onclick=function(){addService();};}
+
+  // Order filter button
+  var orderFilterBtn=document.getElementById('orderFilterBtn');
+  if(orderFilterBtn){orderFilterBtn.onclick=function(){loadOrderHistory();};}
+
   showScreen('login');
 });
 </script>
+<!-- TOASTER CONTAINER (outside .app so it overlays everything) -->
+<div id="toastContainer" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column-reverse;gap:8px;pointer-events:none;width:min(90%,380px);align-items:center"></div>
 </body>
 </html>
