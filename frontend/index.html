@@ -853,11 +853,16 @@ function renderCustomersTab(){
   if(!wrap)return;
   var rows='';
   session.players.forEach(function(p){
+    var phoneDigits=(p.player_phone||'').replace(/[^0-9]/g,'');
+    var actionHtml='';
+    if(p.status==='pending'){
+      actionHtml='<button class="action-chip" onclick="approvePlayer(\''+p.player_id+'\')">Approve</button>';
+    }else{
+      actionHtml='<button class="mini-wa" onclick="window.open(\'https://wa.me/'+phoneDigits+'\',\'_blank\')">W</button>';
+    }
     rows+='<div class="customer-row"><div class="avatar">'+initials(p.player_name)+'</div>'+
-      '<div class="cust-info"><div class="cust-name">'+p.player_name+'</div><div class="cust-meta">'+p.player_phone+' · '+p.status+'</div></div>'+
-      (p.status==='pending'
-        ?'<button class="action-chip" onclick="approvePlayer(\''+p.player_id+'\')">Approve</button>'
-        :'<button class="mini-wa" onclick="window.open(\'https://wa.me/'+p.player_phone.replace(/[^0-9]/g,\'\')+'\',\'_blank\')">W</button>')+
+      '<div class="cust-info"><div class="cust-name">'+p.player_name+'</div><div class="cust-meta">'+p.player_phone+' - '+p.status+'</div></div>'+
+      actionHtml+
       '</div>';
   });
   wrap.innerHTML=rows||'<div class="audit-sub">No players found.</div>';
@@ -1140,12 +1145,87 @@ function startTimer(seconds){
 // Demo timer on page load
 document.addEventListener('DOMContentLoaded',function(){
   startTimer(28*60+45);
+  var signInBtn=document.getElementById('signInBtn');
+  var rolePlayer=document.getElementById('role-player');
+  var roleAdmin=document.getElementById('role-admin');
+  var navLogin=document.getElementById('navLogin');
+  var navPlayer=document.getElementById('navPlayer');
+  var navBooking=document.getElementById('navBooking');
+  var navAdmin=document.getElementById('navAdmin');
+  var navAudit=document.getElementById('navAudit');
+  var backBtn=document.getElementById('backBtn');
+  var signOutBtn=document.getElementById('signOutBtn');
+  var auditBackAdminBtn=document.getElementById('auditBackAdminBtn');
+  var passwordInput=document.getElementById('passwordInput');
   var claimBtn=document.getElementById('claimSeatBtn');
   var undoBtn=document.getElementById('undoBookingBtn');
   var broadcastBtn=document.getElementById('broadcastBtn');
   var composeBtn=document.getElementById('composeBtn');
   var saveSettingsBtn=document.getElementById('saveSettingsBtn');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
+  if(signInBtn){
+    signInBtn.onclick=function(){
+      handleSignIn();
+    };
+  }
+  if(rolePlayer){
+    rolePlayer.onclick=function(){
+      selectRole('player');
+    };
+  }
+  if(roleAdmin){
+    roleAdmin.onclick=function(){
+      selectRole('admin');
+    };
+  }
+  if(navLogin){
+    navLogin.onclick=function(){
+      showScreen('login');
+    };
+  }
+  if(navPlayer){
+    navPlayer.onclick=function(){
+      showScreen('player');
+    };
+  }
+  if(navBooking){
+    navBooking.onclick=function(){
+      showScreen('confirm');
+    };
+  }
+  if(navAdmin){
+    navAdmin.onclick=function(){
+      showScreen('admin');
+    };
+  }
+  if(navAudit){
+    navAudit.onclick=function(){
+      showScreen('audit');
+    };
+  }
+  if(backBtn){
+    backBtn.onclick=function(){
+      showScreen('player');
+    };
+  }
+  if(signOutBtn){
+    signOutBtn.onclick=function(){
+      handleSignOut();
+    };
+  }
+  if(auditBackAdminBtn){
+    auditBackAdminBtn.onclick=function(){
+      showScreen('admin');
+    };
+  }
+  if(passwordInput){
+    passwordInput.addEventListener('keydown',function(event){
+      if(event.key==='Enter'){
+        event.preventDefault();
+        handleSignIn();
+      }
+    });
+  }
   if(claimBtn){
     claimBtn.onclick=function(){
       claimSeat(session.selectedTimeslotId);
