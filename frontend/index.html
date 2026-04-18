@@ -842,13 +842,16 @@ async function handleSignIn(){
   if(session.user.role==='platform_owner'){
     await loadVenueAdmin();
     showScreen('admin');
-  }
-  else if(session.user.role==='business_owner'){
+  } else if(session.user.role==='business_owner'){
     await loadVenueAdmin();
     showScreen('admin');
-  }else{
+  } else {
     await loadPlayerData();
     showScreen('player');
+    // First-login: prompt player to set a real password
+    if(session.user.must_change_password){
+      openSetPasswordSheet(pwd);
+    }
   }
 }
 
@@ -1489,6 +1492,34 @@ async function loadServices(){
   if(!session.currentVenueId)return;
   var items=await apiCall('GET','/venues/'+session.currentVenueId+'/services');
   if(items)session.services=items;
+}
+
+function openSetPasswordSheet(currentPin){
+  var sheet=showBottomSheet('Welcome! Set your password',
+    '<p style="margin:0 0 14px;font-size:14px;color:var(--color-text-secondary)">Your account was created by a venue admin. Please set a personal password before you continue.</p>'+
+    '<div class="login-label">Current PIN (auto-generated)</div>'+
+    '<input id="spCurrentPin" class="login-input" type="password" placeholder="Enter the PIN you just logged in with" value="'+escapeHtml(currentPin||'')+'" style="margin-bottom:10px">'+
+    '<div class="login-label">New password (min 4 characters)</div>'+
+    '<input id="spNewPwd" class="login-input" type="password" placeholder="Choose a new password" style="margin-bottom:10px">'+
+    '<div class="login-label">Confirm new password</div>'+
+    '<input id="spConfirmPwd" class="login-input" type="password" placeholder="Re-enter new password" style="margin-bottom:16px">'+
+    '<div id="spError" style="color:#c0392b;font-size:13px;margin-bottom:10px;display:none"></div>'+
+    '<button class="btn-primary" id="spSaveBtn" style="width:100%">Set password</button>'
+  );
+  sheet.querySelector('#spSaveBtn').addEventListener('click', async function(){
+    var cur=sheet.querySelector('#spCurrentPin').value;
+    var np=sheet.querySelector('#spNewPwd').value;
+    var nc=sheet.querySelector('#spConfirmPwd').value;
+    var errEl=sheet.querySelector('#spError');
+    errEl.style.display='none';
+    if(np.length<4){errEl.textContent='New password must be at least 4 characters.';errEl.style.display='block';return;}
+    if(np!==nc){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
+    var res=await apiCall('POST','/auth/change-password',{user_id:session.user.id,current_password:cur,new_password:np});
+    if(!res){return;}
+    session.user.must_change_password=false;
+    sheet.remove();
+    showToast('Password set! Welcome, '+session.user.name+'.');
+  });
 }
 
 function renderServicesTab(){

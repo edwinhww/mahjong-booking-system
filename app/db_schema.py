@@ -9,6 +9,19 @@ def ensure_schema() -> None:
 
     inspector = inspect(engine)
     tables = inspector.get_table_names()
+
+    # --- mahjoh_t_users ---
+    if "mahjoh_t_users" in tables:
+        user_cols = {c["name"] for c in inspector.get_columns("mahjoh_t_users")}
+        user_stmts = []
+        if "must_change_password" not in user_cols:
+            user_stmts.append("ALTER TABLE mahjoh_t_users ADD COLUMN must_change_password BOOLEAN NOT NULL DEFAULT FALSE")
+        if user_stmts:
+            with engine.begin() as conn:
+                for s in user_stmts:
+                    conn.execute(text(s))
+
+    # --- mahjoh_t_venue_profiles ---
     if "mahjoh_t_venue_profiles" not in tables:
         return
 

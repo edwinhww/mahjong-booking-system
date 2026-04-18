@@ -27,6 +27,7 @@ class UserRead(BaseModel):
     phone: str
     role: UserRole
     status: UserStatus
+    must_change_password: bool = False
 
 
 class AuthResponse(BaseModel):

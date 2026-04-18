@@ -54,6 +54,7 @@ def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_i
         password_hash=hash_password(payload.password),
         role=UserRole.player,
         status=UserStatus.active,
+        must_change_password=True,
     )
     db.add(user)
     db.flush()
@@ -79,7 +80,7 @@ def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_i
     db.commit()
     db.refresh(user)
 
-    return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status)
+    return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status, must_change_password=user.must_change_password)
 
 
 @router.get("/venues/{venue_id}/players/{user_id}/stats", response_model=PlayerVenueStatsRead)
@@ -169,7 +170,7 @@ def update_user(user_id: str, payload: UserAdminUpdate, business_owner_id: str, 
     db.commit()
     db.refresh(user)
 
-    return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status)
+    return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status, must_change_password=user.must_change_password)
 
 
 @router.delete("/users/{user_id}")
