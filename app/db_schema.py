@@ -27,6 +27,7 @@ def ensure_schema() -> None:
 
     # --- mahjoh_t_venue_profiles ---
     if "mahjoh_t_venue_profiles" not in tables:
+        _bootstrap_demo_users()
         return
 
     existing = {column["name"] for column in inspector.get_columns("mahjoh_t_venue_profiles")}
@@ -45,6 +46,7 @@ def ensure_schema() -> None:
         )
 
     if not statements:
+        _bootstrap_demo_users()
         return
 
     with engine.begin() as conn:
