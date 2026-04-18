@@ -430,47 +430,10 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
 
     <div class="admin-panel active" id="ap-schedule">
       <div class="section-title" id="todayTablesTitle">Today's tables</div>
-      <div id="scheduleRows">
-      <div class="table-row">
-        <div class="table-time">10:00 AM</div>
-        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
-        <span class="badge badge-amber">2/4</span>
-        <span class="action-chip" onclick="sendTableNudge(null)">Nudge</span>
-      </div>
-      <div class="table-row">
-        <div class="table-time">12:00 PM</div>
-        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk"></div></div>
-        <span class="badge badge-red">3/4</span>
-        <span class="action-chip" onclick="sendBroadcast()">Blast</span>
-      </div>
-      <div class="table-row">
-        <div class="table-time">2:00 PM</div>
-        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
-        <span class="badge badge-green">Full</span>
-        <span class="action-chip" onclick="sendBroadcast()">Notify</span>
-      </div>
-      <div class="table-row">
-        <div class="table-time">4:00 PM</div>
-        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div><div class="seat-blk taken"></div></div>
-        <span class="badge badge-green">Full</span>
-        <span class="action-chip">Locked</span>
-      </div>
-      <div class="table-row">
-        <div class="table-time">6:00 PM</div>
-        <div class="seat-bar"><div class="seat-blk taken"></div><div class="seat-blk"></div><div class="seat-blk"></div><div class="seat-blk"></div></div>
-        <span class="badge badge-gray">1/4</span>
-        <span class="action-chip" onclick="sendTableNudge(null)">Nudge</span>
-      </div>
-      </div>
+      <div id="scheduleRows"><div class="audit-sub">Loading...</div></div>
       <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--color-border-tertiary)">
         <div class="section-title" id="lockedPlayersTitle">Locked-in players needing admin unlock</div>
-        <div id="lockedBookingsRows">
-        <div class="customer-row">
-          <div class="avatar">TW</div>
-          <div class="cust-info"><div class="cust-name">Tony W.</div><div class="cust-meta">4:00 PM slot · locked 2h ago</div></div>
-          <button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="showToast('Admin unlock requires live data. Log in first.','warn')">Unlock</button>
-        </div>
-        </div>
+        <div id="lockedBookingsRows"></div>
       </div>
     </div>
 

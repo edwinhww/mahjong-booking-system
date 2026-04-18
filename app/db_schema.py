@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from app.database import engine
 from app.models import Base, User, UserRole, UserStatus
 from passlib.context import CryptContext
+from datetime import date, time, timedelta
+from app.models import Venue, VenuePlayer, VenuePlayerStatus, Timeslot, TimeslotStatus, VenueProfile
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -106,6 +108,58 @@ def _bootstrap_demo_users() -> None:
             db.add(admin)
 
         db.commit()
+
+        # Re-query to get IDs after commit
+        owner = db.query(User).filter(User.phone == "+85298765432").first()
+        player = db.query(User).filter(User.phone == "+85291234567").first()
+
+        # Demo venue owned by business owner
+        if owner:
+            existing_venue = db.query(Venue).filter(Venue.owner_id == owner.id).first()
+            if not existing_venue:
+                venue = Venue(
+                    owner_id=owner.id,
+                    name="Dragon Palace MJ",
+                    opening_time=time(10, 0),
+                    closing_time=time(22, 0),
+                    table_count=4,
+                    session_duration_hrs=2,
+                    cooldown_minutes=30,
+                    session_fee=80,
+                    platform_fee_pct=5,
+                    status="active",
+                )
+                db.add(venue)
+                db.flush()
+
+                # Venue profile
+                db.add(VenueProfile(venue_id=venue.id))
+
+                # Link player to venue as approved
+                if player:
+                    db.add(VenuePlayer(
+                        venue_id=venue.id,
+                        player_id=player.id,
+                        status=VenuePlayerStatus.approved,
+                    ))
+
+                # Generate timeslots for today and tomorrow (4 tables, slots at 10,12,14,16,18,20)
+                for day_offset in range(2):
+                    slot_date = date.today() + timedelta(days=day_offset)
+                    for hour in [10, 12, 14, 16, 18, 20]:
+                        start = time(hour, 0)
+                        end = time(hour + 2, 0)
+                        for table_num in range(1, 5):
+                            db.add(Timeslot(
+                                venue_id=venue.id,
+                                date=slot_date,
+                                start_time=start,
+                                end_time=end,
+                                table_number=table_num,
+                                status=TimeslotStatus.open,
+                            ))
+
+                db.commit()
     except Exception:
         db.rollback()
     finally:
