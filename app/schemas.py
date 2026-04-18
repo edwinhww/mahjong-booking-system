@@ -63,6 +63,22 @@ class VenueUpdate(BaseModel):
     platform_fee_pct: float | None = Field(default=None, ge=0, le=100)
 
 
+class VenueUpdateResponse(BaseModel):
+    id: str
+    owner_id: str
+    name: str
+    opening_time: time
+    closing_time: time
+    table_count: int
+    session_duration_hrs: int
+    cooldown_minutes: int
+    session_fee: float
+    platform_fee_pct: float
+    status: str
+    reallocated_count: int = 0
+    draft_count: int = 0
+
+
 class VenueBookingRead(BaseModel):
     id: str
     timeslot_id: str

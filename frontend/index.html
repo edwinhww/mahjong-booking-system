@@ -1441,6 +1441,13 @@ async function saveSettings(){
   var updated=await apiCall('PATCH','/venues/'+session.currentVenueId+'?admin_id='+encodeURIComponent(session.user.id),payload);
   if(!updated)return;
 
+  // Show reallocation status if players were moved
+  var toastMsg='Settings saved.';
+  if(updated.reallocated_count && updated.reallocated_count > 0){
+    toastMsg+=' '+updated.reallocated_count+' player(s) reallocated, '+updated.draft_count+' draft message(s) created for you to review.';
+  }
+  showToast(toastMsg);
+
   var profilePayload={
     currency_code:(session.profile&&session.profile.currency_code)||'GBP',
     business_whatsapp:document.getElementById('settingBusinessWhatsapp').value,
@@ -1458,7 +1465,6 @@ async function saveSettings(){
     session.venues[venueIdx]=Object.assign({},session.venues[venueIdx],updated);
   }
 
-  showToast('Settings saved.');
   await loadAdminData();
 }
 

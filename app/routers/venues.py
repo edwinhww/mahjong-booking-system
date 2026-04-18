@@ -20,7 +20,7 @@ from app.models import (
     VenuePlayer,
     VenuePlayerStatus,
 )
-from app.schemas import VenueCreate, VenueJoinRequest, VenuePlayerDetailRead, VenuePlayerRead, VenueRead, VenueUpdate
+from app.schemas import VenueCreate, VenueJoinRequest, VenuePlayerDetailRead, VenuePlayerRead, VenueRead, VenueUpdate, VenueUpdateResponse
 from app.services.action_audit import log_action
 
 router = APIRouter(prefix="/venues", tags=["venues"])
@@ -295,7 +295,7 @@ def list_venue_players(venue_id: str, status: VenuePlayerStatus | None = None, d
 
 
 @router.patch("/{venue_id}", response_model=VenueRead)
-def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db: Session = Depends(get_db)) -> VenueRead:
+def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db: Session = Depends(get_db)) -> VenueUpdateResponse:
     venue = db.get(Venue, venue_id)
     if not venue:
         raise HTTPException(status_code=404, detail="Venue not found")
@@ -304,7 +304,7 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
 
     update_data = payload.model_dump(exclude_none=True)
     if not update_data:
-        return VenueRead(
+        return VenueUpdateResponse(
             id=venue.id,
             owner_id=venue.owner_id,
             name=venue.name,
@@ -316,6 +316,8 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
             session_fee=float(venue.session_fee),
             platform_fee_pct=float(venue.platform_fee_pct),
             status=venue.status,
+            reallocated_count=0,
+            draft_count=0,
         )
 
     old_table_count = venue.table_count
@@ -347,7 +349,7 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
     db.commit()
     db.refresh(venue)
 
-    return VenueRead(
+    return VenueUpdateResponse(
         id=venue.id,
         owner_id=venue.owner_id,
         name=venue.name,
@@ -359,4 +361,6 @@ def update_venue_settings(venue_id: str, payload: VenueUpdate, admin_id: str, db
         session_fee=float(venue.session_fee),
         platform_fee_pct=float(venue.platform_fee_pct),
         status=venue.status,
+        reallocated_count=moved_count,
+        draft_count=moved_count,
     )
