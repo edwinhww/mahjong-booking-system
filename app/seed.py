@@ -16,7 +16,7 @@ def run_seed() -> None:
             owner = User(
                 name="Platform Owner",
                 phone="+44 7700 900001",
-                password_hash=hash_password("owner1234"),
+                password_hash=hash_password("1234"),
                 role=UserRole.platform_owner,
             )
             db.add(owner)
@@ -26,7 +26,7 @@ def run_seed() -> None:
             business = User(
                 name="Dragon Palace Admin",
                 phone="+44 7700 900002",
-                password_hash=hash_password("admin1234"),
+                password_hash=hash_password("1234"),
                 role=UserRole.business_owner,
             )
             db.add(business)
@@ -36,7 +36,7 @@ def run_seed() -> None:
             player = User(
                 name="Wei Lin",
                 phone="+44 7700 900456",
-                password_hash=hash_password("player1234"),
+                password_hash=hash_password("1234"),
                 role=UserRole.player,
             )
             db.add(player)
