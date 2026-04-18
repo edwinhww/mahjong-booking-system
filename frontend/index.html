@@ -952,6 +952,15 @@ async function loadPlayerData(){
 
 async function loadPlayerTimeslots(){
   if(!session.currentVenueId)return;
+  
+  // Update subtitle with venue name
+  var currentVenue=session.venues.find(function(v){return v.id===session.currentVenueId;});
+  if(currentVenue){
+    var today=new Date();
+    var dayStr=today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    document.getElementById('playerSubTitle').textContent=currentVenue.name+' · '+dayStr;
+  }
+  
   var today=new Date().toISOString().split('T')[0];
   var slots=await apiCall('GET','/venues/'+session.currentVenueId+'/timeslots?day='+today);
   if(!slots)return;
@@ -1729,8 +1738,13 @@ function openCustomerForm(player){
   var isEdit=!!player;
   var phoneParts=splitPhoneNumber(player?player.player_phone:'', '+852');
   var content='<div style="display:grid;gap:10px"><div><div class="login-label">Name</div><input id="customerNameInput" class="login-input" value="'+escapeHtml(player?player.player_name:'')+'"></div>'+
-    '<div><div class="login-label">WhatsApp phone</div><div style="display:flex;gap:6px"><input id="customerCountryCodeInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.countryCode||'+852')+'" style="width:92px;text-align:center"><input id="customerPhoneInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.localNumber||'')+'" placeholder="91234567"></div></div>'+
-    '<button class="cta-btn" id="customerSaveBtn" style="margin-top:8px">'+(isEdit?'Save changes':'Add player')+'</button></div>';
+    '<div><div class="login-label">WhatsApp phone</div><div style="display:flex;gap:6px"><input id="customerCountryCodeInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.countryCode||'+852')+'" style="width:92px;text-align:center"><input id="customerPhoneInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.localNumber||'')+'" placeholder="91234567"></div></div>';
+  
+  if(!isEdit){
+    content+='<div><div class="login-label">Initial password</div><input id="customerPasswordInput" class="login-input" type="password" placeholder="Set a password for the player" value=""></div>';
+  }
+  
+  content+='<button class="cta-btn" id="customerSaveBtn" style="margin-top:8px">'+(isEdit?'Save changes':'Add player')+'</button></div>';
   var overlay=showBottomSheet(isEdit?'Edit player':'Add player',content);
   overlay.querySelector('#customerSaveBtn').onclick=async function(){
     var name=(overlay.querySelector('#customerNameInput').value||'').trim();
@@ -1744,11 +1758,13 @@ function openCustomerForm(player){
       if(!updated)return;
       showToast('Player updated.');
     }else{
-      var digits=phoneDigits(localPhone);
-      var password=digits.slice(-4)||'1234';
+      var passwordInput=overlay.querySelector('#customerPasswordInput');
+      var password=(passwordInput?passwordInput.value||'':'').trim();
+      if(!password){showToast('Please set a password for the player.','warn');return;}
+      if(password.length<4){showToast('Password must be at least 4 characters.','warn');return;}
       var created=await apiCall('POST','/management/venues/'+session.currentVenueId+'/players?business_owner_id='+encodeURIComponent(session.user.id),{name:name,phone:phone,password:password,role:'player'});
       if(!created)return;
-      showToast('Player added to this venue. Default PIN set to the last 4 digits.');
+      showToast('Player added to this venue with password set.');
     }
     await loadAdminData();
     if(document.body.contains(overlay))document.body.removeChild(overlay);
@@ -1810,26 +1826,43 @@ function renderServicesTab(){
   var wrap=document.getElementById('servicesList');
   if(!wrap)return;
   var items=session.services||[];
-  if(!items.length){wrap.innerHTML='<div class="audit-sub">No service items yet.</div>';return;}
-  var html='';
-  items.forEach(function(s){
-    var imgHtml=s.image_url
-      ?'<img class="service-card-img" src="'+s.image_url+'" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0" onerror="this.style.display=\'none\'">'
-      :'<div class="service-card-img-placeholder">&#x1F4E6;</div>';
-    html+='<div class="service-card">'+imgHtml+
-      '<div class="service-card-body">'+
-        '<div class="service-card-name">'+s.name+'</div>'+
-        '<div class="service-card-meta">'+s.category+'  ·  £'+(+s.cost).toFixed(2)+'</div>'+
-        (s.description?'<div class="service-card-meta" style="margin-top:2px">'+s.description+'</div>':'')+
-        '<div class="service-card-actions">'+
-          '<button class="action-chip '+(s.is_active?'':'')+'\" style="'+(s.is_active?'background:#EAF3DE;color:#3B6D11;border-color:#9FE1CB':'')+'\" onclick="toggleServiceActive(\''+s.id+'\','+(!s.is_active)+')">'+
-            (s.is_active?'Active — tap to pause':'Inactive — tap to activate')+
-          '</button>'+
-          '<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="deleteService(\''+s.id+'\')">Delete</button>'+
+  
+  // Always show the add-new-item form
+  var addFormHtml='<div style="margin-bottom:20px;padding:14px;background:#f5f5f5;border-radius:8px">'+
+    '<div class="login-label">Add new service</div>'+
+    '<div style="display:grid;gap:10px">'+
+      '<input id="svcNameInput" class="login-input" placeholder="Service name">'+
+      '<input id="svcCategoryInput" class="login-input" placeholder="Category">'+
+      '<input id="svcCostInput" class="login-input" type="number" step="0.01" placeholder="Cost (£)">'+
+      '<textarea id="svcDescInput" class="login-input" placeholder="Description (optional)" style="resize:vertical;min-height:60px"></textarea>'+
+      '<input id="svcImageInput" class="login-input" placeholder="Image URL (optional)">'+
+      '<button class="cta-btn" onclick="addNewService()">Create service</button>'+
+    '</div>'+
+  '</div>';
+  
+  var html=addFormHtml;
+  if(items.length){
+    items.forEach(function(s){
+      var imgHtml=s.image_url
+        ?'<img class="service-card-img" src="'+s.image_url+'" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0" onerror="this.style.display=\'none\'">'
+        :'<div class="service-card-img-placeholder">&#x1F4E6;</div>';
+      html+='<div class="service-card">'+imgHtml+
+        '<div class="service-card-body">'+
+          '<div class="service-card-name">'+s.name+'</div>'+
+          '<div class="service-card-meta">'+s.category+'  ·  £'+(+s.cost).toFixed(2)+'</div>'+
+          (s.description?'<div class="service-card-meta" style="margin-top:2px">'+s.description+'</div>':'')+
+          '<div class="service-card-actions">'+
+            '<button class="action-chip '+(s.is_active?'':'')+'\" style="'+(s.is_active?'background:#EAF3DE;color:#3B6D11;border-color:#9FE1CB':'')+'\" onclick="toggleServiceActive(\''+s.id+'\','+(!s.is_active)+')">'+
+              (s.is_active?'Active — tap to pause':'Inactive — tap to activate')+
+            '</button>'+
+            '<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="deleteService(\''+s.id+'\')">Delete</button>'+
+          '</div>'+
         '</div>'+
-      '</div>'+
-    '</div>';
-  });
+      '</div>';
+    });
+  }else{
+    html+='<div class="audit-sub">No service items yet. Create your first service above.</div>';
+  }
   wrap.innerHTML=html;
 }
 

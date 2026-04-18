@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import engine
 from app.models import Base, User, UserRole, UserStatus
 from passlib.context import CryptContext
-from datetime import date, time, timedelta
+from datetime import date, datetime, time, timedelta
 from app.models import Venue, VenuePlayer, VenuePlayerStatus, Timeslot, TimeslotStatus, VenueProfile
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -132,12 +132,13 @@ def _bootstrap_demo_users() -> None:
                 db.add(venue)
                 db.flush()
 
-            # Ensure profile exists and has required contact value.
+            # Ensure profile exists and has required contact value and currency.
             profile = db.scalar(select(VenueProfile).where(VenueProfile.venue_id == venue.id))
             if not profile:
                 db.add(
                     VenueProfile(
                         venue_id=venue.id,
+                        currency_code='GBP',
                         business_whatsapp=owner.phone,
                     )
                 )
@@ -159,13 +160,17 @@ def _bootstrap_demo_users() -> None:
                         )
                     )
 
-            # Generate missing timeslots for today and tomorrow (4 tables at 10/12/14/16/18/20).
+            # Generate missing timeslots for today and tomorrow using venue opening/closing times.
             for day_offset in range(2):
                 slot_date = date.today() + timedelta(days=day_offset)
-                for hour in [10, 12, 14, 16, 18, 20]:
-                    start = time(hour, 0)
-                    end = time(hour + 2, 0)
-                    for table_num in range(1, 5):
+                opening_dt = datetime.combine(slot_date, venue.opening_time)
+                closing_dt = datetime.combine(slot_date, venue.closing_time)
+                slot_duration = timedelta(hours=venue.session_duration_hrs)
+                current = opening_dt
+                while current + slot_duration <= closing_dt:
+                    start = current.time()
+                    end = (current + slot_duration).time()
+                    for table_num in range(1, venue.table_count + 1):
                         exists = db.scalar(
                             select(Timeslot).where(
                                 Timeslot.venue_id == venue.id,
@@ -185,6 +190,7 @@ def _bootstrap_demo_users() -> None:
                                     status=TimeslotStatus.open,
                                 )
                             )
+                    current += slot_duration
 
             db.commit()
     except Exception as exc:
