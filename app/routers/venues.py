@@ -149,8 +149,19 @@ def _reallocate_dropped_table_bookings(db: Session, venue: Venue, new_table_coun
 
 
 @router.get("", response_model=list[VenueRead])
-def list_venues(db: Session = Depends(get_db)) -> list[VenueRead]:
-    venues = db.execute(select(Venue)).scalars().all()
+def list_venues(include_inactive: bool = False, player_id: str | None = None, db: Session = Depends(get_db)) -> list[VenueRead]:
+    stmt = select(Venue)
+    if not include_inactive:
+        stmt = stmt.where(Venue.status == "active")
+    if player_id:
+        stmt = (
+            stmt.join(VenuePlayer, VenuePlayer.venue_id == Venue.id)
+            .where(
+                VenuePlayer.player_id == player_id,
+                VenuePlayer.status == VenuePlayerStatus.approved,
+            )
+        )
+    venues = db.execute(stmt).scalars().all()
     return [
         VenueRead(
             id=v.id,

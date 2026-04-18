@@ -190,6 +190,37 @@ def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_i
     return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status, must_change_password=user.must_change_password)
 
 
+@router.delete("/venues/{venue_id}/players/{user_id}")
+def remove_player_from_venue(venue_id: str, user_id: str, business_owner_id: str, db: Session = Depends(get_db)) -> dict[str, bool]:
+    _require_venue_owner(db, venue_id, business_owner_id)
+
+    user = db.get(User, user_id)
+    if not user or user.role != UserRole.player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    membership = db.scalar(
+        select(VenuePlayer).where(
+            VenuePlayer.venue_id == venue_id,
+            VenuePlayer.player_id == user_id,
+        )
+    )
+    if not membership:
+        raise HTTPException(status_code=404, detail="Player not registered for this venue")
+
+    db.delete(membership)
+    log_action(
+        db,
+        actor_id=business_owner_id,
+        action_type="venue.player_removed",
+        venue_id=venue_id,
+        target_type="venue_player",
+        target_id=membership.id,
+        metadata={"player_id": user_id},
+    )
+    db.commit()
+    return {"deleted": True}
+
+
 @router.get("/venues/{venue_id}/players/{user_id}/stats", response_model=PlayerVenueStatsRead)
 def get_player_stats_for_venue(venue_id: str, user_id: str, business_owner_id: str, db: Session = Depends(get_db)) -> PlayerVenueStatsRead:
     venue = _require_venue_owner(db, venue_id, business_owner_id)
@@ -347,6 +378,31 @@ def reset_player_password(user_id: str, new_password: str, business_owner_id: st
     return {"message": f"Password reset successfully for player {user.phone}"}
 
 
+@router.post("/admin/users/{user_id}/reset-password")
+def reset_business_owner_password(user_id: str, new_password: str, platform_owner_id: str, db: Session = Depends(get_db)) -> dict[str, str]:
+    _require_platform_owner(db, platform_owner_id)
+
+    user = db.get(User, user_id)
+    if not user or user.role != UserRole.business_owner:
+        raise HTTPException(status_code=404, detail="Business owner not found")
+
+    if len(new_password) < 4:
+        raise HTTPException(status_code=400, detail="Password must be at least 4 characters")
+
+    user.password_hash = hash_password(new_password)
+    user.must_change_password = True
+    log_action(
+        db,
+        actor_id=platform_owner_id,
+        action_type="user.password_reset",
+        target_type="user",
+        target_id=user.id,
+        metadata={"reset_by": "platform_owner"},
+    )
+    db.commit()
+    return {"message": f"Password reset successfully for business owner {user.phone}"}
+
+
 @router.post("/admin/venues", response_model=VenueRead)
 def admin_create_venue(payload: VenueCreate, platform_owner_id: str, db: Session = Depends(get_db)) -> VenueRead:
     _require_platform_owner(db, platform_owner_id)
@@ -443,3 +499,25 @@ def admin_delete_venue(venue_id: str, platform_owner_id: str, db: Session = Depe
     )
     db.commit()
     return {"deleted": True}
+
+
+@router.post("/admin/venues/{venue_id}/activate")
+def admin_activate_venue(venue_id: str, platform_owner_id: str, db: Session = Depends(get_db)) -> dict[str, bool]:
+    _require_platform_owner(db, platform_owner_id)
+
+    venue = db.get(Venue, venue_id)
+    if not venue:
+        raise HTTPException(status_code=404, detail="Venue not found")
+
+    venue.status = "active"
+    log_action(
+        db,
+        actor_id=platform_owner_id,
+        action_type="venue.updated",
+        venue_id=venue.id,
+        target_type="venue",
+        target_id=venue.id,
+        metadata={"status": "active"},
+    )
+    db.commit()
+    return {"activated": True}

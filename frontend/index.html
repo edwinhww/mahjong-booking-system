@@ -241,20 +241,13 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="login-brand-subtitle" id="loginBrandSubtitle">Punctual Game Network Platform</div>
     </div>
     <div class="content" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px">
-      <!-- Role selection cards (visible before login) -->
+      <!-- Landing entry -->
       <div id="loginRoleSelection" style="display:flex;flex-direction:column;width:100%;gap:12px;align-items:center">
-        <img src="/assets/login-design.png" style="width:100%;max-width:380px;height:auto;border-radius:8px;margin-bottom:12px" alt="Login roles">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%">
-          <button class="role-card selected" id="roleCardPlayer" onclick="selectRole('player')" style="border:none;background:none;padding:0;cursor:pointer;text-align:center">
-            <div style="font-size:12px;color:#666;margin-top:4px">玩家登入</div>
-          </button>
-          <button class="role-card" id="roleCardAdmin" onclick="selectRole('admin')" style="border:none;background:none;padding:0;cursor:pointer;text-align:center">
-            <div style="font-size:12px;color:#666;margin-top:4px">場主登入</div>
-          </button>
-        </div>
+        <img src="/assets/login-design.png" style="width:100%;max-width:520px;height:auto;border-radius:8px;margin-bottom:12px" alt="Punctual Game Platform">
+        <button class="cta-btn" id="startLoginBtn" style="width:min(100%,340px)">Login / 登入</button>
       </div>
 
-      <!-- Login form (shows after role selected) -->
+      <!-- Login form (shows after pressing login) -->
       <div id="loginForm" style="display:none;width:100%;max-width:100%">
         <div style="margin-bottom:12px;padding:10px;background:#EAF3DE;border-radius:8px;font-size:12px;color:#3B6D11">
           <strong>Demo logins:</strong><br>
@@ -275,7 +268,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         </div>
         <button class="cta-btn" onclick="handleSignIn()" id="signInBtn">登入 / SIGN IN</button>
         <p style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-top:12px" id="newPlayerHint">新玩家？請聯絡場主完成註冊。</p>
-        <button class="nav-btn" onclick="backToRoleSelection()" style="width:100%;margin-top:8px;color:#666">← Back to role selection</button>
+        <button class="nav-btn" onclick="backToRoleSelection()" style="width:100%;margin-top:8px;color:#666">← Back</button>
       </div>
     </div>
   </div>
@@ -658,17 +651,42 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
         <div class="section-title" style="margin-bottom:10px">Create venue</div>
         <div style="display:grid;gap:8px">
+          <div class="login-label">Venue name</div>
           <input class="login-input" id="platformVenueName" placeholder="Venue name">
-          <select class="login-input" id="platformVenueOwner"></select>
+
+          <div class="login-label">Business owner name</div>
+          <input class="login-input" id="platformVenueOwnerName" placeholder="Owner full name">
+
+          <div class="login-label">Business owner WhatsApp phone</div>
+          <input class="login-input" id="platformVenueOwnerPhone" placeholder="+85298765432">
+
+          <div class="login-label">Business owner login password</div>
+          <input class="login-input" id="platformVenueOwnerPassword" type="password" placeholder="Set initial password">
+
+          <div class="login-label">Business WhatsApp (shown to players)</div>
+          <input class="login-input" id="platformVenueBusinessWhatsapp" placeholder="+85298765432">
+
+          <div class="login-label">Currency</div>
+          <select class="login-input" id="platformVenueCurrency">
+            <option value="HKD">HKD</option>
+            <option value="GBP">GBP</option>
+            <option value="USD">USD</option>
+          </select>
+
+          <div class="login-label">Opening and closing times</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <input class="login-input" id="platformVenueOpen" type="time" value="10:00">
             <input class="login-input" id="platformVenueClose" type="time" value="22:00">
           </div>
+
+          <div class="login-label">Tables, session hours, cooldown minutes</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
             <input class="login-input" id="platformVenueTables" type="number" min="1" max="20" value="4" placeholder="Tables">
             <input class="login-input" id="platformVenueDuration" type="number" min="1" max="6" value="2" placeholder="Hours">
             <input class="login-input" id="platformVenueCooldown" type="number" min="5" max="120" value="30" placeholder="Cooldown">
           </div>
+
+          <div class="login-label">Session fee and platform fee %</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <input class="login-input" id="platformVenueFee" type="number" min="1" step="0.01" value="40" placeholder="Session fee">
             <input class="login-input" id="platformVenuePlatformFee" type="number" min="0" max="100" value="5" placeholder="Platform fee %">
@@ -676,6 +694,9 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
           <button class="cta-btn" id="createVenueBtn">Create venue</button>
         </div>
       </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--color-text-secondary);font-size:13px">
+        <input type="checkbox" id="platformShowInactive"> Show inactive venues
+      </label>
       <div id="platformVenuesRows"><div class="audit-sub">Loading venues...</div></div>
     </div>
 
@@ -747,6 +768,7 @@ function showToast(msg,type,duration){
 var session={
   user:null,
   venues:[],
+  playerVenueProfiles:{},
   platformOwners:[],
   selectedPlatformVenueId:null,
   timeslots:{},
@@ -883,6 +905,24 @@ function findSlot(slotId){
 }
 
 // ============ AUTH ============
+function updateAuthNavButton(){
+  var navLogin=document.getElementById('navLogin');
+  if(!navLogin)return;
+  if(session.user){
+    navLogin.textContent='Logout';
+    navLogin.onclick=function(){handleSignOut();};
+  }else{
+    navLogin.textContent='Login';
+    navLogin.onclick=function(){showScreen('login');};
+  }
+}
+
+function startLoginFlow(){
+  document.getElementById('loginRoleSelection').style.display='none';
+  document.getElementById('loginForm').style.display='block';
+  document.getElementById('mobileInput').focus();
+}
+
 async function handleSignIn(){
   var countryCode=document.getElementById('countryCodeInput').value.trim();
   var phoneNum=document.getElementById('mobileInput').value.trim();
@@ -899,6 +939,7 @@ async function handleSignIn(){
   session.user=data.user;
   session.token=data.token;
   session.currentVenueId=null;
+  updateAuthNavButton();
   
   // RBAC: Route by role
   if(session.user.role==='platform_owner'){
@@ -909,7 +950,9 @@ async function handleSignIn(){
     showScreen('admin');
   } else {
     await loadPlayerData();
-    showScreen('player');
+    if(session.currentVenueId){
+      showScreen('player');
+    }
     // First-login: prompt player to set a real password
     if(session.user.must_change_password){
       openSetPasswordSheet(pwd);
@@ -920,7 +963,7 @@ async function handleSignIn(){
 function handleSignOut(){
   session.user=null;
   session.token=null;
-  session.selectedRole=null;
+  session.playerVenueProfiles={};
   document.getElementById('passwordInput').value='';
   session.timeslots={};
   session.platformOwners=[];
@@ -932,22 +975,47 @@ function handleSignOut(){
   session.currentVenueId=null;
   session.selectedTimeslotId=null;
   session.selectedBookingId=null;
-  // Reset login UI to role selection
   backToRoleSelection();
+  updateAuthNavButton();
   showScreen('login');
 }
 
 // ============ PLAYER FLOWS ============
+function showPlayerVenuePicker(){
+  var options=(session.venues||[]).map(function(v){
+    return '<button class="soft-btn" style="width:100%;text-align:left;margin-bottom:8px" onclick="choosePlayerVenue(\''+v.id+'\')">'+escapeHtml(v.name)+'</button>';
+  }).join('');
+  var overlay=showBottomSheet('Choose a venue',options||'<div class="audit-sub">No available venues.</div>');
+  overlay.setAttribute('data-player-venue-picker','1');
+}
+
+async function choosePlayerVenue(venueId){
+  session.currentVenueId=venueId;
+  var picker=document.querySelector('[data-player-venue-picker="1"]');
+  if(picker&&picker.parentNode===document.body)document.body.removeChild(picker);
+  await loadPlayerTimeslots();
+  showScreen('player');
+}
+
 async function loadPlayerData(){
   if(!session.user||session.user.role!=='player')return;
-  var venues=await apiCall('GET','/venues');
+  var venues=await apiCall('GET','/venues?player_id='+encodeURIComponent(session.user.id));
   if(!venues)return;
   session.venues=venues;
 
-  if(venues.length>0){
+  if(venues.length===1){
     session.currentVenueId=venues[0].id;
     await loadPlayerTimeslots();
+    return;
   }
+
+  if(venues.length>1){
+    session.currentVenueId=null;
+    showPlayerVenuePicker();
+    return;
+  }
+
+  showToast('No approved venues found for this player. Please contact a business owner.','warn');
 }
 
 async function loadPlayerTimeslots(){
@@ -955,10 +1023,23 @@ async function loadPlayerTimeslots(){
   
   // Update subtitle with venue name
   var currentVenue=session.venues.find(function(v){return v.id===session.currentVenueId;});
+  var profile=await apiCall('GET','/venues/'+session.currentVenueId+'/profile');
+  if(profile)session.playerVenueProfiles[session.currentVenueId]=profile;
   if(currentVenue){
     var today=new Date();
     var dayStr=today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    document.getElementById('playerSubTitle').textContent=currentVenue.name+' · '+dayStr;
+    var whatsapp=(profile&&profile.business_whatsapp)?profile.business_whatsapp:'N/A';
+    var subtitle=document.getElementById('playerSubTitle');
+    subtitle.textContent=currentVenue.name+' · WhatsApp '+whatsapp+' · '+dayStr;
+    if((session.venues||[]).length>1){
+      subtitle.style.cursor='pointer';
+      subtitle.title='Tap to switch venue';
+      subtitle.onclick=function(){showPlayerVenuePicker();};
+    }else{
+      subtitle.style.cursor='default';
+      subtitle.title='';
+      subtitle.onclick=null;
+    }
   }
   
   var today=new Date().toISOString().split('T')[0];
@@ -1047,7 +1128,8 @@ async function undoBooking(bookingId){
 
 // ============ ADMIN FLOWS ============
 async function loadVenueAdmin(){
-  var venues=await apiCall('GET','/venues');
+  var venueEndpoint=session.user&&session.user.role==='platform_owner'?'/venues?include_inactive=true':'/venues';
+  var venues=await apiCall('GET',venueEndpoint);
   if(!venues)return;
   session.venues=venues||[];
 
@@ -1074,18 +1156,10 @@ async function loadVenueAdmin(){
 async function loadPlatformAdminData(){
   var owners=await apiCall('GET','/management/admin/users?platform_owner_id='+encodeURIComponent(session.user.id)+'&role=business_owner');
   if(owners)session.platformOwners=owners;
-  if(!session.selectedPlatformVenueId && session.venues.length){
-    session.selectedPlatformVenueId=session.venues[0].id;
-  }
-  if(session.selectedPlatformVenueId){
-    var exists=session.venues.some(function(venue){return venue.id===session.selectedPlatformVenueId;});
-    if(!exists)session.selectedPlatformVenueId=session.venues.length?session.venues[0].id:null;
-  }
   var adminVenueName=document.getElementById('adminVenueName');
   var adminSubTitle=document.getElementById('adminSubTitle');
-  var selectedVenue=(session.venues||[]).find(function(venue){return venue.id===session.selectedPlatformVenueId;});
   if(adminVenueName)adminVenueName.textContent='Platform Console';
-  if(adminSubTitle)adminSubTitle.textContent=selectedVenue?('Selected venue: '+selectedVenue.name):'Manage owners and venues';
+  if(adminSubTitle)adminSubTitle.textContent='Manage owners and venues';
   renderAdminScreen();
 }
 
@@ -1252,7 +1326,7 @@ function renderCustomersTab(){
     if(p.status==='pending'){
       actionHtml='<button class="action-chip" onclick="event.stopPropagation();approvePlayer(\''+p.player_id+'\')">Approve</button>';
     }else{
-      actionHtml='<div class="customer-actions"><button class="action-chip" onclick="event.stopPropagation();openCustomerDetail(\''+p.player_id+'\')">Details</button><button class="mini-wa" onclick="event.stopPropagation();window.open(\''+makeWhatsappUrl(digits,'')+'\',\'_blank\')">W</button></div>';
+      actionHtml='<div class="customer-actions"><button class="action-chip" onclick="event.stopPropagation();openCustomerDetail(\''+p.player_id+'\')">Details</button><button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="event.stopPropagation();removePlayerFromCurrentVenue(\''+p.player_id+'\')">Delete</button><button class="mini-wa" onclick="event.stopPropagation();window.open(\''+makeWhatsappUrl(digits,'')+'\',\'_blank\')">W</button></div>';
     }
     rows+='<div class="customer-row clickable" onclick="openCustomerDetail(\''+p.player_id+'\')"><div class="avatar">'+initials(p.player_name)+'</div>'+
       '<div class="cust-info"><div class="cust-name">'+p.player_name+'</div><div class="cust-meta">'+p.player_phone+' - '+p.status+'</div></div>'+
@@ -1357,41 +1431,98 @@ function renderPlatformOwnersTab(){
       '<div class="cust-info"><div class="cust-name">'+escapeHtml(owner.name)+'</div><div class="cust-meta">'+escapeHtml(owner.phone)+' · '+escapeHtml(owner.status)+'</div></div></div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No business owners match this search.</div>';
-
-  var ownerSelect=document.getElementById('platformVenueOwner');
-  if(ownerSelect){
-    ownerSelect.innerHTML='';
-    owners.forEach(function(owner){
-      var opt=document.createElement('option');
-      opt.value=owner.id;
-      opt.textContent=owner.name+' ('+owner.phone+')';
-      ownerSelect.appendChild(opt);
-    });
-  }
 }
 
 function renderPlatformVenuesTab(){
   var wrap=document.getElementById('platformVenuesRows');
   if(!wrap)return;
+  var showInactive=(document.getElementById('platformShowInactive')||{}).checked;
   var ownerMap={};
   (session.platformOwners||[]).forEach(function(owner){ownerMap[owner.id]=owner;});
   var html='';
-  (session.venues||[]).forEach(function(venue){
+  (session.venues||[]).filter(function(venue){
+    return showInactive||venue.status==='active';
+  }).forEach(function(venue){
     var owner=ownerMap[venue.owner_id];
-    var selected=session.selectedPlatformVenueId===venue.id;
-    html+='<div class="audit-row" style="cursor:pointer;'+(selected?'border:1px solid #1D9E75;border-radius:10px;padding:8px 10px;':'')+'" onclick="selectPlatformVenue(\''+venue.id+'\')"><div><div class="audit-left">'+escapeHtml(venue.name)+(selected?' <span class="badge badge-green" style="margin-left:6px">Selected</span>':'')+'</div>'+
-      '<div class="audit-sub">Owner: '+escapeHtml(owner?owner.name:venue.owner_id)+' · '+formatTime(venue.opening_time)+'-'+formatTime(venue.closing_time)+' · '+venue.table_count+' tables</div></div>'+
-      '<div style="text-align:right"><div class="audit-fee">£'+Number(venue.session_fee||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+Number(venue.platform_fee_pct||0)+'%</div></div></div>';
+    var statusBadge=venue.status==='active'
+      ?'<span class="badge badge-green" style="margin-left:6px">Active</span>'
+      :'<span class="badge badge-gray" style="margin-left:6px">Inactive</span>';
+    html+='<div class="audit-row" style="border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:10px 10px;margin-bottom:8px"><div><div class="audit-left">'+escapeHtml(venue.name)+statusBadge+'</div>'+
+      '<div class="audit-sub">Owner: '+escapeHtml(owner?owner.name:venue.owner_id)+' ('+escapeHtml(owner&&owner.phone?owner.phone:'')+') · '+formatTime(venue.opening_time)+'-'+formatTime(venue.closing_time)+' · '+venue.table_count+' tables</div></div>'+
+      '<div style="text-align:right"><div class="audit-fee">£'+Number(venue.session_fee||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+Number(venue.platform_fee_pct||0)+'%</div></div></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+
+        '<button class="action-chip" onclick="openPlatformVenueEditor(\''+venue.id+'\')">Edit details</button>'+
+        '<button class="action-chip" onclick="resetPlatformOwnerPassword(\''+venue.owner_id+'\')">Reset owner password</button>'+
+        (venue.status==='active'
+          ?'<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="inactivatePlatformVenue(\''+venue.id+'\')">Inactivate</button>'
+          :'<button class="action-chip" onclick="activatePlatformVenue(\''+venue.id+'\')">Activate</button>')+
+      '</div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No venues found.</div>';
 }
 
-function selectPlatformVenue(venueId){
-  session.selectedPlatformVenueId=venueId;
-  var selectedVenue=(session.venues||[]).find(function(venue){return venue.id===venueId;});
-  var adminSubTitle=document.getElementById('adminSubTitle');
-  if(adminSubTitle)adminSubTitle.textContent=selectedVenue?('Selected venue: '+selectedVenue.name):'Manage owners and venues';
-  renderPlatformVenuesTab();
+async function openPlatformVenueEditor(venueId){
+  var venue=(session.venues||[]).find(function(v){return v.id===venueId;});
+  if(!venue)return;
+  var profile=await apiCall('GET','/venues/'+venueId+'/profile');
+  var content='<div style="display:grid;gap:10px">'+
+    '<div><div class="login-label">Venue name</div><input id="editVenueName" class="login-input" value="'+escapeHtml(venue.name)+'"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Open</div><input id="editVenueOpen" class="login-input" type="time" value="'+formatTime(venue.opening_time)+'"></div><div><div class="login-label">Close</div><input id="editVenueClose" class="login-input" type="time" value="'+formatTime(venue.closing_time)+'"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div class="login-label">Tables</div><input id="editVenueTables" class="login-input" type="number" min="1" max="20" value="'+Number(venue.table_count||4)+'"></div><div><div class="login-label">Session hours</div><input id="editVenueDuration" class="login-input" type="number" min="1" max="6" value="'+Number(venue.session_duration_hrs||2)+'"></div><div><div class="login-label">Cooldown</div><input id="editVenueCooldown" class="login-input" type="number" min="5" max="120" value="'+Number(venue.cooldown_minutes||30)+'"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Session fee</div><input id="editVenueFee" class="login-input" type="number" min="1" step="0.01" value="'+Number(venue.session_fee||40)+'"></div><div><div class="login-label">Platform fee %</div><input id="editVenuePlatformFee" class="login-input" type="number" min="0" max="100" value="'+Number(venue.platform_fee_pct||5)+'"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Currency</div><input id="editVenueCurrency" class="login-input" value="'+escapeHtml(profile&&profile.currency_code?profile.currency_code:'HKD')+'" maxlength="3"></div><div><div class="login-label">Business WhatsApp</div><input id="editVenueWhatsapp" class="login-input" value="'+escapeHtml(profile&&profile.business_whatsapp?profile.business_whatsapp:'')+'"></div></div>'+
+    '<button class="cta-btn" id="saveVenueEditBtn">Save venue changes</button>'+
+  '</div>';
+  var overlay=showBottomSheet('Edit venue',content);
+  overlay.querySelector('#saveVenueEditBtn').onclick=async function(){
+    var payload={
+      name:(overlay.querySelector('#editVenueName').value||'').trim(),
+      opening_time:(overlay.querySelector('#editVenueOpen').value||'').trim(),
+      closing_time:(overlay.querySelector('#editVenueClose').value||'').trim(),
+      table_count:Number(overlay.querySelector('#editVenueTables').value||4),
+      session_duration_hrs:Number(overlay.querySelector('#editVenueDuration').value||2),
+      cooldown_minutes:Number(overlay.querySelector('#editVenueCooldown').value||30),
+      session_fee:Number(overlay.querySelector('#editVenueFee').value||40),
+      platform_fee_pct:Number(overlay.querySelector('#editVenuePlatformFee').value||5)
+    };
+    var updated=await apiCall('PATCH','/management/admin/venues/'+venueId+'?platform_owner_id='+encodeURIComponent(session.user.id),payload);
+    if(!updated)return;
+    var profilePayload={
+      currency_code:(overlay.querySelector('#editVenueCurrency').value||'HKD').trim().toUpperCase(),
+      business_whatsapp:(overlay.querySelector('#editVenueWhatsapp').value||'').trim(),
+      nudge_window_minutes:profile&&profile.nudge_window_minutes?profile.nudge_window_minutes:60,
+      nudge_message_template:profile&&profile.nudge_message_template?profile.nudge_message_template:'Hi {player_name}, we are filling a table around {slot_time}. Want to join today\'s game?',
+      reminder_lead_minutes:profile&&profile.reminder_lead_minutes?profile.reminder_lead_minutes:30,
+      reminder_message_template:profile&&profile.reminder_message_template?profile.reminder_message_template:'Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.'
+    };
+    await apiCall('PUT','/venues/'+venueId+'/profile?admin_id='+encodeURIComponent(session.user.id),profilePayload);
+    showToast('Venue updated.');
+    if(document.body.contains(overlay))document.body.removeChild(overlay);
+    await loadVenueAdmin();
+  };
+}
+
+async function resetPlatformOwnerPassword(ownerId){
+  var newPassword=(window.prompt('Enter new owner password (minimum 4 characters):','1234')||'').trim();
+  if(!newPassword)return;
+  if(newPassword.length<4){showToast('Password must be at least 4 characters.','warn');return;}
+  var res=await apiCall('POST','/management/admin/users/'+ownerId+'/reset-password?new_password='+encodeURIComponent(newPassword)+'&platform_owner_id='+encodeURIComponent(session.user.id),null);
+  if(!res)return;
+  showToast('Owner password reset.');
+}
+
+async function inactivatePlatformVenue(venueId){
+  var ok=await apiCall('DELETE','/management/admin/venues/'+venueId+'?platform_owner_id='+encodeURIComponent(session.user.id),null);
+  if(!ok)return;
+  showToast('Venue inactivated.');
+  await loadVenueAdmin();
+}
+
+async function activatePlatformVenue(venueId){
+  var ok=await apiCall('POST','/management/admin/venues/'+venueId+'/activate?platform_owner_id='+encodeURIComponent(session.user.id),null);
+  if(!ok)return;
+  showToast('Venue activated.');
+  await loadVenueAdmin();
 }
 
 async function createBusinessOwner(){
@@ -1413,7 +1544,11 @@ async function createBusinessOwner(){
 
 async function createVenueAsPlatform(){
   var name=(document.getElementById('platformVenueName').value||'').trim();
-  var ownerId=document.getElementById('platformVenueOwner').value;
+  var ownerName=(document.getElementById('platformVenueOwnerName').value||'').trim();
+  var ownerPhone=(document.getElementById('platformVenueOwnerPhone').value||'').trim();
+  var ownerPassword=(document.getElementById('platformVenueOwnerPassword').value||'').trim();
+  var businessWhatsapp=(document.getElementById('platformVenueBusinessWhatsapp').value||'').trim();
+  var currency=(document.getElementById('platformVenueCurrency').value||'HKD').trim().toUpperCase();
   var open=(document.getElementById('platformVenueOpen').value||'').trim();
   var close=(document.getElementById('platformVenueClose').value||'').trim();
   var tables=Number(document.getElementById('platformVenueTables').value||4);
@@ -1421,10 +1556,14 @@ async function createVenueAsPlatform(){
   var cooldown=Number(document.getElementById('platformVenueCooldown').value||30);
   var fee=Number(document.getElementById('platformVenueFee').value||40);
   var platformFee=Number(document.getElementById('platformVenuePlatformFee').value||5);
-  if(!name||!ownerId||!open||!close){showToast('Please fill venue name, owner, and hours.','warn');return;}
+  if(!name||!ownerName||!ownerPhone||!ownerPassword||!open||!close){showToast('Please fill venue, owner, password, and hours.','warn');return;}
+
+  var ownerPayload={name:ownerName,phone:ownerPhone,password:ownerPassword,role:'business_owner'};
+  var owner=await apiCall('POST','/management/admin/users?platform_owner_id='+encodeURIComponent(session.user.id),ownerPayload);
+  if(!owner)return;
 
   var payload={
-    owner_id:ownerId,
+    owner_id:owner.id,
     name:name,
     opening_time:open,
     closing_time:close,
@@ -1437,9 +1576,22 @@ async function createVenueAsPlatform(){
   var created=await apiCall('POST','/management/admin/venues?platform_owner_id='+encodeURIComponent(session.user.id),payload);
   if(!created)return;
 
+  await apiCall('PUT','/venues/'+created.id+'/profile?admin_id='+encodeURIComponent(session.user.id),{
+    currency_code:currency,
+    business_whatsapp:businessWhatsapp||ownerPhone,
+    nudge_window_minutes:60,
+    nudge_message_template:'Hi {player_name}, we are filling a table around {slot_time}. Want to join today\'s game?',
+    reminder_lead_minutes:30,
+    reminder_message_template:'Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.'
+  });
+
   session.selectedPlatformVenueId=created.id;
   document.getElementById('platformVenueName').value='';
-  showToast('Venue created and selected.');
+  document.getElementById('platformVenueOwnerName').value='';
+  document.getElementById('platformVenueOwnerPhone').value='';
+  document.getElementById('platformVenueOwnerPassword').value='';
+  document.getElementById('platformVenueBusinessWhatsapp').value='';
+  showToast('Venue created with business owner.');
   await loadVenueAdmin();
 }
 
@@ -1728,10 +1880,24 @@ async function openCustomerDetail(playerId){
     '<div class="info-row"><span class="info-key">Total games</span><span class="info-val">'+(data.total_games_played||0)+'</span></div>'+
     '<div class="info-row"><span class="info-key">Total hours</span><span class="info-val">'+(data.total_hours_played||0)+'</span></div>'+
     '<div class="info-row"><span class="info-key">Total spending</span><span class="info-val">£'+Number(data.total_spending||0).toFixed(2)+'</span></div>'+
-    '<div style="display:flex;gap:8px;margin-top:14px"><button class="soft-btn" id="playerEditBtn">Edit</button><button class="soft-btn" id="playerWhatsAppBtn">WhatsApp</button></div>';
+    '<div style="display:flex;gap:8px;margin-top:14px"><button class="soft-btn" id="playerEditBtn">Edit</button><button class="soft-btn" id="playerWhatsAppBtn">WhatsApp</button><button class="soft-btn" id="playerDeleteBtn" style="color:#A32D2D;border-color:#F7C1C1">Delete</button></div>';
   var overlay=showBottomSheet(player.player_name,content);
   overlay.querySelector('#playerEditBtn').onclick=function(){ if(document.body.contains(overlay))document.body.removeChild(overlay); openCustomerForm(player); };
   overlay.querySelector('#playerWhatsAppBtn').onclick=function(){ var url=makeWhatsappUrl(player.player_phone,''); if(url)window.open(url,'_blank'); };
+  overlay.querySelector('#playerDeleteBtn').onclick=async function(){
+    if(document.body.contains(overlay))document.body.removeChild(overlay);
+    await removePlayerFromCurrentVenue(player.player_id);
+  };
+}
+
+async function removePlayerFromCurrentVenue(playerId){
+  if(!session.currentVenueId||!session.user)return;
+  var confirmed=window.confirm('Remove this player from current venue?');
+  if(!confirmed)return;
+  var removed=await apiCall('DELETE','/management/venues/'+session.currentVenueId+'/players/'+playerId+'?business_owner_id='+encodeURIComponent(session.user.id),null);
+  if(!removed)return;
+  showToast('Player removed from this venue.');
+  await loadAdminData();
 }
 
 function openCustomerForm(player){
@@ -2177,22 +2343,13 @@ function setFontSize(scale,el){
 }
 
 function selectRole(r){
-  session.selectedRole=r;
-  // Update role card styling
-  var playerBtn=document.getElementById('roleCardPlayer');
-  var adminBtn=document.getElementById('roleCardAdmin');
-  if(playerBtn) playerBtn.style.opacity=r==='player'?'1':'0.5';
-  if(adminBtn) adminBtn.style.opacity=r==='admin'?'1':'0.5';
-  // Switch from role selection to login form
-  document.getElementById('loginRoleSelection').style.display='none';
-  document.getElementById('loginForm').style.display='block';
-  // Clear password on role switch
+  // Legacy hook kept for compatibility; single-button flow uses startLoginFlow().
+  startLoginFlow();
   document.getElementById('passwordInput').value='';
   document.getElementById('mobileInput').focus();
 }
 
 function backToRoleSelection(){
-  session.selectedRole=null;
   document.getElementById('loginRoleSelection').style.display='flex';
   document.getElementById('loginForm').style.display='none';
   document.getElementById('mobileInput').value='';
@@ -2341,6 +2498,7 @@ function startTimer(seconds){
 // Demo timer on page load
 document.addEventListener('DOMContentLoaded',function(){
   startTimer(28*60+45);
+  var startLoginBtn=document.getElementById('startLoginBtn');
   var signInBtn=document.getElementById('signInBtn');
   var rolePlayer=document.getElementById('role-player');
   var roleAdmin=document.getElementById('role-admin');
@@ -2364,6 +2522,13 @@ document.addEventListener('DOMContentLoaded',function(){
   var createOwnerBtn=document.getElementById('createOwnerBtn');
   var createVenueBtn=document.getElementById('createVenueBtn');
   var platformOwnerSearch=document.getElementById('platformOwnerSearch');
+  var platformShowInactive=document.getElementById('platformShowInactive');
+  updateAuthNavButton();
+  if(startLoginBtn){
+    startLoginBtn.onclick=function(){
+      startLoginFlow();
+    };
+  }
   if(signInBtn){
     signInBtn.onclick=function(){
       handleSignIn();
@@ -2380,9 +2545,7 @@ document.addEventListener('DOMContentLoaded',function(){
     };
   }
   if(navLogin){
-    navLogin.onclick=function(){
-      showScreen('login');
-    };
+    updateAuthNavButton();
   }
   if(navPlayer){
     navPlayer.onclick=function(){
@@ -2480,6 +2643,11 @@ document.addEventListener('DOMContentLoaded',function(){
   if(platformOwnerSearch){
     platformOwnerSearch.addEventListener('input',function(){
       renderPlatformOwnersTab();
+    });
+  }
+  if(platformShowInactive){
+    platformShowInactive.addEventListener('change',function(){
+      renderPlatformVenuesTab();
     });
   }
 
