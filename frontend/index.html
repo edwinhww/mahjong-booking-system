@@ -656,6 +656,9 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
           <button class="cta-btn" id="createOwnerBtn">Create owner</button>
         </div>
       </div>
+      <div style="margin-bottom:10px">
+        <input class="login-input" id="platformOwnerSearch" placeholder="Search owner by name or phone">
+      </div>
       <div id="platformOwnersRows"><div class="audit-sub">Loading owners...</div></div>
     </div>
 
@@ -754,6 +757,7 @@ var session={
   user:null,
   venues:[],
   platformOwners:[],
+  selectedPlatformVenueId:null,
   timeslots:{},
   bookings:[],
   bookingHistory:[],
@@ -904,6 +908,7 @@ function handleSignOut(){
   document.getElementById('passwordInput').value='';
   session.timeslots={};
   session.platformOwners=[];
+  session.selectedPlatformVenueId=null;
   session.bookings=[];
   session.players=[];
   session.messages=[];
@@ -1042,10 +1047,18 @@ async function loadVenueAdmin(){
 async function loadPlatformAdminData(){
   var owners=await apiCall('GET','/management/admin/users?platform_owner_id='+encodeURIComponent(session.user.id)+'&role=business_owner');
   if(owners)session.platformOwners=owners;
+  if(!session.selectedPlatformVenueId && session.venues.length){
+    session.selectedPlatformVenueId=session.venues[0].id;
+  }
+  if(session.selectedPlatformVenueId){
+    var exists=session.venues.some(function(venue){return venue.id===session.selectedPlatformVenueId;});
+    if(!exists)session.selectedPlatformVenueId=session.venues.length?session.venues[0].id:null;
+  }
   var adminVenueName=document.getElementById('adminVenueName');
   var adminSubTitle=document.getElementById('adminSubTitle');
+  var selectedVenue=(session.venues||[]).find(function(venue){return venue.id===session.selectedPlatformVenueId;});
   if(adminVenueName)adminVenueName.textContent='Platform Console';
-  if(adminSubTitle)adminSubTitle.textContent='Manage owners and venues';
+  if(adminSubTitle)adminSubTitle.textContent=selectedVenue?('Selected venue: '+selectedVenue.name):'Manage owners and venues';
   renderAdminScreen();
 }
 
@@ -1233,12 +1246,18 @@ function renderPlatformOwnersTab(){
   var wrap=document.getElementById('platformOwnersRows');
   if(!wrap)return;
   var owners=(session.platformOwners||[]).filter(function(user){return user.role==='business_owner';});
+  var searchInput=document.getElementById('platformOwnerSearch');
+  var query=((searchInput&&searchInput.value)||'').trim().toLowerCase();
+  var filteredOwners=owners.filter(function(owner){
+    if(!query)return true;
+    return String(owner.name||'').toLowerCase().indexOf(query)>=0 || String(owner.phone||'').toLowerCase().indexOf(query)>=0;
+  });
   var html='';
-  owners.forEach(function(owner){
+  filteredOwners.forEach(function(owner){
     html+='<div class="customer-row"><div class="avatar">'+initials(owner.name)+'</div>'+
       '<div class="cust-info"><div class="cust-name">'+escapeHtml(owner.name)+'</div><div class="cust-meta">'+escapeHtml(owner.phone)+' · '+escapeHtml(owner.status)+'</div></div></div>';
   });
-  wrap.innerHTML=html||'<div class="audit-sub">No business owners found.</div>';
+  wrap.innerHTML=html||'<div class="audit-sub">No business owners match this search.</div>';
 
   var ownerSelect=document.getElementById('platformVenueOwner');
   if(ownerSelect){
@@ -1260,11 +1279,20 @@ function renderPlatformVenuesTab(){
   var html='';
   (session.venues||[]).forEach(function(venue){
     var owner=ownerMap[venue.owner_id];
-    html+='<div class="audit-row"><div><div class="audit-left">'+escapeHtml(venue.name)+'</div>'+
+    var selected=session.selectedPlatformVenueId===venue.id;
+    html+='<div class="audit-row" style="cursor:pointer;'+(selected?'border:1px solid #1D9E75;border-radius:10px;padding:8px 10px;':'')+'" onclick="selectPlatformVenue(\''+venue.id+'\')"><div><div class="audit-left">'+escapeHtml(venue.name)+(selected?' <span class="badge badge-green" style="margin-left:6px">Selected</span>':'')+'</div>'+
       '<div class="audit-sub">Owner: '+escapeHtml(owner?owner.name:venue.owner_id)+' · '+formatTime(venue.opening_time)+'-'+formatTime(venue.closing_time)+' · '+venue.table_count+' tables</div></div>'+
       '<div style="text-align:right"><div class="audit-fee">£'+Number(venue.session_fee||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+Number(venue.platform_fee_pct||0)+'%</div></div></div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No venues found.</div>';
+}
+
+function selectPlatformVenue(venueId){
+  session.selectedPlatformVenueId=venueId;
+  var selectedVenue=(session.venues||[]).find(function(venue){return venue.id===venueId;});
+  var adminSubTitle=document.getElementById('adminSubTitle');
+  if(adminSubTitle)adminSubTitle.textContent=selectedVenue?('Selected venue: '+selectedVenue.name):'Manage owners and venues';
+  renderPlatformVenuesTab();
 }
 
 async function createBusinessOwner(){
@@ -1310,8 +1338,9 @@ async function createVenueAsPlatform(){
   var created=await apiCall('POST','/management/admin/venues?platform_owner_id='+encodeURIComponent(session.user.id),payload);
   if(!created)return;
 
+  session.selectedPlatformVenueId=created.id;
   document.getElementById('platformVenueName').value='';
-  showToast('Venue created.');
+  showToast('Venue created and selected.');
   await loadVenueAdmin();
 }
 
@@ -2178,6 +2207,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var customerAddBtn=document.getElementById('customerAddBtn');
   var createOwnerBtn=document.getElementById('createOwnerBtn');
   var createVenueBtn=document.getElementById('createVenueBtn');
+  var platformOwnerSearch=document.getElementById('platformOwnerSearch');
   if(signInBtn){
     signInBtn.onclick=function(){
       handleSignIn();
@@ -2285,6 +2315,11 @@ document.addEventListener('DOMContentLoaded',function(){
     createVenueBtn.onclick=function(){
       createVenueAsPlatform();
     };
+  }
+  if(platformOwnerSearch){
+    platformOwnerSearch.addEventListener('input',function(){
+      renderPlatformOwnersTab();
+    });
   }
 
   // Add-ons screen bindings
