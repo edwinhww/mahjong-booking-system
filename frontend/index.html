@@ -558,7 +558,9 @@ var session={
   token:null
 };
 
-const API_BASE='http://127.0.0.1:8000/api/v1';
+const API_BASE=(window.location.protocol==='file:'
+  ?'http://127.0.0.1:8000/api/v1'
+  :window.location.origin+'/api/v1');
 
 // ============ API HELPERS ============
 async function apiCall(method,endpoint,body=null){
