@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import User, UserRole, UserStatus, Venue, VenuePlayer, VenuePlayerStatus
-from app.schemas import UserAdminUpdate, UserCreate, UserRead, VenueCreate, VenueRead, VenueUpdate
+from app.models import Booking, BookingOrder, BookingStatus, Timeslot, User, UserRole, UserStatus, Venue, VenuePlayer, VenuePlayerStatus
+from app.schemas import PlayerVenueStatsRead, UserAdminUpdate, UserCreate, UserRead, VenueCreate, VenueRead, VenueUpdate
 from app.security import hash_password
 from app.services.action_audit import log_action
 
@@ -20,6 +20,16 @@ def _require_business_owner(db: Session, actor_id: str) -> User:
     return actor
 
 
+def _require_venue_owner(db: Session, venue_id: str, actor_id: str) -> Venue:
+    owner = _require_business_owner(db, actor_id)
+    venue = db.get(Venue, venue_id)
+    if not venue:
+        raise HTTPException(status_code=404, detail="Venue not found")
+    if venue.owner_id != owner.id:
+        raise HTTPException(status_code=403, detail="Business owner does not own this venue")
+    return venue
+
+
 def _require_platform_owner(db: Session, actor_id: str) -> User:
     actor = db.get(User, actor_id)
     if not actor or actor.role != UserRole.platform_owner:
@@ -29,12 +39,7 @@ def _require_platform_owner(db: Session, actor_id: str) -> User:
 
 @router.post("/venues/{venue_id}/players", response_model=UserRead)
 def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_id: str, auto_approve: bool = True, db: Session = Depends(get_db)) -> UserRead:
-    owner = _require_business_owner(db, business_owner_id)
-    venue = db.get(Venue, venue_id)
-    if not venue:
-        raise HTTPException(status_code=404, detail="Venue not found")
-    if venue.owner_id != owner.id:
-        raise HTTPException(status_code=403, detail="Business owner does not own this venue")
+    venue = _require_venue_owner(db, venue_id, business_owner_id)
     if payload.role != UserRole.player:
         raise HTTPException(status_code=400, detail="Only player users can be created in this endpoint")
 
@@ -77,15 +82,78 @@ def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_i
     return UserRead(id=user.id, name=user.name, phone=user.phone, role=user.role, status=user.status)
 
 
+@router.get("/venues/{venue_id}/players/{user_id}/stats", response_model=PlayerVenueStatsRead)
+def get_player_stats_for_venue(venue_id: str, user_id: str, business_owner_id: str, db: Session = Depends(get_db)) -> PlayerVenueStatsRead:
+    venue = _require_venue_owner(db, venue_id, business_owner_id)
+
+    user = db.get(User, user_id)
+    if not user or user.role != UserRole.player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    venue_player = db.scalar(
+        select(VenuePlayer).where(
+            VenuePlayer.venue_id == venue.id,
+            VenuePlayer.player_id == user_id,
+        )
+    )
+    if not venue_player:
+        raise HTTPException(status_code=404, detail="Player not registered for this venue")
+
+    booking_rows = db.execute(
+        select(Booking, Timeslot)
+        .join(Timeslot, Timeslot.id == Booking.timeslot_id)
+        .where(
+            Timeslot.venue_id == venue_id,
+            Booking.player_id == user_id,
+            Booking.status != BookingStatus.cancelled,
+        )
+        .order_by(Timeslot.date.desc(), Timeslot.start_time.desc())
+    ).all()
+
+    total_games_played = len(booking_rows)
+    total_hours_played = 0.0
+    last_game_played_at = None
+    for booking, timeslot in booking_rows:
+        duration_hours = (datetime.combine(timeslot.date, timeslot.end_time) - datetime.combine(timeslot.date, timeslot.start_time)).total_seconds() / 3600.0
+        total_hours_played += max(duration_hours, 0)
+        if last_game_played_at is None:
+            last_game_played_at = datetime.combine(timeslot.date, timeslot.start_time)
+
+    total_spending = db.scalar(
+        select(func.coalesce(func.sum(BookingOrder.total_cost), 0))
+        .where(
+            BookingOrder.venue_id == venue_id,
+            BookingOrder.player_id == user_id,
+        )
+    )
+
+    return PlayerVenueStatsRead(
+        player_id=user_id,
+        joined_at=venue_player.created_at,
+        last_game_played_at=last_game_played_at,
+        total_games_played=total_games_played,
+        total_hours_played=round(total_hours_played, 2),
+        total_spending=float(total_spending or 0),
+    )
+
+
 @router.patch("/users/{user_id}", response_model=UserRead)
 def update_user(user_id: str, payload: UserAdminUpdate, business_owner_id: str, db: Session = Depends(get_db)) -> UserRead:
-    _require_business_owner(db, business_owner_id)
+    owner = _require_business_owner(db, business_owner_id)
 
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if user.role != UserRole.player:
         raise HTTPException(status_code=400, detail="Only player users can be managed here")
+
+    membership = db.execute(
+        select(VenuePlayer, Venue)
+        .join(Venue, Venue.id == VenuePlayer.venue_id)
+        .where(VenuePlayer.player_id == user_id, Venue.owner_id == owner.id)
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="Business owner cannot manage this player")
 
     for field, value in payload.model_dump(exclude_none=True).items():
         setattr(user, field, value)
@@ -106,13 +174,21 @@ def update_user(user_id: str, payload: UserAdminUpdate, business_owner_id: str, 
 
 @router.delete("/users/{user_id}")
 def delete_user(user_id: str, business_owner_id: str, db: Session = Depends(get_db)) -> dict[str, bool]:
-    _require_business_owner(db, business_owner_id)
+    owner = _require_business_owner(db, business_owner_id)
 
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if user.role != UserRole.player:
         raise HTTPException(status_code=400, detail="Only player users can be managed here")
+
+    membership = db.execute(
+        select(VenuePlayer, Venue)
+        .join(Venue, Venue.id == VenuePlayer.venue_id)
+        .where(VenuePlayer.player_id == user_id, Venue.owner_id == owner.id)
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="Business owner cannot manage this player")
 
     user.status = UserStatus.suspended
     log_action(

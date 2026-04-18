@@ -174,6 +174,10 @@ class VenueProfile(Base):
     venue_id: Mapped[str] = mapped_column(ForeignKey("mahjoh_t_venues.id"), unique=True, nullable=False)
     currency_code: Mapped[str] = mapped_column(String(3), default="GBP", nullable=False)
     business_whatsapp: Mapped[str] = mapped_column(String(30), nullable=False)
+    nudge_window_minutes: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
+    nudge_message_template: Mapped[str] = mapped_column(Text, default="Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?", nullable=False)
+    reminder_lead_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
+    reminder_message_template: Mapped[str] = mapped_column(Text, default="Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.", nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
 

@@ -52,6 +52,7 @@ class VenueRead(VenueCreate):
 
 
 class VenueUpdate(BaseModel):
+    name: str | None = None
     opening_time: time | None = None
     closing_time: time | None = None
     table_count: int | None = Field(default=None, ge=1, le=20)
@@ -150,6 +151,10 @@ class AuditRead(BaseModel):
 class VenueProfileUpsert(BaseModel):
     currency_code: str = Field(min_length=3, max_length=3)
     business_whatsapp: str
+    nudge_window_minutes: int = Field(default=60, ge=0, le=240)
+    nudge_message_template: str = Field(default="Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?", min_length=1, max_length=600)
+    reminder_lead_minutes: int = Field(default=30, ge=0, le=240)
+    reminder_message_template: str = Field(default="Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.", min_length=1, max_length=600)
 
 
 class VenueProfileRead(BaseModel):
@@ -157,6 +162,10 @@ class VenueProfileRead(BaseModel):
     venue_id: str
     currency_code: str
     business_whatsapp: str
+    nudge_window_minutes: int
+    nudge_message_template: str
+    reminder_lead_minutes: int
+    reminder_message_template: str
     updated_at: datetime
 
 
@@ -266,6 +275,15 @@ class UserAdminUpdate(BaseModel):
     phone: str | None = None
     email: str | None = None
     status: UserStatus | None = None
+
+
+class PlayerVenueStatsRead(BaseModel):
+    player_id: str
+    joined_at: datetime | None
+    last_game_played_at: datetime | None
+    total_games_played: int
+    total_hours_played: float
+    total_spending: float
 
 
 class ActionAuditRead(BaseModel):

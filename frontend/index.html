@@ -81,12 +81,13 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .avatar.me{background:#FAEEDA;color:#854F0B}
 .player-name{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
 .player-status{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
-.admin-tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);overflow-x:auto}
-.atab{flex:1;padding:11px 8px;text-align:center;font-size:calc(13px * var(--font-scale));color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:90px}
-.atab.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500}
+.admin-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.atab{padding:10px 8px;text-align:center;font-size:calc(13px * var(--font-scale));color:var(--color-text-secondary);cursor:pointer;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);white-space:nowrap;background:#fff}
+.atab.active{color:#1D9E75;border-color:#9FE1CB;background:#EAF3DE;font-weight:600}
 .admin-panel{display:none;padding:16px}
 .admin-panel.active{display:block}
-.table-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;flex-wrap:wrap}
+.slot-divider{padding:8px 2px 6px;margin-top:4px;border-top:1px solid var(--color-border-secondary);font-size:calc(11px * var(--font-scale));font-weight:700;color:var(--color-text-secondary);letter-spacing:0.7px;text-transform:uppercase}
+.table-row{display:flex;align-items:center;gap:10px;padding:12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;flex-wrap:wrap;cursor:pointer}
 .table-time{font-size:calc(13px * var(--font-scale));font-weight:500;color:var(--color-text-primary);min-width:60px}
 .seat-bar{flex:1;display:flex;gap:4px}
 .seat-blk{flex:1;height:20px;border-radius:4px;background:var(--color-border-tertiary)}
@@ -94,6 +95,9 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .seat-blk.me{background:#BA7517}
 .action-chip{font-size:11px;padding:3px 8px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary)}
 .action-chip:hover{background:var(--color-background-secondary)}
+.table-meta{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
+.table-actions{width:100%;display:flex;gap:8px;flex-wrap:wrap}
+.table-actions .action-chip{padding:7px 10px}
 .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
 .metric-num{font-size:calc(24px * var(--font-scale));font-weight:500;color:var(--color-text-primary)}
@@ -146,7 +150,19 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .settings-row:last-child{border-bottom:none}
 .settings-label{font-size:calc(13px * var(--font-scale));color:var(--color-text-primary)}
 .settings-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
-.settings-input{width:80px;padding:6px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(13px * var(--font-scale));text-align:right}
+.settings-input{width:80px;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(13px * var(--font-scale));text-align:right}
+.settings-input.timewide{width:122px;font-size:calc(15px * var(--font-scale));padding:10px 12px}
+.settings-input.textwide{width:150px;text-align:left}
+.settings-stack{display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-width:52%}
+.settings-textarea{width:100%;min-height:86px;padding:10px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(13px * var(--font-scale));color:var(--color-text-primary);resize:vertical}
+.customer-actions{display:flex;gap:8px;align-items:center}
+.customer-row.clickable{cursor:pointer}
+.customer-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+.soft-btn{border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:calc(13px * var(--font-scale));cursor:pointer}
+.msg-reminder-row{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px}
+.msg-reminder-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.msg-reminder-title{font-size:calc(13px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
+.msg-reminder-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);margin-top:2px}
 .toggle{width:40px;height:22px;background:var(--color-border-tertiary);border-radius:11px;cursor:pointer;position:relative;border:none}
 .toggle.on{background:#1D9E75}
 .toggle::after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.15s}
@@ -171,6 +187,8 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
   .toolbar-chip{padding:7px 10px}
   .app{max-width:100%;border-radius:0;border-left:none;border-right:none}
   .slot-grid{grid-template-columns:1fr}
+  .admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settings-stack{max-width:58%}
 }
 </style>
 </head>
@@ -373,7 +391,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
   <div class="screen" id="screen-admin">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Dragon Palace MJ</div>
+        <div class="topbar-title" id="adminVenueName">Dragon Palace MJ</div>
         <div class="topbar-sub" id="adminSubTitle">Admin · Thu 17 Apr</div>
       </div>
       <span class="badge badge-blue" id="adminBadge">Admin</span>
@@ -435,7 +453,10 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     </div>
 
     <div class="admin-panel" id="ap-customers">
-      <div class="section-title" id="registeredPlayersTitle">Registered players (12)</div>
+      <div class="customer-topbar">
+        <div class="section-title" id="registeredPlayersTitle" style="margin-bottom:0">Registered players (12)</div>
+        <button class="soft-btn" id="customerAddBtn">Add player</button>
+      </div>
       <div id="customersRows">
       <div class="customer-row">
         <div class="avatar">WL</div>
@@ -470,6 +491,8 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     </div>
 
     <div class="admin-panel" id="ap-messages">
+      <div class="section-title">Due reminders</div>
+      <div id="dueReminderRows" style="margin-bottom:14px"><div class="audit-sub">No reminders due right now.</div></div>
       <div class="section-title" id="recentMessagesTitle">Recent messages sent</div>
       <div id="messageRows">
       <div class="msg-row">
@@ -506,12 +529,16 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="section-title" id="businessSettingsTitle">Business settings</div>
       <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0 14px">
         <div class="settings-row">
+          <div><div class="settings-label">Business name</div><div class="settings-sub">Displayed to players and owners</div></div>
+          <input class="settings-input textwide" id="settingBusinessName" type="text" value="Dragon Palace MJ">
+        </div>
+        <div class="settings-row">
           <div><div class="settings-label" id="openingTimeLabel">Opening time</div><div class="settings-sub" id="openingTimeSub">First slot of the day</div></div>
-          <input class="settings-input" id="settingOpeningTime" type="time" value="10:00">
+          <input class="settings-input timewide" id="settingOpeningTime" type="time" value="10:00">
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="closingTimeLabel">Closing time</div><div class="settings-sub" id="closingTimeSub">Last slot ends by</div></div>
-          <input class="settings-input" id="settingClosingTime" type="time" value="22:00">
+          <input class="settings-input timewide" id="settingClosingTime" type="time" value="22:00">
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="tablesAvailableLabel">Tables available</div><div class="settings-sub" id="tablesAvailableSub">Concurrent games hosted</div></div>
@@ -526,8 +553,8 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
           <input class="settings-input" id="settingCooldown" type="number" value="30" min="5" max="60" style="width:60px">
         </div>
         <div class="settings-row">
-          <div><div class="settings-label" id="waNotifLabel">WhatsApp notifications</div><div class="settings-sub" id="waNotifSub">Auto-send on table full</div></div>
-          <button class="toggle on" id="waToggle" onclick="this.classList.toggle('on')"></button>
+          <div><div class="settings-label" id="waNotifLabel">Business WhatsApp</div><div class="settings-sub" id="waNotifSub">Used to open click-to-chat links</div></div>
+          <input class="settings-input textwide" id="settingBusinessWhatsapp" type="tel" value="">
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="sessionFeeLabel">Session fee (per table)</div><div class="settings-sub" id="sessionFeeSub">Used for audit & billing</div></div>
@@ -536,6 +563,30 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="settings-row">
           <div><div class="settings-label" id="platformFeeLabel">Platform fee %</div><div class="settings-sub" id="platformFeeSub">Developer charge per session</div></div>
           <input class="settings-input" id="settingPlatformFee" type="number" value="5" min="1" max="20" style="width:60px">
+        </div>
+        <div class="settings-row" style="align-items:flex-start">
+          <div><div class="settings-label">Nudge timeframe</div><div class="settings-sub">Players with prior play within +/- this many minutes</div></div>
+          <div class="settings-stack">
+            <input class="settings-input" id="settingNudgeWindow" type="number" value="60" min="0" max="240" style="width:74px">
+          </div>
+        </div>
+        <div class="settings-row" style="align-items:flex-start">
+          <div><div class="settings-label">Nudge message</div><div class="settings-sub">Use {player_name} and {slot_time}</div></div>
+          <div class="settings-stack" style="width:100%">
+            <textarea class="settings-textarea" id="settingNudgeMessage">Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?</textarea>
+          </div>
+        </div>
+        <div class="settings-row" style="align-items:flex-start">
+          <div><div class="settings-label">Reminder lead time</div><div class="settings-sub">Show due reminders this many minutes before start</div></div>
+          <div class="settings-stack">
+            <input class="settings-input" id="settingReminderLead" type="number" value="30" min="0" max="240" style="width:74px">
+          </div>
+        </div>
+        <div class="settings-row" style="align-items:flex-start">
+          <div><div class="settings-label">Reminder message</div><div class="settings-sub">Use {player_name} and {slot_time}</div></div>
+          <div class="settings-stack" style="width:100%">
+            <textarea class="settings-textarea" id="settingReminderMessage">Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.</textarea>
+          </div>
         </div>
       </div>
       <button class="cta-btn" style="margin-top:14px" id="saveSettingsBtn">Save settings</button>
@@ -662,10 +713,13 @@ var session={
   venues:[],
   timeslots:{},
   bookings:[],
+  bookingHistory:[],
   players:[],
   messages:[],
   auditLog:[],
   services:[],
+  profile:null,
+  playerStatsCache:{},
   addonSelections:{},
   currentVenueId:null,
   selectedTimeslotId:null,
@@ -706,6 +760,69 @@ function formatTime(raw){
 function initials(name){
   if(!name)return '?';
   return name.split(' ').slice(0,2).map(function(p){return p[0]||'';}).join('').toUpperCase();
+}
+
+function phoneDigits(raw){
+  return String(raw||'').replace(/[^0-9]/g,'');
+}
+
+function escapeHtml(value){
+  return String(value==null?'':value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function makeWhatsappUrl(phone,message){
+  var digits=phoneDigits(phone);
+  if(!digits)return null;
+  return 'https://wa.me/'+digits+'?text='+encodeURIComponent(message||'');
+}
+
+function applyTemplate(template,playerName,slotTime){
+  return String(template||'')
+    .replace(/\{player_name\}/g,playerName||'player')
+    .replace(/\{slot_time\}/g,slotTime||'your slot');
+}
+
+function timeStringToMinutes(raw){
+  var value=formatTime(raw);
+  if(!value||value.indexOf(':')<0)return 0;
+  var parts=value.split(':');
+  return Number(parts[0]||0)*60+Number(parts[1]||0);
+}
+
+function formatDateTimeFriendly(raw){
+  if(!raw)return '—';
+  return new Date(raw).toLocaleString();
+}
+
+function formatDateFriendly(raw){
+  if(!raw)return '—';
+  return new Date(raw).toLocaleDateString();
+}
+
+function showBottomSheet(title,contentHtml){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.42);z-index:8500;display:flex;align-items:flex-end;justify-content:center;padding:0 12px';
+  overlay.innerHTML='<div style="background:#fff;width:min(100%,420px);max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 20px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:16px;font-weight:700">'+escapeHtml(title)+'</div><button id="sheetCloseBtn" style="border:none;background:#F1EFE8;border-radius:999px;padding:8px 10px;cursor:pointer">Close</button></div>'+
+    contentHtml+
+  '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#sheetCloseBtn').onclick=function(){document.body.removeChild(overlay);};
+  overlay.addEventListener('click',function(event){ if(event.target===overlay){document.body.removeChild(overlay);} });
+  return overlay;
+}
+
+function findPlayer(playerId){
+  return (session.players||[]).find(function(player){return player.player_id===playerId;});
+}
+
+function findSlot(slotId){
+  return (session.timeslots[session.currentVenueId]||[]).find(function(slot){return slot.id===slotId;});
 }
 
 // ============ AUTH ============
@@ -880,6 +997,9 @@ async function loadAdminData(){
   var bookings=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings?day='+today);
   if(bookings)session.bookings=bookings;
 
+  var bookingHistory=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings');
+  if(bookingHistory)session.bookingHistory=bookingHistory;
+
   var players=await apiCall('GET','/venues/'+session.currentVenueId+'/players');
   if(players)session.players=players;
   
@@ -892,8 +1012,12 @@ async function loadAdminData(){
   var services=await apiCall('GET','/venues/'+session.currentVenueId+'/services');
   if(services)session.services=services;
 
+  var profile=await apiCall('GET','/venues/'+session.currentVenueId+'/profile');
+  if(profile)session.profile=profile;
+
   var selectedVenue=(session.venues||[]).find(function(v){return v.id===session.currentVenueId;});
   if(selectedVenue){
+    var businessName=document.getElementById('settingBusinessName');
     var open=document.getElementById('settingOpeningTime');
     var close=document.getElementById('settingClosingTime');
     var tc=document.getElementById('settingTableCount');
@@ -901,6 +1025,8 @@ async function loadAdminData(){
     var cd=document.getElementById('settingCooldown');
     var fee=document.getElementById('settingSessionFee');
     var pf=document.getElementById('settingPlatformFee');
+    var adminVenueName=document.getElementById('adminVenueName');
+    if(businessName)businessName.value=selectedVenue.name||'';
     if(open)open.value=formatTime(selectedVenue.opening_time);
     if(close)close.value=formatTime(selectedVenue.closing_time);
     if(tc)tc.value=selectedVenue.table_count;
@@ -908,6 +1034,20 @@ async function loadAdminData(){
     if(cd)cd.value=selectedVenue.cooldown_minutes;
     if(fee)fee.value=selectedVenue.session_fee;
     if(pf)pf.value=selectedVenue.platform_fee_pct;
+    if(adminVenueName)adminVenueName.textContent=selectedVenue.name||'Business venue';
+  }
+
+  if(session.profile){
+    var settingBusinessWhatsapp=document.getElementById('settingBusinessWhatsapp');
+    var settingNudgeWindow=document.getElementById('settingNudgeWindow');
+    var settingNudgeMessage=document.getElementById('settingNudgeMessage');
+    var settingReminderLead=document.getElementById('settingReminderLead');
+    var settingReminderMessage=document.getElementById('settingReminderMessage');
+    if(settingBusinessWhatsapp)settingBusinessWhatsapp.value=session.profile.business_whatsapp||'';
+    if(settingNudgeWindow)settingNudgeWindow.value=session.profile.nudge_window_minutes;
+    if(settingNudgeMessage)settingNudgeMessage.value=session.profile.nudge_message_template||'';
+    if(settingReminderLead)settingReminderLead.value=session.profile.reminder_lead_minutes;
+    if(settingReminderMessage)settingReminderMessage.value=session.profile.reminder_message_template||'';
   }
   
   renderAdminScreen();
@@ -929,24 +1069,44 @@ function renderScheduleTab(){
   var lockedRows=document.getElementById('lockedBookingsRows');
   if(!scheduleRows||!lockedRows)return;
 
-  var html='';
+  var grouped={};
   slots.forEach(function(slot){
+    var key=formatTime(slot.start_time);
+    if(!grouped[key])grouped[key]=[];
+    grouped[key].push(slot);
+  });
+
+  var html='';
+  Object.keys(grouped).sort().forEach(function(timeKey){
+    html+='<div class="slot-divider">'+timeKey+'</div>';
+    grouped[timeKey].forEach(function(slot){
     var slotBookings=activeBookings.filter(function(b){return b.timeslot_id===slot.id;});
     var count=slotBookings.length;
     var status='';
     var bcClass='amber';
     if(count===4){status='Full';bcClass='green';}
     else if(count===3){status='3/4';bcClass='red';}
+    else if(count===0){status='Open';bcClass='gray';}
     else{status=count+'/4';bcClass='amber';}
 
-    html+='<div class="table-row"><div class="table-time">'+formatTime(slot.start_time)+'</div>'+
+    var names=slotBookings.map(function(booking){
+      var player=findPlayer(booking.player_id);
+      return player?player.player_name:'Unknown';
+    }).join(' · ');
+
+    html+='<div class="table-row" onclick="openSlotManager(\''+slot.id+'\')"><div class="table-time">T'+slot.table_number+'</div>'+
       '<div class="seat-bar">'+
       '<div class="seat-blk '+(count>0?'taken':'')+'"></div>'+
       '<div class="seat-blk '+(count>1?'taken':'')+'"></div>'+
       '<div class="seat-blk '+(count>2?'taken':'')+'"></div>'+
       '<div class="seat-blk '+(count>3?'taken':'')+'"></div>'+
       '</div><span class="badge badge-'+bcClass+'">'+status+'</span>'+
-      '<span class="action-chip" onclick="sendTableNudge(\''+slot.id+'\')">Nudge</span></div>';
+      '<div class="table-meta"><span>'+(names||'Tap to add players to this table')+'</span><span>'+formatTime(slot.start_time)+' - '+formatTime(slot.end_time)+'</span></div>'+
+      '<div class="table-actions">'+
+      '<button class="action-chip" onclick="event.stopPropagation();openSlotManager(\''+slot.id+'\')">'+(count===0?'Add players':'Manage players')+'</button>'+
+      '<button class="action-chip" onclick="event.stopPropagation();sendTableNudge(\''+slot.id+'\')">Nudge</button>'+
+      '</div></div>';
+    });
   });
 
   scheduleRows.innerHTML=html||'<div class="audit-sub">No timeslots today.</div>';
@@ -965,17 +1125,19 @@ function renderScheduleTab(){
 
 function renderCustomersTab(){
   var wrap=document.getElementById('customersRows');
+  var title=document.getElementById('registeredPlayersTitle');
   if(!wrap)return;
+  if(title)title.textContent='Registered players ('+(session.players||[]).length+')';
   var rows='';
   session.players.forEach(function(p){
-    var phoneDigits=(p.player_phone||'').replace(/[^0-9]/g,'');
+    var digits=phoneDigits(p.player_phone);
     var actionHtml='';
     if(p.status==='pending'){
-      actionHtml='<button class="action-chip" onclick="approvePlayer(\''+p.player_id+'\')">Approve</button>';
+      actionHtml='<button class="action-chip" onclick="event.stopPropagation();approvePlayer(\''+p.player_id+'\')">Approve</button>';
     }else{
-      actionHtml='<button class="mini-wa" onclick="window.open(\'https://wa.me/'+phoneDigits+'\',\'_blank\')">W</button>';
+      actionHtml='<div class="customer-actions"><button class="action-chip" onclick="event.stopPropagation();openCustomerDetail(\''+p.player_id+'\')">Details</button><button class="mini-wa" onclick="event.stopPropagation();window.open(\''+makeWhatsappUrl(digits,'')+'\',\'_blank\')">W</button></div>';
     }
-    rows+='<div class="customer-row"><div class="avatar">'+initials(p.player_name)+'</div>'+
+    rows+='<div class="customer-row clickable" onclick="openCustomerDetail(\''+p.player_id+'\')"><div class="avatar">'+initials(p.player_name)+'</div>'+
       '<div class="cust-info"><div class="cust-name">'+p.player_name+'</div><div class="cust-meta">'+p.player_phone+' - '+p.status+'</div></div>'+
       actionHtml+
       '</div>';
@@ -984,6 +1146,7 @@ function renderCustomersTab(){
 }
 
 function renderMessagesTab(){
+  renderDueReminders();
   var wrap=document.getElementById('messageRows');
   if(!wrap)return;
   var msgs=session.messages||[];
@@ -1012,8 +1175,43 @@ async function sendMessage(messageType,content,recipientCount){
 }
 
 async function sendTableNudge(timeslotId){
-  var count=session.players.filter(function(p){return p.status==='approved';}).length || 1;
-  await sendMessage('reminder','Friendly reminder: seats are open for upcoming tables. Tap to book now.',count);
+  var slot=findSlot(timeslotId);
+  if(!slot){showToast('Timeslot not found','error');return;}
+  var windowMinutes=(session.profile&&session.profile.nudge_window_minutes)||60;
+  var slotMinutes=timeStringToMinutes(slot.start_time);
+  var currentPlayerIds=session.bookings.filter(function(booking){return booking.timeslot_id===timeslotId&&booking.status!=='cancelled';}).map(function(booking){return booking.player_id;});
+  var candidateMap={};
+  (session.bookingHistory||[]).forEach(function(booking){
+    if(booking.status==='cancelled')return;
+    var diff=Math.abs(timeStringToMinutes(booking.start_time)-slotMinutes);
+    if(diff>windowMinutes)return;
+    if(currentPlayerIds.indexOf(booking.player_id)>=0)return;
+    var player=findPlayer(booking.player_id);
+    if(!player||player.status!=='approved')return;
+    candidateMap[booking.player_id]=player;
+  });
+  var candidates=Object.keys(candidateMap).map(function(playerId){return candidateMap[playerId];});
+  if(!candidates.length){showToast('No regular players found for this timeslot window.','warn');return;}
+
+  var content='<div class="audit-sub" style="margin-bottom:10px">Players with prior play within +/- '+windowMinutes+' minutes of '+formatTime(slot.start_time)+'</div>';
+  candidates.forEach(function(player){
+    var message=applyTemplate((session.profile&&session.profile.nudge_message_template)||'',player.player_name,formatTime(slot.start_time));
+    content+='<div class="msg-reminder-row"><div class="msg-reminder-head"><div><div class="msg-reminder-title">'+escapeHtml(player.player_name)+'</div><div class="msg-reminder-sub">'+escapeHtml(player.player_phone)+'</div></div>'+
+      '<button class="soft-btn" data-player-id="'+player.player_id+'">Open WhatsApp</button></div>'+
+      '<div class="msg-reminder-sub" style="margin-top:8px">'+escapeHtml(message)+'</div></div>';
+  });
+  var overlay=showBottomSheet('Nudge players',content);
+  Array.prototype.slice.call(overlay.querySelectorAll('[data-player-id]')).forEach(function(button){
+    button.onclick=async function(){
+      var player=findPlayer(button.getAttribute('data-player-id'));
+      if(!player)return;
+      var message=applyTemplate((session.profile&&session.profile.nudge_message_template)||'',player.player_name,formatTime(slot.start_time));
+      var url=makeWhatsappUrl(player.player_phone,message);
+      if(url)window.open(url,'_blank');
+      await sendMessage('reminder',message,1);
+      showToast('WhatsApp opened for '+player.player_name);
+    };
+  });
 }
 
 async function sendBroadcast(){
@@ -1042,6 +1240,7 @@ async function unlockBookingAdmin(bookingId){
 async function saveSettings(){
   if(!session.currentVenueId||!session.user)return;
   var payload={
+    name:document.getElementById('settingBusinessName').value,
     opening_time:document.getElementById('settingOpeningTime').value,
     closing_time:document.getElementById('settingClosingTime').value,
     table_count:Number(document.getElementById('settingTableCount').value),
@@ -1053,6 +1252,17 @@ async function saveSettings(){
   var updated=await apiCall('PATCH','/venues/'+session.currentVenueId+'?admin_id='+encodeURIComponent(session.user.id),payload);
   if(!updated)return;
 
+  var profilePayload={
+    currency_code:(session.profile&&session.profile.currency_code)||'GBP',
+    business_whatsapp:document.getElementById('settingBusinessWhatsapp').value,
+    nudge_window_minutes:Number(document.getElementById('settingNudgeWindow').value),
+    nudge_message_template:document.getElementById('settingNudgeMessage').value,
+    reminder_lead_minutes:Number(document.getElementById('settingReminderLead').value),
+    reminder_message_template:document.getElementById('settingReminderMessage').value
+  };
+  var updatedProfile=await apiCall('PUT','/venues/'+session.currentVenueId+'/profile?admin_id='+encodeURIComponent(session.user.id),profilePayload);
+  if(updatedProfile)session.profile=updatedProfile;
+
   // Keep local venue cache in sync; otherwise loadAdminData() repopulates stale values.
   var venueIdx=(session.venues||[]).findIndex(function(v){return v.id===session.currentVenueId;});
   if(venueIdx>=0){
@@ -1061,6 +1271,201 @@ async function saveSettings(){
 
   showToast('Settings saved.');
   await loadAdminData();
+}
+
+async function assignPlayerToSlot(timeslotId,playerId){
+  var created=await apiCall('POST','/timeslots/'+timeslotId+'/book',{player_id:playerId});
+  if(!created)return false;
+  await loadAdminData();
+  return true;
+}
+
+async function replacePlayerInSlot(bookingId,newPlayerId){
+  var booking=session.bookings.find(function(row){return row.id===bookingId;});
+  if(!booking)return;
+  var unlocked=await apiCall('PATCH','/bookings/'+bookingId+'/unlock?admin_id='+encodeURIComponent(session.user.id),null);
+  if(!unlocked)return;
+  var created=await assignPlayerToSlot(booking.timeslot_id,newPlayerId);
+  if(created)showToast('Player replaced successfully.');
+}
+
+async function openSlotManager(slotId,replaceBookingId){
+  var slot=findSlot(slotId);
+  if(!slot)return;
+  var slotBookings=session.bookings.filter(function(booking){return booking.timeslot_id===slotId&&booking.status!=='cancelled';});
+  var bookedPlayerIds=slotBookings.map(function(booking){return booking.player_id;});
+  var approvedPlayers=(session.players||[]).filter(function(player){return player.status==='approved';});
+  var content='';
+
+  if(replaceBookingId==='__add__' || replaceBookingId){
+    content+='<input id="slotSearchInput" class="login-input" placeholder="Search name or WhatsApp" style="margin-bottom:10px">';
+    content+='<div id="slotPlayerList"></div>';
+    var overlayReplace=showBottomSheet((replaceBookingId==='__add__'?'Add player to ':'Replace player at ')+formatTime(slot.start_time)+' Table '+slot.table_number,content);
+    var listElReplace=overlayReplace.querySelector('#slotPlayerList');
+    var searchElReplace=overlayReplace.querySelector('#slotSearchInput');
+    function renderReplaceCandidates(){
+      var q=((searchElReplace&&searchElReplace.value)||'').toLowerCase();
+      var rows='';
+      approvedPlayers.filter(function(player){
+        if(replaceBookingId!== '__add__'){
+          var original=session.bookings.find(function(item){return item.id===replaceBookingId;});
+          if(original && player.player_id===original.player_id)return false;
+        }
+        if(bookedPlayerIds.indexOf(player.player_id)>=0)return false;
+        return (player.player_name||'').toLowerCase().indexOf(q)>=0 || (player.player_phone||'').toLowerCase().indexOf(q)>=0;
+      }).forEach(function(player){
+        rows+='<div class="customer-row"><div class="avatar">'+initials(player.player_name)+'</div><div class="cust-info"><div class="cust-name">'+escapeHtml(player.player_name)+'</div><div class="cust-meta">'+escapeHtml(player.player_phone)+'</div></div><button class="soft-btn" data-replace-player="'+player.player_id+'">'+(replaceBookingId==='__add__'?'Add':'Replace')+'</button></div>';
+      });
+      listElReplace.innerHTML=rows||'<div class="audit-sub">No matching players.</div>';
+      Array.prototype.slice.call(overlayReplace.querySelectorAll('[data-replace-player]')).forEach(function(button){
+        button.onclick=async function(){
+          if(replaceBookingId==='__add__'){
+            var ok=await assignPlayerToSlot(slotId,button.getAttribute('data-replace-player'));
+            if(ok)showToast('Player added to table.');
+          }else{
+            await replacePlayerInSlot(replaceBookingId,button.getAttribute('data-replace-player'));
+          }
+          if(document.body.contains(overlayReplace))document.body.removeChild(overlayReplace);
+        };
+      });
+    }
+    searchElReplace.oninput=renderReplaceCandidates;
+    renderReplaceCandidates();
+    return;
+  }
+
+  if(slotBookings.length===0){
+    content+='<input id="slotSearchInput" class="login-input" placeholder="Search name or WhatsApp" style="margin-bottom:10px">';
+    content+='<div id="slotPlayerList"></div>';
+    var overlayAdd=showBottomSheet('Add players to '+formatTime(slot.start_time)+' Table '+slot.table_number,content);
+    var listEl=overlayAdd.querySelector('#slotPlayerList');
+    var searchEl=overlayAdd.querySelector('#slotSearchInput');
+    function renderCandidates(){
+      var q=((searchEl&&searchEl.value)||'').toLowerCase();
+      var rows='';
+      approvedPlayers.filter(function(player){
+        return bookedPlayerIds.indexOf(player.player_id)<0 && ((player.player_name||'').toLowerCase().indexOf(q)>=0 || (player.player_phone||'').toLowerCase().indexOf(q)>=0);
+      }).forEach(function(player){
+        rows+='<div class="customer-row"><div class="avatar">'+initials(player.player_name)+'</div><div class="cust-info"><div class="cust-name">'+escapeHtml(player.player_name)+'</div><div class="cust-meta">'+escapeHtml(player.player_phone)+'</div></div><button class="soft-btn" data-add-player="'+player.player_id+'">Add</button></div>';
+      });
+      listEl.innerHTML=rows||'<div class="audit-sub">No matching players.</div>';
+      Array.prototype.slice.call(overlayAdd.querySelectorAll('[data-add-player]')).forEach(function(button){
+        button.onclick=async function(){
+          var ok=await assignPlayerToSlot(slotId,button.getAttribute('data-add-player'));
+          if(ok){showToast('Player added to table.');if(document.body.contains(overlayAdd))document.body.removeChild(overlayAdd);} 
+        };
+      });
+    }
+    searchEl.oninput=renderCandidates;
+    renderCandidates();
+    return;
+  }
+
+  slotBookings.forEach(function(booking){
+    var player=findPlayer(booking.player_id);
+    content+='<div class="customer-row"><div class="avatar">'+initials(player?player.player_name:'?')+'</div><div class="cust-info"><div class="cust-name">'+escapeHtml(player?player.player_name:'Unknown')+'</div><div class="cust-meta">'+escapeHtml(player?player.player_phone:'')+'</div></div><div class="customer-actions"><button class="action-chip" data-clear-booking="'+booking.id+'">Clear</button><button class="action-chip" data-replace-booking="'+booking.id+'">Replace</button></div></div>';
+  });
+  if(slotBookings.length<4){
+    content+='<div style="margin-top:10px"><button class="soft-btn" id="slotAddAnotherBtn">Add another player</button></div>';
+  }
+  var overlay=showBottomSheet('Manage '+formatTime(slot.start_time)+' Table '+slot.table_number,content);
+  Array.prototype.slice.call(overlay.querySelectorAll('[data-clear-booking]')).forEach(function(button){
+    button.onclick=async function(){
+      var unlocked=await apiCall('PATCH','/bookings/'+button.getAttribute('data-clear-booking')+'/unlock?admin_id='+encodeURIComponent(session.user.id),null);
+      if(unlocked){showToast('Player removed from table.');await loadAdminData();if(document.body.contains(overlay))document.body.removeChild(overlay);} 
+    };
+  });
+  Array.prototype.slice.call(overlay.querySelectorAll('[data-replace-booking]')).forEach(function(button){
+    button.onclick=function(){
+      if(document.body.contains(overlay))document.body.removeChild(overlay);
+      openSlotManager(slotId,button.getAttribute('data-replace-booking'));
+    };
+  });
+  var addAnotherBtn=overlay.querySelector('#slotAddAnotherBtn');
+  if(addAnotherBtn){
+    addAnotherBtn.onclick=function(){
+      if(document.body.contains(overlay))document.body.removeChild(overlay);
+      openSlotManager(slotId,'__add__');
+    };
+  }
+}
+
+function renderDueReminders(){
+  var wrap=document.getElementById('dueReminderRows');
+  if(!wrap)return;
+  var leadMinutes=(session.profile&&session.profile.reminder_lead_minutes)||30;
+  var now=new Date();
+  var rows='';
+  session.bookings.filter(function(booking){return booking.status!=='cancelled';}).forEach(function(booking){
+    var slot=findSlot(booking.timeslot_id);
+    var player=findPlayer(booking.player_id);
+    if(!slot||!player)return;
+    var parts=formatTime(slot.start_time).split(':');
+    var slotTime=new Date();
+    slotTime.setHours(Number(parts[0]||0),Number(parts[1]||0),0,0);
+    var minsUntil=Math.round((slotTime-now)/60000);
+    if(minsUntil<0||minsUntil>leadMinutes)return;
+    rows+='<div class="msg-reminder-row"><div class="msg-reminder-head"><div><div class="msg-reminder-title">'+escapeHtml(player.player_name)+' · '+formatTime(slot.start_time)+' Table '+slot.table_number+'</div><div class="msg-reminder-sub">Starts in '+minsUntil+' min · '+escapeHtml(player.player_phone)+'</div></div><button class="soft-btn" data-reminder-booking="'+booking.id+'">Open WhatsApp</button></div></div>';
+  });
+  wrap.innerHTML=rows||'<div class="audit-sub">No reminders due right now.</div>';
+  Array.prototype.slice.call(wrap.querySelectorAll('[data-reminder-booking]')).forEach(function(button){
+    button.onclick=async function(){
+      var booking=session.bookings.find(function(row){return row.id===button.getAttribute('data-reminder-booking');});
+      var slot=booking?findSlot(booking.timeslot_id):null;
+      var player=booking?findPlayer(booking.player_id):null;
+      if(!slot||!player)return;
+      var message=applyTemplate((session.profile&&session.profile.reminder_message_template)||'',player.player_name,formatTime(slot.start_time));
+      var url=makeWhatsappUrl(player.player_phone,message);
+      if(url)window.open(url,'_blank');
+      await sendMessage('reminder',message,1);
+      showToast('Reminder prepared for '+player.player_name);
+    };
+  });
+}
+
+async function openCustomerDetail(playerId){
+  var player=findPlayer(playerId);
+  if(!player)return;
+  if(!session.playerStatsCache[playerId]){
+    var stats=await apiCall('GET','/management/venues/'+session.currentVenueId+'/players/'+playerId+'/stats?business_owner_id='+encodeURIComponent(session.user.id));
+    if(stats)session.playerStatsCache[playerId]=stats;
+  }
+  var data=session.playerStatsCache[playerId]||{};
+  var content='<div class="info-row"><span class="info-key">Joined date</span><span class="info-val">'+formatDateFriendly(data.joined_at)+'</span></div>'+
+    '<div class="info-row"><span class="info-key">Last game played</span><span class="info-val">'+formatDateTimeFriendly(data.last_game_played_at)+'</span></div>'+
+    '<div class="info-row"><span class="info-key">Total games</span><span class="info-val">'+(data.total_games_played||0)+'</span></div>'+
+    '<div class="info-row"><span class="info-key">Total hours</span><span class="info-val">'+(data.total_hours_played||0)+'</span></div>'+
+    '<div class="info-row"><span class="info-key">Total spending</span><span class="info-val">£'+Number(data.total_spending||0).toFixed(2)+'</span></div>'+
+    '<div style="display:flex;gap:8px;margin-top:14px"><button class="soft-btn" id="playerEditBtn">Edit</button><button class="soft-btn" id="playerWhatsAppBtn">WhatsApp</button></div>';
+  var overlay=showBottomSheet(player.player_name,content);
+  overlay.querySelector('#playerEditBtn').onclick=function(){ if(document.body.contains(overlay))document.body.removeChild(overlay); openCustomerForm(player); };
+  overlay.querySelector('#playerWhatsAppBtn').onclick=function(){ var url=makeWhatsappUrl(player.player_phone,''); if(url)window.open(url,'_blank'); };
+}
+
+function openCustomerForm(player){
+  var isEdit=!!player;
+  var content='<div style="display:grid;gap:10px"><div><div class="login-label">Name</div><input id="customerNameInput" class="login-input" value="'+escapeHtml(player?player.player_name:'')+'"></div>'+
+    '<div><div class="login-label">WhatsApp phone</div><input id="customerPhoneInput" class="login-input" type="tel" value="'+escapeHtml(player?player.player_phone:'')+'"></div>'+
+    '<button class="cta-btn" id="customerSaveBtn" style="margin-top:8px">'+(isEdit?'Save changes':'Add player')+'</button></div>';
+  var overlay=showBottomSheet(isEdit?'Edit player':'Add player',content);
+  overlay.querySelector('#customerSaveBtn').onclick=async function(){
+    var name=(overlay.querySelector('#customerNameInput').value||'').trim();
+    var phone=(overlay.querySelector('#customerPhoneInput').value||'').trim();
+    if(!name||!phone){showToast('Please enter name and WhatsApp phone.','warn');return;}
+    if(isEdit){
+      var updated=await apiCall('PATCH','/management/users/'+player.player_id+'?business_owner_id='+encodeURIComponent(session.user.id),{name:name,phone:phone});
+      if(!updated)return;
+      showToast('Player updated.');
+    }else{
+      var digits=phoneDigits(phone);
+      var password=digits.slice(-4)||'1234';
+      var created=await apiCall('POST','/management/venues/'+session.currentVenueId+'/players?business_owner_id='+encodeURIComponent(session.user.id),{name:name,phone:phone,password:password,role:'player'});
+      if(!created)return;
+      showToast('Player added. Default PIN set to the last 4 digits.');
+    }
+    await loadAdminData();
+    if(document.body.contains(overlay))document.body.removeChild(overlay);
+  };
 }
 
 function exportAuditCsv(){
@@ -1554,6 +1959,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var composeBtn=document.getElementById('composeBtn');
   var saveSettingsBtn=document.getElementById('saveSettingsBtn');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
+  var customerAddBtn=document.getElementById('customerAddBtn');
   if(signInBtn){
     signInBtn.onclick=function(){
       handleSignIn();
@@ -1645,6 +2051,11 @@ document.addEventListener('DOMContentLoaded',function(){
   if(exportCsvBtn){
     exportCsvBtn.onclick=function(){
       exportAuditCsv();
+    };
+  }
+  if(customerAddBtn){
+    customerAddBtn.onclick=function(){
+      openCustomerForm();
     };
   }
 

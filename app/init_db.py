@@ -1,8 +1,8 @@
-from app.database import Base, engine
+from app.db_schema import ensure_schema
 
 
 def run_init_db() -> None:
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
 
 
 if __name__ == "__main__":

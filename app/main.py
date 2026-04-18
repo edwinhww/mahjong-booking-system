@@ -7,12 +7,13 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
+from app.db_schema import ensure_schema
 from app.models import User, UserRole
 from app.routers import action_audit, audit, auth, bookings, catalog, management, messages, orders, timeslots, venues
 from app.schemas import HealthResponse
 from app.services.booking_engine import lock_expired_bookings
 
-Base.metadata.create_all(bind=engine)
+ensure_schema()
 
 app = FastAPI(title="Mahjong Booking System", version="0.1.0")
 

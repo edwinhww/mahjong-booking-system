@@ -59,7 +59,15 @@ def get_venue_profile(venue_id: str, db: Session = Depends(get_db)) -> VenueProf
 
     profile = db.scalar(select(VenueProfile).where(VenueProfile.venue_id == venue_id))
     if not profile:
-        profile = VenueProfile(venue_id=venue_id, currency_code="GBP", business_whatsapp="")
+        profile = VenueProfile(
+            venue_id=venue_id,
+            currency_code="GBP",
+            business_whatsapp="",
+            nudge_window_minutes=60,
+            nudge_message_template="Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?",
+            reminder_lead_minutes=30,
+            reminder_message_template="Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.",
+        )
         db.add(profile)
         db.commit()
         db.refresh(profile)
@@ -69,6 +77,10 @@ def get_venue_profile(venue_id: str, db: Session = Depends(get_db)) -> VenueProf
         venue_id=profile.venue_id,
         currency_code=profile.currency_code,
         business_whatsapp=profile.business_whatsapp,
+        nudge_window_minutes=profile.nudge_window_minutes,
+        nudge_message_template=profile.nudge_message_template,
+        reminder_lead_minutes=profile.reminder_lead_minutes,
+        reminder_message_template=profile.reminder_message_template,
         updated_at=profile.updated_at,
     )
 
@@ -83,11 +95,23 @@ def upsert_venue_profile(venue_id: str, payload: VenueProfileUpsert, admin_id: s
 
     profile = db.scalar(select(VenueProfile).where(VenueProfile.venue_id == venue_id))
     if not profile:
-        profile = VenueProfile(venue_id=venue_id, currency_code=payload.currency_code.upper(), business_whatsapp=payload.business_whatsapp)
+        profile = VenueProfile(
+            venue_id=venue_id,
+            currency_code=payload.currency_code.upper(),
+            business_whatsapp=payload.business_whatsapp,
+            nudge_window_minutes=payload.nudge_window_minutes,
+            nudge_message_template=payload.nudge_message_template,
+            reminder_lead_minutes=payload.reminder_lead_minutes,
+            reminder_message_template=payload.reminder_message_template,
+        )
         db.add(profile)
     else:
         profile.currency_code = payload.currency_code.upper()
         profile.business_whatsapp = payload.business_whatsapp
+        profile.nudge_window_minutes = payload.nudge_window_minutes
+        profile.nudge_message_template = payload.nudge_message_template
+        profile.reminder_lead_minutes = payload.reminder_lead_minutes
+        profile.reminder_message_template = payload.reminder_message_template
         profile.updated_at = datetime.utcnow()
 
     log_action(
@@ -107,6 +131,10 @@ def upsert_venue_profile(venue_id: str, payload: VenueProfileUpsert, admin_id: s
         venue_id=profile.venue_id,
         currency_code=profile.currency_code,
         business_whatsapp=profile.business_whatsapp,
+        nudge_window_minutes=profile.nudge_window_minutes,
+        nudge_message_template=profile.nudge_message_template,
+        reminder_lead_minutes=profile.reminder_lead_minutes,
+        reminder_message_template=profile.reminder_message_template,
         updated_at=profile.updated_at,
     )
 
