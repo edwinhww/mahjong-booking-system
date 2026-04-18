@@ -5,7 +5,7 @@ This workspace now includes:
 - Mobile-first frontend mockup at `frontend/index.html`
 - FastAPI backend with core entities, booking flow, and audit hooks
 - Local SQLite default (easy start)
-- Heroku-ready runtime files (`Procfile`, `runtime.txt`)
+- Heroku-ready runtime files (`Procfile`, `.python-version`)
 
 ## Project Structure
 
