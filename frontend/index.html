@@ -1727,24 +1727,28 @@ async function openCustomerDetail(playerId){
 
 function openCustomerForm(player){
   var isEdit=!!player;
+  var phoneParts=splitPhoneNumber(player?player.player_phone:'', '+852');
   var content='<div style="display:grid;gap:10px"><div><div class="login-label">Name</div><input id="customerNameInput" class="login-input" value="'+escapeHtml(player?player.player_name:'')+'"></div>'+
-    '<div><div class="login-label">WhatsApp phone</div><input id="customerPhoneInput" class="login-input" type="tel" value="'+escapeHtml(player?player.player_phone:'')+'"></div>'+
+    '<div><div class="login-label">WhatsApp phone</div><div style="display:flex;gap:6px"><input id="customerCountryCodeInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.countryCode||'+852')+'" style="width:92px;text-align:center"><input id="customerPhoneInput" class="login-input" type="tel" value="'+escapeHtml(phoneParts.localNumber||'')+'" placeholder="91234567"></div></div>'+
     '<button class="cta-btn" id="customerSaveBtn" style="margin-top:8px">'+(isEdit?'Save changes':'Add player')+'</button></div>';
   var overlay=showBottomSheet(isEdit?'Edit player':'Add player',content);
   overlay.querySelector('#customerSaveBtn').onclick=async function(){
     var name=(overlay.querySelector('#customerNameInput').value||'').trim();
-    var phone=(overlay.querySelector('#customerPhoneInput').value||'').trim();
-    if(!name||!phone){showToast('Please enter name and WhatsApp phone.','warn');return;}
+    var countryCode=(overlay.querySelector('#customerCountryCodeInput').value||'').trim()||'+852';
+    var localPhone=(overlay.querySelector('#customerPhoneInput').value||'').trim();
+    if(!name||!localPhone){showToast('Please enter name and WhatsApp phone.','warn');return;}
+    var phone=buildPhoneNumber(countryCode,localPhone);
+    if(!phone){showToast('Please enter a valid WhatsApp phone.','warn');return;}
     if(isEdit){
       var updated=await apiCall('PATCH','/management/users/'+player.player_id+'?business_owner_id='+encodeURIComponent(session.user.id),{name:name,phone:phone});
       if(!updated)return;
       showToast('Player updated.');
     }else{
-      var digits=phoneDigits(phone);
+      var digits=phoneDigits(localPhone);
       var password=digits.slice(-4)||'1234';
       var created=await apiCall('POST','/management/venues/'+session.currentVenueId+'/players?business_owner_id='+encodeURIComponent(session.user.id),{name:name,phone:phone,password:password,role:'player'});
       if(!created)return;
-      showToast('Player added. Default PIN set to the last 4 digits.');
+      showToast('Player added to this venue. Default PIN set to the last 4 digits.');
     }
     await loadAdminData();
     if(document.body.contains(overlay))document.body.removeChild(overlay);

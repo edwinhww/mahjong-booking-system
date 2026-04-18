@@ -113,7 +113,46 @@ def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_i
 
     exists = db.scalar(select(User).where(User.phone == payload.phone))
     if exists:
-        raise HTTPException(status_code=409, detail="Phone already registered")
+        if exists.role != UserRole.player:
+            raise HTTPException(status_code=409, detail="Phone already registered")
+
+        existing_membership = db.scalar(
+            select(VenuePlayer).where(
+                VenuePlayer.venue_id == venue_id,
+                VenuePlayer.player_id == exists.id,
+            )
+        )
+        if existing_membership:
+            raise HTTPException(status_code=409, detail="Player already registered for this venue")
+
+        vp = VenuePlayer(
+            venue_id=venue_id,
+            player_id=exists.id,
+            status=VenuePlayerStatus.approved if auto_approve else VenuePlayerStatus.pending,
+            approved_by=business_owner_id if auto_approve else None,
+            approved_at=datetime.utcnow() if auto_approve else None,
+        )
+        db.add(vp)
+        log_action(
+            db,
+            actor_id=business_owner_id,
+            action_type="venue.player_linked",
+            venue_id=venue_id,
+            target_type="venue_player",
+            target_id=vp.id,
+            metadata={"player_id": exists.id, "phone": exists.phone, "auto_approve": auto_approve},
+        )
+        db.commit()
+        db.refresh(exists)
+
+        return UserRead(
+            id=exists.id,
+            name=exists.name,
+            phone=exists.phone,
+            role=exists.role,
+            status=exists.status,
+            must_change_password=exists.must_change_password,
+        )
 
     user = User(
         name=payload.name,
