@@ -404,6 +404,8 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="atab" onclick="showAdminTab('orders',this)" id="tabOrders">Orders</div>
       <div class="atab" onclick="showAdminTab('adminaudit',this)" id="tabAdminAudit">Audit</div>
       <div class="atab" onclick="showAdminTab('settings',this)" id="tabSettings">Settings</div>
+      <div class="atab" onclick="showAdminTab('platformowners',this)" id="tabPlatformOwners">Owners</div>
+      <div class="atab" onclick="showAdminTab('platformvenues',this)" id="tabPlatformVenues">Venues</div>
     </div>
 
     <div class="admin-panel active" id="ap-schedule">
@@ -643,6 +645,46 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div id="adminAuditList"><div class="audit-sub">Loading...</div></div>
     </div>
 
+    <div class="admin-panel" id="ap-platformowners">
+      <div class="section-title">Business owners</div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:10px">Create business owner</div>
+        <div style="display:grid;gap:8px">
+          <input class="login-input" id="platformOwnerName" placeholder="Owner name">
+          <input class="login-input" id="platformOwnerPhone" placeholder="WhatsApp phone">
+          <input class="login-input" id="platformOwnerPassword" type="password" placeholder="Temporary password">
+          <button class="cta-btn" id="createOwnerBtn">Create owner</button>
+        </div>
+      </div>
+      <div id="platformOwnersRows"><div class="audit-sub">Loading owners...</div></div>
+    </div>
+
+    <div class="admin-panel" id="ap-platformvenues">
+      <div class="section-title">Venues</div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:10px">Create venue</div>
+        <div style="display:grid;gap:8px">
+          <input class="login-input" id="platformVenueName" placeholder="Venue name">
+          <select class="login-input" id="platformVenueOwner"></select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <input class="login-input" id="platformVenueOpen" type="time" value="10:00">
+            <input class="login-input" id="platformVenueClose" type="time" value="22:00">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <input class="login-input" id="platformVenueTables" type="number" min="1" max="20" value="4" placeholder="Tables">
+            <input class="login-input" id="platformVenueDuration" type="number" min="1" max="6" value="2" placeholder="Hours">
+            <input class="login-input" id="platformVenueCooldown" type="number" min="5" max="120" value="30" placeholder="Cooldown">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <input class="login-input" id="platformVenueFee" type="number" min="1" step="0.01" value="40" placeholder="Session fee">
+            <input class="login-input" id="platformVenuePlatformFee" type="number" min="0" max="100" value="5" placeholder="Platform fee %">
+          </div>
+          <button class="cta-btn" id="createVenueBtn">Create venue</button>
+        </div>
+      </div>
+      <div id="platformVenuesRows"><div class="audit-sub">Loading venues...</div></div>
+    </div>
+
   </div>
 
   <!-- AUDIT SCREEN -->
@@ -711,6 +753,7 @@ function showToast(msg,type,duration){
 var session={
   user:null,
   venues:[],
+  platformOwners:[],
   timeslots:{},
   bookings:[],
   bookingHistory:[],
@@ -860,6 +903,7 @@ function handleSignOut(){
   session.token=null;
   document.getElementById('passwordInput').value='';
   session.timeslots={};
+  session.platformOwners=[];
   session.bookings=[];
   session.players=[];
   session.messages=[];
@@ -972,14 +1016,19 @@ async function undoBooking(bookingId){
 // ============ ADMIN FLOWS ============
 async function loadVenueAdmin(){
   var venues=await apiCall('GET','/venues');
-  if(!venues||venues.length===0)return;
-  session.venues=venues;
+  if(!venues)return;
+  session.venues=venues||[];
+
+  if(session.user.role==='platform_owner'){
+    await loadPlatformAdminData();
+    return;
+  }
+
+  if(!venues.length)return;
 
   var adminVenue=null;
   if(session.user.role==='business_owner'){
     adminVenue=venues.find(function(v){return v.owner_id===session.user.id});
-  }else if(session.user.role==='platform_owner'){
-    adminVenue=venues[0];
   }
   if(adminVenue)session.currentVenueId=adminVenue.id;
   if(!session.currentVenueId){
@@ -988,6 +1037,16 @@ async function loadVenueAdmin(){
   }
   
   await loadAdminData();
+}
+
+async function loadPlatformAdminData(){
+  var owners=await apiCall('GET','/management/admin/users?platform_owner_id='+encodeURIComponent(session.user.id)+'&role=business_owner');
+  if(owners)session.platformOwners=owners;
+  var adminVenueName=document.getElementById('adminVenueName');
+  var adminSubTitle=document.getElementById('adminSubTitle');
+  if(adminVenueName)adminVenueName.textContent='Platform Console';
+  if(adminSubTitle)adminSubTitle.textContent='Manage owners and venues';
+  renderAdminScreen();
 }
 
 async function loadAdminData(){
@@ -1057,6 +1116,13 @@ async function loadAdminData(){
 }
 
 function renderAdminScreen(){
+  if(session.user&&session.user.role==='platform_owner'){
+    renderPlatformOwnersTab();
+    renderPlatformVenuesTab();
+    var ownersTab=document.getElementById('tabPlatformOwners');
+    if(ownersTab)showAdminTab('platformowners',ownersTab);
+    return;
+  }
   renderScheduleTab();
   renderCustomersTab();
   renderMessagesTab();
@@ -1161,6 +1227,92 @@ function renderMessagesTab(){
       '<div class="msg-time">'+new Date(msg.sent_at).toLocaleString()+' · '+msg.recipient_count+' recipients · '+msg.channel+'</div></div></div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No recent messages.</div>';
+}
+
+function renderPlatformOwnersTab(){
+  var wrap=document.getElementById('platformOwnersRows');
+  if(!wrap)return;
+  var owners=(session.platformOwners||[]).filter(function(user){return user.role==='business_owner';});
+  var html='';
+  owners.forEach(function(owner){
+    html+='<div class="customer-row"><div class="avatar">'+initials(owner.name)+'</div>'+
+      '<div class="cust-info"><div class="cust-name">'+escapeHtml(owner.name)+'</div><div class="cust-meta">'+escapeHtml(owner.phone)+' · '+escapeHtml(owner.status)+'</div></div></div>';
+  });
+  wrap.innerHTML=html||'<div class="audit-sub">No business owners found.</div>';
+
+  var ownerSelect=document.getElementById('platformVenueOwner');
+  if(ownerSelect){
+    ownerSelect.innerHTML='';
+    owners.forEach(function(owner){
+      var opt=document.createElement('option');
+      opt.value=owner.id;
+      opt.textContent=owner.name+' ('+owner.phone+')';
+      ownerSelect.appendChild(opt);
+    });
+  }
+}
+
+function renderPlatformVenuesTab(){
+  var wrap=document.getElementById('platformVenuesRows');
+  if(!wrap)return;
+  var ownerMap={};
+  (session.platformOwners||[]).forEach(function(owner){ownerMap[owner.id]=owner;});
+  var html='';
+  (session.venues||[]).forEach(function(venue){
+    var owner=ownerMap[venue.owner_id];
+    html+='<div class="audit-row"><div><div class="audit-left">'+escapeHtml(venue.name)+'</div>'+
+      '<div class="audit-sub">Owner: '+escapeHtml(owner?owner.name:venue.owner_id)+' · '+formatTime(venue.opening_time)+'-'+formatTime(venue.closing_time)+' · '+venue.table_count+' tables</div></div>'+
+      '<div style="text-align:right"><div class="audit-fee">£'+Number(venue.session_fee||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+Number(venue.platform_fee_pct||0)+'%</div></div></div>';
+  });
+  wrap.innerHTML=html||'<div class="audit-sub">No venues found.</div>';
+}
+
+async function createBusinessOwner(){
+  var name=(document.getElementById('platformOwnerName').value||'').trim();
+  var phone=(document.getElementById('platformOwnerPhone').value||'').trim();
+  var password=document.getElementById('platformOwnerPassword').value||'';
+  if(!name||!phone||!password){showToast('Please fill owner name, phone, and password.','warn');return;}
+
+  var payload={name:name,phone:phone,password:password,role:'business_owner'};
+  var created=await apiCall('POST','/management/admin/users?platform_owner_id='+encodeURIComponent(session.user.id),payload);
+  if(!created)return;
+
+  document.getElementById('platformOwnerName').value='';
+  document.getElementById('platformOwnerPhone').value='';
+  document.getElementById('platformOwnerPassword').value='';
+  showToast('Business owner created.');
+  await loadVenueAdmin();
+}
+
+async function createVenueAsPlatform(){
+  var name=(document.getElementById('platformVenueName').value||'').trim();
+  var ownerId=document.getElementById('platformVenueOwner').value;
+  var open=(document.getElementById('platformVenueOpen').value||'').trim();
+  var close=(document.getElementById('platformVenueClose').value||'').trim();
+  var tables=Number(document.getElementById('platformVenueTables').value||4);
+  var duration=Number(document.getElementById('platformVenueDuration').value||2);
+  var cooldown=Number(document.getElementById('platformVenueCooldown').value||30);
+  var fee=Number(document.getElementById('platformVenueFee').value||40);
+  var platformFee=Number(document.getElementById('platformVenuePlatformFee').value||5);
+  if(!name||!ownerId||!open||!close){showToast('Please fill venue name, owner, and hours.','warn');return;}
+
+  var payload={
+    owner_id:ownerId,
+    name:name,
+    opening_time:open,
+    closing_time:close,
+    table_count:tables,
+    session_duration_hrs:duration,
+    cooldown_minutes:cooldown,
+    session_fee:fee,
+    platform_fee_pct:platformFee
+  };
+  var created=await apiCall('POST','/management/admin/venues?platform_owner_id='+encodeURIComponent(session.user.id),payload);
+  if(!created)return;
+
+  document.getElementById('platformVenueName').value='';
+  showToast('Venue created.');
+  await loadVenueAdmin();
 }
 
 async function sendMessage(messageType,content,recipientCount){
@@ -1799,17 +1951,49 @@ function showScreen(id){
     if(navBooking)navBooking.style.display='none';
     if(navAdmin)navAdmin.style.display='';
     if(navAudit)navAudit.style.display='none';
-    // Hide Audit tab in admin for business_owner
+    // Business-owner tabs
     var tabAudit=document.getElementById('tabAdminAudit');
     if(tabAudit)tabAudit.style.display='none';
+    var tabSchedule=document.getElementById('tabSchedule');
+    var tabCustomers=document.getElementById('tabCustomers');
+    var tabMessages=document.getElementById('tabMessages');
+    var tabServices=document.getElementById('tabServices');
+    var tabOrders=document.getElementById('tabOrders');
+    var tabSettings=document.getElementById('tabSettings');
+    var tabPlatformOwners=document.getElementById('tabPlatformOwners');
+    var tabPlatformVenues=document.getElementById('tabPlatformVenues');
+    if(tabSchedule)tabSchedule.style.display='';
+    if(tabCustomers)tabCustomers.style.display='';
+    if(tabMessages)tabMessages.style.display='';
+    if(tabServices)tabServices.style.display='';
+    if(tabOrders)tabOrders.style.display='';
+    if(tabSettings)tabSettings.style.display='';
+    if(tabPlatformOwners)tabPlatformOwners.style.display='none';
+    if(tabPlatformVenues)tabPlatformVenues.style.display='none';
   }else{
     // platform_owner
     if(navPlayer)navPlayer.style.display='none';
     if(navBooking)navBooking.style.display='none';
     if(navAdmin)navAdmin.style.display='';
     if(navAudit)navAudit.style.display='';
+    var tabSchedule2=document.getElementById('tabSchedule');
+    var tabCustomers2=document.getElementById('tabCustomers');
+    var tabMessages2=document.getElementById('tabMessages');
+    var tabServices2=document.getElementById('tabServices');
+    var tabOrders2=document.getElementById('tabOrders');
     var tabAudit2=document.getElementById('tabAdminAudit');
-    if(tabAudit2)tabAudit2.style.display='';
+    var tabSettings2=document.getElementById('tabSettings');
+    var tabPlatformOwners2=document.getElementById('tabPlatformOwners');
+    var tabPlatformVenues2=document.getElementById('tabPlatformVenues');
+    if(tabSchedule2)tabSchedule2.style.display='none';
+    if(tabCustomers2)tabCustomers2.style.display='none';
+    if(tabMessages2)tabMessages2.style.display='none';
+    if(tabServices2)tabServices2.style.display='none';
+    if(tabOrders2)tabOrders2.style.display='none';
+    if(tabAudit2)tabAudit2.style.display='none';
+    if(tabSettings2)tabSettings2.style.display='none';
+    if(tabPlatformOwners2)tabPlatformOwners2.style.display='';
+    if(tabPlatformVenues2)tabPlatformVenues2.style.display='';
   }
   // addons screen not shown in nav bar
   if(id==='addons'){document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));}
@@ -1835,8 +2019,9 @@ function selectRole(r){
 function showAdminTab(tab,el){
   document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('ap-'+tab).classList.add('active');
-  el.classList.add('active');
+  var panel=document.getElementById('ap-'+tab);
+  if(panel)panel.classList.add('active');
+  if(el)el.classList.add('active');
   if(tab==='adminaudit')loadAndRenderAdminAudit();
   if(tab==='orders'){var wrap=document.getElementById('orderHistoryList');if(wrap&&wrap.innerHTML.indexOf('Press Filter')>=0)loadOrderHistory();}
 }
@@ -1991,6 +2176,8 @@ document.addEventListener('DOMContentLoaded',function(){
   var saveSettingsBtn=document.getElementById('saveSettingsBtn');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
   var customerAddBtn=document.getElementById('customerAddBtn');
+  var createOwnerBtn=document.getElementById('createOwnerBtn');
+  var createVenueBtn=document.getElementById('createVenueBtn');
   if(signInBtn){
     signInBtn.onclick=function(){
       handleSignIn();
@@ -2087,6 +2274,16 @@ document.addEventListener('DOMContentLoaded',function(){
   if(customerAddBtn){
     customerAddBtn.onclick=function(){
       openCustomerForm();
+    };
+  }
+  if(createOwnerBtn){
+    createOwnerBtn.onclick=function(){
+      createBusinessOwner();
+    };
+  }
+  if(createVenueBtn){
+    createVenueBtn.onclick=function(){
+      createVenueAsPlatform();
     };
   }
 

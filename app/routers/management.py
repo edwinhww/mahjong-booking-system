@@ -37,6 +37,74 @@ def _require_platform_owner(db: Session, actor_id: str) -> User:
     return actor
 
 
+@router.get("/admin/users", response_model=list[UserRead])
+def admin_list_users(platform_owner_id: str, role: str | None = None, db: Session = Depends(get_db)) -> list[UserRead]:
+    _require_platform_owner(db, platform_owner_id)
+
+    stmt = select(User).order_by(User.created_at.desc())
+    if role:
+        try:
+            role_enum = UserRole(role)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail="Invalid role filter") from exc
+        stmt = stmt.where(User.role == role_enum)
+
+    users = db.execute(stmt).scalars().all()
+    return [
+        UserRead(
+            id=user.id,
+            name=user.name,
+            phone=user.phone,
+            role=user.role,
+            status=user.status,
+            must_change_password=user.must_change_password,
+        )
+        for user in users
+    ]
+
+
+@router.post("/admin/users", response_model=UserRead)
+def admin_create_business_owner(payload: UserCreate, platform_owner_id: str, db: Session = Depends(get_db)) -> UserRead:
+    _require_platform_owner(db, platform_owner_id)
+    if payload.role != UserRole.business_owner:
+        raise HTTPException(status_code=400, detail="Only business_owner can be created via this endpoint")
+
+    exists = db.scalar(select(User).where(User.phone == payload.phone))
+    if exists:
+        raise HTTPException(status_code=409, detail="Phone already registered")
+
+    user = User(
+        name=payload.name,
+        phone=payload.phone,
+        email=payload.email,
+        password_hash=hash_password(payload.password),
+        role=UserRole.business_owner,
+        status=UserStatus.active,
+        must_change_password=False,
+    )
+    db.add(user)
+    db.flush()
+    log_action(
+        db,
+        actor_id=platform_owner_id,
+        action_type="user.created",
+        target_type="user",
+        target_id=user.id,
+        metadata={"role": user.role.value, "phone": user.phone},
+    )
+    db.commit()
+    db.refresh(user)
+
+    return UserRead(
+        id=user.id,
+        name=user.name,
+        phone=user.phone,
+        role=user.role,
+        status=user.status,
+        must_change_password=user.must_change_password,
+    )
+
+
 @router.post("/venues/{venue_id}/players", response_model=UserRead)
 def create_player_for_venue(venue_id: str, payload: UserCreate, business_owner_id: str, auto_approve: bool = True, db: Session = Depends(get_db)) -> UserRead:
     venue = _require_venue_owner(db, venue_id, business_owner_id)
