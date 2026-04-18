@@ -478,6 +478,11 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <div class="admin-panel" id="ap-messages">
       <div class="section-title">Due reminders</div>
       <div id="dueReminderRows" style="margin-bottom:14px"><div class="audit-sub">No reminders due right now.</div></div>
+      <div class="section-title">Reallocation drafts</div>
+      <div id="reallocationDraftRows" style="margin-bottom:14px"><div class="audit-sub">No reallocation drafts.</div></div>
+      <button class="wa-btn" id="sendAllDraftsBtn" style="margin-bottom:14px">
+        <span style="font-size:16px">&#x1F4E4;</span> Send all drafts
+      </button>
       <div class="section-title" id="recentMessagesTitle">Recent messages sent</div>
       <div id="messageRows">
       <div class="msg-row">
@@ -539,7 +544,10 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="waNotifLabel">Business WhatsApp</div><div class="settings-sub" id="waNotifSub">Used to open click-to-chat links</div></div>
-          <input class="settings-input textwide" id="settingBusinessWhatsapp" type="tel" value="">
+          <div style="display:flex;gap:6px;align-items:center">
+            <input class="settings-input" id="settingBusinessWhatsappCode" type="tel" value="+852" style="width:72px;text-align:center">
+            <input class="settings-input textwide" id="settingBusinessWhatsappLocal" type="tel" value="" placeholder="91234567">
+          </div>
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="sessionFeeLabel">Session fee (per table)</div><div class="settings-sub" id="sessionFeeSub">Used for audit & billing</div></div>
@@ -794,6 +802,25 @@ function initials(name){
 
 function phoneDigits(raw){
   return String(raw||'').replace(/[^0-9]/g,'');
+}
+
+function splitPhoneNumber(raw,defaultCountryCode){
+  var fallback=defaultCountryCode||'+852';
+  var value=String(raw||'').trim();
+  if(!value)return {countryCode:fallback,localNumber:''};
+  var withPlus=value.charAt(0)==='+'?value:('+'+phoneDigits(value));
+  var match=withPlus.match(/^(\+\d{1,4})(\d*)$/);
+  if(!match)return {countryCode:fallback,localNumber:phoneDigits(value)};
+  return {countryCode:match[1],localNumber:match[2]||''};
+}
+
+function buildPhoneNumber(countryCode,localNumber){
+  var cc=String(countryCode||'').trim();
+  var local=phoneDigits(localNumber);
+  if(!local)return '';
+  if(!cc)cc='+852';
+  if(cc.charAt(0)!=='+')cc='+'+phoneDigits(cc);
+  return cc+local;
 }
 
 function escapeHtml(value){
@@ -1104,12 +1131,15 @@ async function loadAdminData(){
   }
 
   if(session.profile){
-    var settingBusinessWhatsapp=document.getElementById('settingBusinessWhatsapp');
+    var settingBusinessWhatsappCode=document.getElementById('settingBusinessWhatsappCode');
+    var settingBusinessWhatsappLocal=document.getElementById('settingBusinessWhatsappLocal');
     var settingNudgeWindow=document.getElementById('settingNudgeWindow');
     var settingNudgeMessage=document.getElementById('settingNudgeMessage');
     var settingReminderLead=document.getElementById('settingReminderLead');
     var settingReminderMessage=document.getElementById('settingReminderMessage');
-    if(settingBusinessWhatsapp)settingBusinessWhatsapp.value=session.profile.business_whatsapp||'';
+    var phoneParts=splitPhoneNumber(session.profile.business_whatsapp||'', '+852');
+    if(settingBusinessWhatsappCode)settingBusinessWhatsappCode.value=phoneParts.countryCode;
+    if(settingBusinessWhatsappLocal)settingBusinessWhatsappLocal.value=phoneParts.localNumber;
     if(settingNudgeWindow)settingNudgeWindow.value=session.profile.nudge_window_minutes;
     if(settingNudgeMessage)settingNudgeMessage.value=session.profile.nudge_message_template||'';
     if(settingReminderLead)settingReminderLead.value=session.profile.reminder_lead_minutes;
@@ -1225,9 +1255,12 @@ function renderCustomersTab(){
 
 function renderMessagesTab(){
   renderDueReminders();
+  renderReallocationDrafts();
   var wrap=document.getElementById('messageRows');
   if(!wrap)return;
-  var msgs=session.messages||[];
+  var msgs=(session.messages||[]).filter(function(msg){
+    return String(msg.content||'').indexOf('Draft:')!==0;
+  });
   var html='';
   msgs.slice(0,5).forEach(function(msg){
     html+='<div class="msg-row"><div class="msg-icon">&#x2709;</div><div class="msg-body">'+
@@ -1236,6 +1269,67 @@ function renderMessagesTab(){
       '<div class="msg-time">'+new Date(msg.sent_at).toLocaleString()+' · '+msg.recipient_count+' recipients · '+msg.channel+'</div></div></div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No recent messages.</div>';
+}
+
+function getReallocationDrafts(){
+  return (session.messages||[]).filter(function(msg){
+    return String(msg.content||'').indexOf('Draft:')===0;
+  });
+}
+
+function parseDraftPhone(content){
+  var match=String(content||'').match(/\(([^)]+)\)\./);
+  if(!match||!match[1])return '';
+  return match[1].trim();
+}
+
+async function openDraftWhatsapp(messageId){
+  var draft=(session.messages||[]).find(function(msg){return msg.id===messageId;});
+  if(!draft){showToast('Draft not found','warn');return;}
+  var phone=parseDraftPhone(draft.content);
+  if(!phone){showToast('Draft phone number not found','warn');return;}
+  var whatsappBody=String(draft.content||'').replace(/^Draft:\s*/,'').trim();
+  var url=makeWhatsappUrl(phone,whatsappBody);
+  if(!url){showToast('Invalid draft phone number','warn');return;}
+  window.open(url,'_blank');
+  await sendMessage('reminder',whatsappBody,1);
+  showToast('Draft opened in WhatsApp');
+}
+
+async function sendAllDrafts(){
+  var drafts=getReallocationDrafts();
+  if(!drafts.length){showToast('No reallocation drafts to send','warn');return;}
+  var sentCount=0;
+  for(var i=0;i<drafts.length;i++){
+    var phone=parseDraftPhone(drafts[i].content);
+    var whatsappBody=String(drafts[i].content||'').replace(/^Draft:\s*/,'').trim();
+    var url=makeWhatsappUrl(phone,whatsappBody);
+    if(url){
+      window.open(url,'_blank');
+      await sendMessage('reminder',whatsappBody,1);
+      sentCount++;
+    }
+  }
+  if(sentCount===0)showToast('No valid draft recipients found','warn');
+  else showToast('Opened '+sentCount+' draft message(s) in WhatsApp');
+}
+
+function renderReallocationDrafts(){
+  var wrap=document.getElementById('reallocationDraftRows');
+  if(!wrap)return;
+  var drafts=getReallocationDrafts();
+  var html='';
+  drafts.slice(0,8).forEach(function(msg){
+    var phone=parseDraftPhone(msg.content)||'Unknown';
+    var body=String(msg.content||'').replace(/^Draft:\s*/,'').trim();
+    html+='<div class="msg-row"><div class="msg-icon">&#x1F4DD;</div><div class="msg-body">'+
+      '<div class="msg-title">Reallocation draft · '+escapeHtml(phone)+'</div>'+
+      '<div class="msg-text">'+escapeHtml(body)+'</div>'+
+      '<div class="msg-time">'+new Date(msg.sent_at).toLocaleString()+' · draft</div>'+
+      '<div style="margin-top:8px"><button class="soft-btn" onclick="openDraftWhatsapp(\''+msg.id+'\')">Open WhatsApp</button></div>'+
+      '</div></div>';
+  });
+  wrap.innerHTML=html||'<div class="audit-sub">No reallocation drafts.</div>';
 }
 
 function renderPlatformOwnersTab(){
@@ -1441,7 +1535,10 @@ async function saveSettings(){
 
   var profilePayload={
     currency_code:(session.profile&&session.profile.currency_code)||'GBP',
-    business_whatsapp:document.getElementById('settingBusinessWhatsapp').value,
+    business_whatsapp:buildPhoneNumber(
+      (document.getElementById('settingBusinessWhatsappCode')||{}).value,
+      (document.getElementById('settingBusinessWhatsappLocal')||{}).value
+    ),
     nudge_window_minutes:Number(document.getElementById('settingNudgeWindow').value),
     nudge_message_template:document.getElementById('settingNudgeMessage').value,
     reminder_lead_minutes:Number(document.getElementById('settingReminderLead').value),
@@ -2223,6 +2320,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var undoBtn=document.getElementById('undoBookingBtn');
   var broadcastBtn=document.getElementById('broadcastBtn');
   var composeBtn=document.getElementById('composeBtn');
+  var sendAllDraftsBtn=document.getElementById('sendAllDraftsBtn');
   var saveSettingsBtn=document.getElementById('saveSettingsBtn');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
   var customerAddBtn=document.getElementById('customerAddBtn');
@@ -2310,6 +2408,11 @@ document.addEventListener('DOMContentLoaded',function(){
   if(composeBtn){
     composeBtn.onclick=function(){
       composeMessage();
+    };
+  }
+  if(sendAllDraftsBtn){
+    sendAllDraftsBtn.onclick=function(){
+      sendAllDrafts();
     };
   }
   if(saveSettingsBtn){
