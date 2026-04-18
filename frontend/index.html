@@ -242,16 +242,15 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     </div>
     <div class="content" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px">
       <!-- Role selection cards (visible before login) -->
-      <div id="loginRoleSelection" style="display:flex;flex-direction:column;width:100%;gap:12px">
-        <div class="role-card selected" id="roleCardPlayer" onclick="selectRole('player')">
-          <div class="role-card-icon">&#x1F4A0;</div>
-          <div class="role-card-label" id="rolePlayerLabel">玩家登入</div>
-          <div class="role-card-sub" id="rolePlayerSub">JOIN A GAME</div>
-        </div>
-        <div class="role-card" id="roleCardAdmin" onclick="selectRole('admin')">
-          <div class="role-card-icon">🔑</div>
-          <div class="role-card-label" id="roleAdminLabel">場主登入</div>
-          <div class="role-card-sub" id="roleAdminSub">MANAGE YOUR VENUE</div>
+      <div id="loginRoleSelection" style="display:flex;flex-direction:column;width:100%;gap:12px;align-items:center">
+        <img src="./login-design.png" style="width:100%;max-width:380px;height:auto;border-radius:8px;margin-bottom:12px" alt="Login roles">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%">
+          <button class="role-card selected" id="roleCardPlayer" onclick="selectRole('player')" style="border:none;background:none;padding:0;cursor:pointer;text-align:center">
+            <div style="font-size:12px;color:#666;margin-top:4px">玩家登入</div>
+          </button>
+          <button class="role-card" id="roleCardAdmin" onclick="selectRole('admin')" style="border:none;background:none;padding:0;cursor:pointer;text-align:center">
+            <div style="font-size:12px;color:#666;margin-top:4px">場主登入</div>
+          </button>
         </div>
       </div>
 
@@ -2077,8 +2076,10 @@ function setFontSize(scale,el){
 function selectRole(r){
   session.selectedRole=r;
   // Update role card styling
-  document.getElementById('roleCardPlayer').classList.toggle('selected',r==='player');
-  document.getElementById('roleCardAdmin').classList.toggle('selected',r==='admin');
+  var playerBtn=document.getElementById('roleCardPlayer');
+  var adminBtn=document.getElementById('roleCardAdmin');
+  if(playerBtn) playerBtn.style.opacity=r==='player'?'1':'0.5';
+  if(adminBtn) adminBtn.style.opacity=r==='admin'?'1':'0.5';
   // Switch from role selection to login form
   document.getElementById('loginRoleSelection').style.display='none';
   document.getElementById('loginForm').style.display='block';
