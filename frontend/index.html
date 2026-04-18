@@ -243,7 +243,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <div class="content" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px">
       <!-- Role selection cards (visible before login) -->
       <div id="loginRoleSelection" style="display:flex;flex-direction:column;width:100%;gap:12px;align-items:center">
-        <img src="./login-design.png" style="width:100%;max-width:380px;height:auto;border-radius:8px;margin-bottom:12px" alt="Login roles">
+        <img src="/assets/login-design.png" style="width:100%;max-width:380px;height:auto;border-radius:8px;margin-bottom:12px" alt="Login roles">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%">
           <button class="role-card selected" id="roleCardPlayer" onclick="selectRole('player')" style="border:none;background:none;padding:0;cursor:pointer;text-align:center">
             <div style="font-size:12px;color:#666;margin-top:4px">玩家登入</div>
@@ -256,6 +256,12 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
 
       <!-- Login form (shows after role selected) -->
       <div id="loginForm" style="display:none;width:100%;max-width:100%">
+        <div style="margin-bottom:12px;padding:10px;background:#EAF3DE;border-radius:8px;font-size:12px;color:#3B6D11">
+          <strong>Demo logins:</strong><br>
+          Player: +852 | 91234567 | 1234<br>
+          Owner: +852 | 98765432 | 1234<br>
+          Admin: +852 | 87654321 | 1234
+        </div>
         <div style="margin-bottom:16px">
           <div class="login-label" id="mobileLabel">手機 / WhatsApp 號碼</div>
           <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
@@ -265,7 +271,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         </div>
         <div style="margin-bottom:16px">
           <div class="login-label" id="passwordLabel">PIN / 密碼</div>
-          <input class="login-input" id="passwordInput" type="password" placeholder="Enter PIN or password" value="player1234">
+          <input class="login-input" id="passwordInput" type="password" placeholder="Enter PIN or password" value="1234">
         </div>
         <button class="cta-btn" onclick="handleSignIn()" id="signInBtn">登入 / SIGN IN</button>
         <p style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-top:12px" id="newPlayerHint">新玩家？請聯絡場主完成註冊。</p>
