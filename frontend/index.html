@@ -248,22 +248,16 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
 
       <!-- Login form (shows after pressing login) -->
       <div id="loginForm" style="display:none;width:100%;max-width:100%">
-        <div style="margin-bottom:12px;padding:10px;background:#EAF3DE;border-radius:8px;font-size:12px;color:#3B6D11">
-          <strong>Demo logins:</strong><br>
-          Player: +852 | 91234567 | 1234<br>
-          Owner: +852 | 98765432 | 1234<br>
-          Admin: +852 | 87654321 | 1234
-        </div>
         <div style="margin-bottom:16px">
           <div class="login-label" id="mobileLabel">手機 / WhatsApp 號碼</div>
           <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
-            <input class="login-input" id="countryCodeInput" type="tel" placeholder="+852" value="+852" style="text-align:center">
-            <input class="login-input" id="mobileInput" type="tel" placeholder="91234567" value="91234567">
+            <input class="login-input" id="countryCodeInput" type="tel" placeholder="+852" style="text-align:center">
+            <input class="login-input" id="mobileInput" type="tel" placeholder="91234567">
           </div>
         </div>
         <div style="margin-bottom:16px">
           <div class="login-label" id="passwordLabel">PIN / 密碼</div>
-          <input class="login-input" id="passwordInput" type="password" placeholder="Enter PIN or password" value="1234">
+          <input class="login-input" id="passwordInput" type="password" placeholder="Enter PIN or password">
         </div>
         <button class="cta-btn" onclick="handleSignIn()" id="signInBtn">登入 / SIGN IN</button>
         <p style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-top:12px" id="newPlayerHint">新玩家？請聯絡場主完成註冊。</p>
@@ -2582,7 +2576,7 @@ function backToRoleSelection(){
   document.getElementById('loginForm').style.display='none';
   document.getElementById('mobileInput').value='';
   document.getElementById('passwordInput').value='';
-  document.getElementById('countryCodeInput').value='+852';
+  document.getElementById('countryCodeInput').value='';
 }
 
 function showAdminTab(tab,el){
