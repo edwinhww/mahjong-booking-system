@@ -905,10 +905,36 @@ function timezoneLabelForCurrency(venueId,dateObj){
   }
 }
 
+function parseApiTimestampAsUtc(raw){
+  if(!raw)return null;
+  if(raw instanceof Date)return isNaN(raw.getTime())?null:raw;
+  var text=String(raw).trim();
+  if(!text)return null;
+  var normalized=text.replace(' ','T');
+  var hasTimezone=/([zZ]|[+\-]\d{2}:?\d{2})$/.test(normalized);
+  if(!hasTimezone&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?$/.test(normalized)){
+    normalized+='Z';
+  }
+  var dt=new Date(normalized);
+  if(!isNaN(dt.getTime()))return dt;
+  var match=text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,6})?)?$/);
+  if(match){
+    return new Date(Date.UTC(
+      Number(match[1]),
+      Number(match[2])-1,
+      Number(match[3]),
+      Number(match[4]),
+      Number(match[5]),
+      Number(match[6]||0)
+    ));
+  }
+  return null;
+}
+
 function formatTimestampWithCurrencyTimezone(raw,venueId){
   if(!raw)return '—';
-  var dt=new Date(raw);
-  if(isNaN(dt.getTime()))return '—';
+  var dt=parseApiTimestampAsUtc(raw);
+  if(!dt||isNaN(dt.getTime()))return '—';
   var cfg=currencyTimezoneConfig(getCurrencyCode(venueId));
   try{
     var parts=new Intl.DateTimeFormat('en-CA',{
