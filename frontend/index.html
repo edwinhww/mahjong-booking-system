@@ -2697,6 +2697,11 @@ function renderAuditScreen(selectedVenue){
     grouped[key].count+=1;
   });
   var rows=Object.keys(grouped).map(function(key){return grouped[key];});
+  var fullRows=rows.filter(function(entry){return entry.count>=4;});
+  var chargeablePlayerSessions=fullRows.length*4;
+  var perPlayerFee=Number(venue&&venue.session_fee?venue.session_fee:0);
+  var fullTableFee=perPlayerFee*4;
+  var fullTablePlatformFee=fullTableFee*Number(venue&&venue.platform_fee_pct?venue.platform_fee_pct:0)/100;
   var auditTitle=document.getElementById('auditRevenueTitle');
   var auditSub=document.getElementById('auditSubTitle');
   var grid=document.getElementById('revenueMetricGrid');
@@ -2704,20 +2709,20 @@ function renderAuditScreen(selectedVenue){
   if(auditTitle)auditTitle.textContent='Revenue';
   if(auditSub)auditSub.textContent=venue?(venue.name+' · Revenue view'):'No venue selected';
   if(grid){
-    grid.innerHTML='<div class="metric-card"><div class="metric-num">'+rows.length+'</div><div class="metric-label">Full tables booked</div></div>'+
-      '<div class="metric-card"><div class="metric-num">'+bookings.length+'</div><div class="metric-label">Player sessions</div></div>'+
+    grid.innerHTML='<div class="metric-card"><div class="metric-num">'+fullRows.length+'</div><div class="metric-label">Full tables booked</div></div>'+
+      '<div class="metric-card"><div class="metric-num">'+chargeablePlayerSessions+'</div><div class="metric-label">Player sessions</div></div>'+
       '<div class="metric-card"><div class="metric-num">'+formatMoney(totalFees,venue&&venue.id?venue.id:session.currentVenueId)+'</div><div class="metric-label">Gross table fees</div></div>'+
       '<div class="metric-card"><div class="metric-num">'+formatMoney(totalPlatformFee,venue&&venue.id?venue.id:session.currentVenueId)+'</div><div class="metric-label">Platform fee</div></div>';
   }
   if(list){
-    if(!rows.length){
+    if(!fullRows.length){
       list.innerHTML='<div class="audit-sub">No revenue data for this venue yet.</div>';
     }else{
       var html='';
-      rows.forEach(function(entry){
+      fullRows.forEach(function(entry){
         var row=entry.row;
         html+='<div class="audit-row"><div><div class="audit-left">'+formatDateFriendly(row.booked_at)+' · '+formatTime(row.start_time)+' · Table '+row.table_number+'</div><div class="audit-sub">'+entry.count+' player session(s)</div></div>'+
-          '<div style="text-align:right"><div class="audit-fee">'+formatMoney(venue&&venue.session_fee?venue.session_fee:0,venue&&venue.id?venue.id:session.currentVenueId)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">fee '+formatMoney(venue&&venue.platform_fee_pct?((venue.session_fee*venue.platform_fee_pct)/100):0,venue&&venue.id?venue.id:session.currentVenueId)+'</div></div></div>';
+          '<div style="text-align:right"><div class="audit-fee">'+formatMoney(fullTableFee,venue&&venue.id?venue.id:session.currentVenueId)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">fee '+formatMoney(fullTablePlatformFee,venue&&venue.id?venue.id:session.currentVenueId)+'</div></div></div>';
       });
       list.innerHTML=html;
     }

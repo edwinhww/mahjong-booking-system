@@ -43,7 +43,9 @@ def update_timeslot_if_full(db: Session, timeslot_id: str, performed_by: str) ->
         timeslot.status = models.TimeslotStatus.full
         venue = db.get(models.Venue, timeslot.venue_id)
         if venue:
-            session_fee = float(venue.session_fee)
+            # A table is chargeable only when 4 players are present.
+            # Revenue is 4 * per-player session fee.
+            session_fee = float(venue.session_fee) * 4
             platform_fee = round(session_fee * float(venue.platform_fee_pct) / 100, 2)
             db.add(
                 models.AuditLog(
