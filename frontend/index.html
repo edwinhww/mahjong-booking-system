@@ -682,6 +682,17 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <div class="content">
       <div class="metric-grid" id="revenueMetricGrid"></div>
       <div class="section-title" id="confirmedTablesTitle">Filled / completed tables</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <select class="login-input" id="revenueStatusFilter" style="flex:1;min-width:160px">
+          <option value="" id="revenueStatusAllOption">All statuses</option>
+          <option value="filled" id="revenueStatusFilledOption">Filled</option>
+          <option value="completed" id="revenueStatusCompletedOption">Completed</option>
+        </select>
+        <input class="login-input" id="revenueFromDate" type="date" style="width:128px">
+        <input class="login-input" id="revenueToDate" type="date" style="width:128px">
+        <button class="action-chip" id="revenueApplyBtn" style="align-self:flex-end;height:42px">Apply</button>
+        <button class="action-chip" id="revenueResetBtn" style="align-self:flex-end;height:42px">Reset</button>
+      </div>
       <div id="revenueRows"><div class="audit-sub">No venue selected.</div></div>
       <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap">
         <button class="nav-btn" id="revenuePrevBtn" style="min-width:84px">Prev</button>
@@ -758,6 +769,9 @@ var session={
   revenuePage:1,
   revenuePageSize:20,
   revenueTotal:0,
+  revenueFilterStatus:'',
+  revenueFilterFromDate:'',
+  revenueFilterToDate:'',
   systemAuditPage:1,
   systemAuditPageSize:20,
   systemAuditTotal:0,
@@ -2704,6 +2718,31 @@ function scrollRevenueToTop(){
   if(content)content.scrollTop=0;
 }
 
+function applyRevenueFilters(){
+  var statusInput=document.getElementById('revenueStatusFilter');
+  var fromInput=document.getElementById('revenueFromDate');
+  var toInput=document.getElementById('revenueToDate');
+  session.revenueFilterStatus=statusInput?String(statusInput.value||''):'';
+  session.revenueFilterFromDate=fromInput?String(fromInput.value||''):'';
+  session.revenueFilterToDate=toInput?String(toInput.value||''):'';
+  session.revenuePage=1;
+  renderAuditScreen();
+}
+
+function resetRevenueFilters(){
+  var statusInput=document.getElementById('revenueStatusFilter');
+  var fromInput=document.getElementById('revenueFromDate');
+  var toInput=document.getElementById('revenueToDate');
+  if(statusInput)statusInput.value='';
+  if(fromInput)fromInput.value='';
+  if(toInput)toInput.value='';
+  session.revenueFilterStatus='';
+  session.revenueFilterFromDate='';
+  session.revenueFilterToDate='';
+  session.revenuePage=1;
+  renderAuditScreen();
+}
+
 function renderAuditScreen(selectedVenue){
   var venue=selectedVenue||((session.venues||[]).find(function(v){return v.id===session.selectedPlatformVenueId||v.id===session.currentVenueId;}));
   var audit=session.auditLog||[];
@@ -2748,10 +2787,44 @@ function renderAuditScreen(selectedVenue){
   var pageInfo=document.getElementById('revenuePageInfo');
   var prevBtn=document.getElementById('revenuePrevBtn');
   var nextBtn=document.getElementById('revenueNextBtn');
+  var statusInput=document.getElementById('revenueStatusFilter');
+  var fromInput=document.getElementById('revenueFromDate');
+  var toInput=document.getElementById('revenueToDate');
   var playersById={};
   (session.players||[]).forEach(function(player){
     playersById[player.player_id]=player;
   });
+  if(statusInput)statusInput.value=session.revenueFilterStatus||'';
+  if(fromInput)fromInput.value=session.revenueFilterFromDate||'';
+  if(toInput)toInput.value=session.revenueFilterToDate||'';
+
+  var enrichedRows=fullRows.map(function(entry){
+    var allCompleted=entry.bookings.every(function(item){return String(item.status||'').toLowerCase()==='completed';});
+    var playDate=entry.row.date||String(entry.row.booked_at||'').substring(0,10)||'';
+    return {
+      entry:entry,
+      allCompleted:allCompleted,
+      status:allCompleted?'completed':'filled',
+      playDate:playDate
+    };
+  }).filter(function(item){
+    var okStatus=!session.revenueFilterStatus||item.status===session.revenueFilterStatus;
+    if(!okStatus)return false;
+    if(session.revenueFilterFromDate&&item.playDate&&item.playDate<session.revenueFilterFromDate)return false;
+    if(session.revenueFilterToDate&&item.playDate&&item.playDate>session.revenueFilterToDate)return false;
+    return true;
+  });
+
+  session.revenueTotal=enrichedRows.length;
+  var revenuePageSize=session.revenuePageSize||20;
+  var revenuePage=Math.max(1,session.revenuePage||1);
+  var totalRevenuePages=Math.max(1,Math.ceil(enrichedRows.length/revenuePageSize));
+  if(revenuePage>totalRevenuePages){
+    revenuePage=totalRevenuePages;
+    session.revenuePage=revenuePage;
+  }
+  var pageStart=(revenuePage-1)*revenuePageSize;
+  var pageRows=enrichedRows.slice(pageStart,pageStart+revenuePageSize);
   if(auditTitle)auditTitle.textContent='Revenue';
   if(auditSub)auditSub.textContent=venue?(venue.name+' · Revenue view'):'No venue selected';
   if(grid){
@@ -2761,13 +2834,14 @@ function renderAuditScreen(selectedVenue){
       '<div class="metric-card"><div class="metric-num">'+formatMoney(totalPlatformFee,venue&&venue.id?venue.id:session.currentVenueId)+'</div><div class="metric-label">Platform fee</div></div>';
   }
   if(list){
-    if(!fullRows.length){
+    if(!enrichedRows.length){
       list.innerHTML='<div class="audit-sub">No revenue data for this venue yet.</div>';
     }else{
       var html='';
-      pageRows.forEach(function(entry){
+      pageRows.forEach(function(item){
+        var entry=item.entry;
         var row=entry.row;
-        var allCompleted=entry.bookings.every(function(item){return String(item.status||'').toLowerCase()==='completed';});
+        var allCompleted=item.allCompleted;
         var statusLabel=allCompleted
           ?langText('Completed','已完成','已完成')
           :langText('Filled','已滿桌','已满桌');
@@ -2811,7 +2885,7 @@ var translations={
     cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'Business WhatsApp',waNotifSub:'Fixed to Hong Kong +852 for click-to-chat links',currencyLabel:'Currency',currencySub:'Shown in revenue and billing',
     sessionFeeLabel:'Session fee (per table)',sessionFeeSub:'Used for audit and billing',platformFeeLabel:'Platform fee %',platformFeeSub:'Developer charge per session',saveSettingsBtn:'Save settings',
     auditRevenueTitle:'Audit and Revenue',auditSubTitle:'Dragon Palace · April 2025',auditAdminBadge:'Admin',metricFullTables:'Full tables booked',metricPlayerSessions:'Player sessions',metricGrossFees:'Gross table fees',metricPlatformFee:'Platform fee (5%)',
-    confirmedTablesTitle:'Filled / completed tables',exportCsvBtn:'Export CSV',revenuePrevBtn:'Prev',revenueNextBtn:'Next',revenueToTopBtn:'Back to top',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system',systemAuditApplyBtn:'Apply',systemAuditResetBtn:'Reset',systemAuditPrevBtn:'Prev',systemAuditNextBtn:'Next'
+    confirmedTablesTitle:'Filled / completed tables',exportCsvBtn:'Export CSV',revenueStatusAllOption:'All statuses',revenueStatusFilledOption:'Filled',revenueStatusCompletedOption:'Completed',revenueApplyBtn:'Apply',revenueResetBtn:'Reset',revenuePrevBtn:'Prev',revenueNextBtn:'Next',revenueToTopBtn:'Back to top',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system',systemAuditApplyBtn:'Apply',systemAuditResetBtn:'Reset',systemAuditPrevBtn:'Prev',systemAuditNextBtn:'Next'
   },
   'zh-Hant':{
     srTitle:'麻將訂位系統互動原型 - 可在登入、玩家、訂位、商家與審計畫面切換',
@@ -2833,7 +2907,7 @@ var translations={
     cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一鍵開啟 WhatsApp',currencyLabel:'貨幣',currencySub:'顯示於營收與計費',
     sessionFeeLabel:'每桌場次費',sessionFeeSub:'用於審計與計費',platformFeeLabel:'平台服務費 %',platformFeeSub:'每場抽成比例',saveSettingsBtn:'儲存設定',
     auditRevenueTitle:'審計與營收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'滿桌場次',metricPlayerSessions:'玩家出席次數',metricGrossFees:'總桌費',metricPlatformFee:'平台費 (5%)',
-    confirmedTablesTitle:'已滿桌 / 已完成桌次',exportCsvBtn:'匯出 CSV',revenuePrevBtn:'上一頁',revenueNextBtn:'下一頁',revenueToTopBtn:'回到頂部',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重設',systemAuditPrevBtn:'上一頁',systemAuditNextBtn:'下一頁'
+    confirmedTablesTitle:'已滿桌 / 已完成桌次',exportCsvBtn:'匯出 CSV',revenueStatusAllOption:'所有狀態',revenueStatusFilledOption:'已滿桌',revenueStatusCompletedOption:'已完成',revenueApplyBtn:'套用',revenueResetBtn:'重設',revenuePrevBtn:'上一頁',revenueNextBtn:'下一頁',revenueToTopBtn:'回到頂部',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重設',systemAuditPrevBtn:'上一頁',systemAuditNextBtn:'下一頁'
   },
   'zh-Hans':{
     srTitle:'麻将订位系统互动原型 - 可在登录、玩家、订位、商家与审计画面切换',
@@ -2855,7 +2929,7 @@ var translations={
     cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一键打开 WhatsApp',currencyLabel:'货币',currencySub:'显示于营收与计费',
     sessionFeeLabel:'每桌场次费',sessionFeeSub:'用于审计与计费',platformFeeLabel:'平台服务费 %',platformFeeSub:'每场抽成比例',saveSettingsBtn:'保存设置',
     auditRevenueTitle:'审计与营收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'满桌场次',metricPlayerSessions:'玩家出席次数',metricGrossFees:'总桌费',metricPlatformFee:'平台费 (5%)',
-    confirmedTablesTitle:'已满桌 / 已完成桌次',exportCsvBtn:'导出 CSV',revenuePrevBtn:'上一页',revenueNextBtn:'下一页',revenueToTopBtn:'回到顶部',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重设',systemAuditPrevBtn:'上一页',systemAuditNextBtn:'下一页'
+    confirmedTablesTitle:'已满桌 / 已完成桌次',exportCsvBtn:'导出 CSV',revenueStatusAllOption:'所有状态',revenueStatusFilledOption:'已满桌',revenueStatusCompletedOption:'已完成',revenueApplyBtn:'套用',revenueResetBtn:'重设',revenuePrevBtn:'上一页',revenueNextBtn:'下一页',revenueToTopBtn:'回到顶部',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重设',systemAuditPrevBtn:'上一页',systemAuditNextBtn:'下一页'
   }
 };
 
@@ -2931,6 +3005,8 @@ document.addEventListener('DOMContentLoaded',function(){
   var ownerChangePasswordBtn=document.getElementById('ownerChangePasswordBtn');
   var settingCurrency=document.getElementById('settingCurrency');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
+  var revenueApplyBtn=document.getElementById('revenueApplyBtn');
+  var revenueResetBtn=document.getElementById('revenueResetBtn');
   var revenuePrevBtn=document.getElementById('revenuePrevBtn');
   var revenueNextBtn=document.getElementById('revenueNextBtn');
   var revenueToTopBtn=document.getElementById('revenueToTopBtn');
@@ -3061,6 +3137,16 @@ document.addEventListener('DOMContentLoaded',function(){
   if(exportCsvBtn){
     exportCsvBtn.onclick=function(){
       exportAuditCsv();
+    };
+  }
+  if(revenueApplyBtn){
+    revenueApplyBtn.onclick=function(){
+      applyRevenueFilters();
+    };
+  }
+  if(revenueResetBtn){
+    revenueResetBtn.onclick=function(){
+      resetRevenueFilters();
     };
   }
   if(revenuePrevBtn){
