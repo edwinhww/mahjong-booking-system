@@ -89,6 +89,19 @@ def list_timeslots(venue_id: str, day: date | None = None, db: Session = Depends
     # Filter out stale slots that no longer fall in the venue's current operating window
     # (e.g. leftover rows from a previous opening-time setting).
     rows = [t for t in rows if _in_operating_window(t.start_time, venue.opening_time, venue.closing_time)]
+
+    # Filter out slots that don't align with the current session duration step.
+    # e.g. if duration changed from 1 hr to 2 hrs, drop the old in-between slots.
+    step_mins = venue.session_duration_hrs * 60
+    opening_mins = venue.opening_time.hour * 60 + venue.opening_time.minute
+
+    def _aligns_with_step(slot_time) -> bool:
+        slot_mins = slot_time.hour * 60 + slot_time.minute
+        # Normalise to minutes-from-opening (handles overnight)
+        diff = (slot_mins - opening_mins) % (24 * 60)
+        return diff % step_mins == 0
+
+    rows = [t for t in rows if _aligns_with_step(t.start_time)]
     rows = _sort_slot_rows(rows, venue.opening_time)
 
     return [
