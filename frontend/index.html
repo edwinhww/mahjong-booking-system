@@ -883,26 +883,47 @@ function formatDateFriendly(raw){
 
 function currencyTimezoneConfig(code){
   var cc=String(code||'HKD').toUpperCase();
-  if(cc==='HKD')return {offsetHours:8,label:'GMT+8'};
-  if(cc==='GBP')return {offsetHours:0,label:'GMT+0'};
-  if(cc==='USD')return {offsetHours:-5,label:'GMT-5'};
-  return {offsetHours:0,label:'GMT+0'};
+  if(cc==='HKD')return {timeZone:'Asia/Hong_Kong',fallbackLabel:'GMT+8'};
+  if(cc==='GBP')return {timeZone:'Europe/London',fallbackLabel:'GMT+0'};
+  if(cc==='USD')return {timeZone:'America/New_York',fallbackLabel:'GMT-5'};
+  return {timeZone:'UTC',fallbackLabel:'GMT+0'};
+}
+
+function timezoneLabelForCurrency(venueId,dateObj){
+  var cfg=currencyTimezoneConfig(getCurrencyCode(venueId));
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{
+      timeZone:cfg.timeZone,
+      timeZoneName:'shortOffset',
+      hour:'2-digit'
+    }).formatToParts(dateObj||new Date());
+    var tzPart=parts.find(function(part){return part.type==='timeZoneName';});
+    var label=tzPart&&tzPart.value?String(tzPart.value):cfg.fallbackLabel;
+    return label.replace('UTC','GMT');
+  }catch(_e){
+    return cfg.fallbackLabel;
+  }
 }
 
 function formatTimestampWithCurrencyTimezone(raw,venueId){
   if(!raw)return '—';
   var dt=new Date(raw);
   if(isNaN(dt.getTime()))return '—';
-  var tz=currencyTimezoneConfig(getCurrencyCode(venueId));
-  var shiftedMs=dt.getTime()+(tz.offsetHours*60*60*1000);
-  var shifted=new Date(shiftedMs);
-  var y=shifted.getUTCFullYear();
-  var m=String(shifted.getUTCMonth()+1).padStart(2,'0');
-  var d=String(shifted.getUTCDate()).padStart(2,'0');
-  var hh=String(shifted.getUTCHours()).padStart(2,'0');
-  var mm=String(shifted.getUTCMinutes()).padStart(2,'0');
-  var ss=String(shifted.getUTCSeconds()).padStart(2,'0');
-  return y+'-'+m+'-'+d+' '+hh+':'+mm+':'+ss+' '+tz.label;
+  var cfg=currencyTimezoneConfig(getCurrencyCode(venueId));
+  try{
+    var parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:cfg.timeZone,
+      year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',second:'2-digit',
+      hour12:false
+    }).formatToParts(dt);
+    var map={};
+    parts.forEach(function(part){map[part.type]=part.value;});
+    var label=timezoneLabelForCurrency(venueId,dt);
+    return map.year+'-'+map.month+'-'+map.day+' '+map.hour+':'+map.minute+':'+map.second+' '+label;
+  }catch(_e){
+    return dt.toISOString().replace('T',' ').substring(0,19)+' '+timezoneLabelForCurrency(venueId,dt);
+  }
 }
 
 function currencySymbol(code){
@@ -2822,7 +2843,7 @@ function renderAuditScreen(selectedVenue){
   var statusInput=document.getElementById('revenueStatusFilter');
   var fromInput=document.getElementById('revenueFromDate');
   var toInput=document.getElementById('revenueToDate');
-  var timezoneLabel=currencyTimezoneConfig(getCurrencyCode(venue&&venue.id?venue.id:session.currentVenueId)).label;
+  var timezoneLabel=timezoneLabelForCurrency(venue&&venue.id?venue.id:session.currentVenueId,new Date());
   var playersById={};
   (session.players||[]).forEach(function(player){
     playersById[player.player_id]=player;
