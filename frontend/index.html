@@ -881,6 +881,30 @@ function formatDateFriendly(raw){
   return new Date(raw).toLocaleDateString();
 }
 
+function currencyTimezoneConfig(code){
+  var cc=String(code||'HKD').toUpperCase();
+  if(cc==='HKD')return {offsetHours:8,label:'GMT+8'};
+  if(cc==='GBP')return {offsetHours:0,label:'GMT+0'};
+  if(cc==='USD')return {offsetHours:-5,label:'GMT-5'};
+  return {offsetHours:0,label:'GMT+0'};
+}
+
+function formatTimestampWithCurrencyTimezone(raw,venueId){
+  if(!raw)return '—';
+  var dt=new Date(raw);
+  if(isNaN(dt.getTime()))return '—';
+  var tz=currencyTimezoneConfig(getCurrencyCode(venueId));
+  var shiftedMs=dt.getTime()+(tz.offsetHours*60*60*1000);
+  var shifted=new Date(shiftedMs);
+  var y=shifted.getUTCFullYear();
+  var m=String(shifted.getUTCMonth()+1).padStart(2,'0');
+  var d=String(shifted.getUTCDate()).padStart(2,'0');
+  var hh=String(shifted.getUTCHours()).padStart(2,'0');
+  var mm=String(shifted.getUTCMinutes()).padStart(2,'0');
+  var ss=String(shifted.getUTCSeconds()).padStart(2,'0');
+  return y+'-'+m+'-'+d+' '+hh+':'+mm+':'+ss+' '+tz.label;
+}
+
 function currencySymbol(code){
   var cc=String(code||'HKD').toUpperCase();
   if(cc==='GBP')return '£';
@@ -2380,7 +2404,7 @@ async function loadAndRenderAdminAudit(){
       '<div class="audit-log-meta">'+
         (a.performed_by?a.performed_by+' · ':'')+
         (a.target_type?a.target_type+' · ':'')+
-        new Date(a.created_at).toLocaleString()+
+        formatTimestampWithCurrencyTimezone(a.created_at,session.currentVenueId)+
       '</div>'+
     '</div>';
   });
@@ -2406,6 +2430,14 @@ async function loadSystemAuditActionTypes(){
 async function loadAndRenderSystemAudit(){
   showScreen('systemaudit');
   await loadSystemAuditActionTypes();
+  var systemAuditSubTitle=document.getElementById('systemAuditSubTitle');
+  if(systemAuditSubTitle){
+    systemAuditSubTitle.textContent=langText(
+      'All actions carried out in the system (timestamps shown in venue currency timezone)',
+      '系統中所有已執行動作（時間以場館貨幣時區顯示）',
+      '系统中所有已执行动作（时间以场馆货币时区显示）'
+    );
+  }
   var page=Math.max(1,session.systemAuditPage||1);
   var pageSize=20;
   session.systemAuditPageSize=pageSize;
@@ -2441,7 +2473,7 @@ async function loadAndRenderSystemAudit(){
   data.forEach(function(a){
     html+='<div class="audit-log-row">'+
       '<div class="audit-log-type">'+escapeHtml(a.action_type)+'</div>'+
-      '<div class="audit-log-meta">'+escapeHtml(a.actor_role||'')+(a.venue_id?(' · '+escapeHtml(venueMap[a.venue_id]||a.venue_id)):'')+' · '+new Date(a.created_at).toLocaleString()+'</div>'+
+      '<div class="audit-log-meta">'+escapeHtml(a.actor_role||'')+(a.venue_id?(' · '+escapeHtml(venueMap[a.venue_id]||a.venue_id)):'')+' · '+formatTimestampWithCurrencyTimezone(a.created_at,a.venue_id||session.currentVenueId)+'</div>'+
       (a.target_type||a.metadata_json?'<div class="audit-sub" style="margin-top:4px">'+escapeHtml((a.target_type||'')+(a.target_id?(' · '+a.target_id):'')+(a.metadata_json?(' · '+a.metadata_json):''))+'</div>':'')+
     '</div>';
   });
@@ -2790,6 +2822,7 @@ function renderAuditScreen(selectedVenue){
   var statusInput=document.getElementById('revenueStatusFilter');
   var fromInput=document.getElementById('revenueFromDate');
   var toInput=document.getElementById('revenueToDate');
+  var timezoneLabel=currencyTimezoneConfig(getCurrencyCode(venue&&venue.id?venue.id:session.currentVenueId)).label;
   var playersById={};
   (session.players||[]).forEach(function(player){
     playersById[player.player_id]=player;
@@ -2826,7 +2859,7 @@ function renderAuditScreen(selectedVenue){
   var pageStart=(revenuePage-1)*revenuePageSize;
   var pageRows=enrichedRows.slice(pageStart,pageStart+revenuePageSize);
   if(auditTitle)auditTitle.textContent='Revenue';
-  if(auditSub)auditSub.textContent=venue?(venue.name+' · Revenue view'):'No venue selected';
+  if(auditSub)auditSub.textContent=venue?(venue.name+' · Revenue view · '+timezoneLabel):('No venue selected · '+timezoneLabel);
   if(grid){
     grid.innerHTML='<div class="metric-card"><div class="metric-num">'+fullRows.length+'</div><div class="metric-label">Full tables booked</div></div>'+
       '<div class="metric-card"><div class="metric-num">'+chargeablePlayerSessions+'</div><div class="metric-label">Player sessions</div></div>'+
