@@ -1,7 +1,19 @@
-from datetime import date, datetime, time
-from pydantic import BaseModel, Field
+from datetime import date, datetime, time, timezone
+from pydantic import BaseModel as PydanticBaseModel, ConfigDict, Field
 
 from .models import BookingStatus, CancellationRequestStatus, MessageChannel, MessageType, ServiceCategory, UserRole, UserStatus, VenuePlayerStatus
+
+
+def serialize_datetime_utc(value: datetime) -> str:
+    if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
+        value = value.replace(tzinfo=timezone.utc)
+    else:
+        value = value.astimezone(timezone.utc)
+    return value.isoformat().replace("+00:00", "Z")
+
+
+class BaseModel(PydanticBaseModel):
+    model_config = ConfigDict(json_encoders={datetime: serialize_datetime_utc})
 
 
 class HealthResponse(BaseModel):
