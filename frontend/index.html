@@ -10,31 +10,33 @@
   --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --device-width:390px;
   --device-height:844px;
+  var navSystemAudit=document.getElementById('navSystemAudit');
   --font-scale:1;
   --color-background-primary:#FFFFFF;
   --color-background-secondary:#FBFAF7;
   --color-text-primary:#202124;
   --color-text-secondary:#666C74;
+    if(navSystemAudit)navSystemAudit.style.display='none';
   --color-border-secondary:#D9D8D3;
   --color-border-tertiary:#E8E6DF;
   --border-radius-md:10px;
   --border-radius-lg:14px;
   --border-radius-xl:18px;
 }
+    if(navSystemAudit)navSystemAudit.style.display='none';
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#fff7de 0%,#f4f2ec 38%,#ecebe5 100%);padding:12px;color:var(--color-text-primary);display:flex;flex-direction:column;align-items:center;gap:8px}
 .app{width:min(100%,var(--device-width));margin:0 auto;background:var(--color-background-secondary);border-radius:var(--border-radius-xl);overflow:hidden;border:0.5px solid var(--color-border-tertiary);box-shadow:0 14px 36px rgba(34,43,56,0.14)}
 .screen{display:none;flex-direction:column;min-height:700px}
 .screen.active{display:flex}
+    if(navSystemAudit)navSystemAudit.style.display='none';
 .topbar{padding:14px 16px 10px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px}
-.topbar-title{font-size:calc(16px * var(--font-scale));font-weight:600;color:var(--color-text-primary);flex:1;line-height:1.25}
 .topbar-sub{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);line-height:1.35}
 .badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
 .badge-green{background:#EAF3DE;color:#3B6D11}
 .badge-amber{background:#FAEEDA;color:#854F0B}
 .badge-red{background:#FCEBEB;color:#A32D2D}
 .badge-blue{background:#E6F1FB;color:#185FA5}
-.badge-gray{background:#F1EFE8;color:#5F5E5A}
 .content{flex:1;padding:16px;overflow-y:auto}
 .nav-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 14px;font-size:calc(14px * var(--font-scale));color:var(--color-text-primary);cursor:pointer;min-height:42px}
 .nav-btn:hover{background:var(--color-background-secondary)}
@@ -42,7 +44,6 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .logo-tile{width:64px;height:64px;background:#1D9E75;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px}
 .logo-name{font-size:calc(24px * var(--font-scale));font-weight:700;color:var(--color-text-primary);letter-spacing:-0.5px}
 .logo-sub{font-size:calc(14px * var(--font-scale));color:var(--color-text-secondary);margin-top:4px;line-height:1.4}
-.login-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;margin-bottom:12px}
 .login-label{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);margin-bottom:6px}
 .login-input{width:100%;padding:11px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:calc(15px * var(--font-scale));color:var(--color-text-primary);background:var(--color-background-primary)}
 .login-input:focus{outline:none;border-color:#1D9E75}
@@ -50,23 +51,20 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .role-btn{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:14px 8px;text-align:center;cursor:pointer;background:var(--color-background-primary);min-height:86px}
 .role-btn.selected{border:2px solid #1D9E75;background:#EAF3DE}
 .role-btn .r-icon{font-size:22px;margin-bottom:6px}
+    if(navSystemAudit)navSystemAudit.style.display='';
 .role-btn .r-label{font-size:calc(14px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
 .role-btn .r-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary)}
 .login-topbar{padding:28px 16px 12px;background:linear-gradient(135deg,#1D6B54 0%,#2A8B6F 100%);text-align:center;color:#fff}
 .login-brand-title{font-size:calc(36px * var(--font-scale));font-weight:700;line-height:1.1;margin-bottom:6px;letter-spacing:-0.5px}
 .login-brand-subtitle{font-size:calc(14px * var(--font-scale));font-weight:400;opacity:0.95;letter-spacing:0.3px}
-.role-card{background:var(--color-background-primary);border:2px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:100px}
 .role-card:hover{border-color:#1D9E75;box-shadow:0 4px 12px rgba(29,158,117,0.12)}
-.role-card.selected{border-color:#1D9E75;background:#EAF3DE;box-shadow:0 4px 12px rgba(29,158,117,0.2)}
 .role-card-icon{font-size:36px;display:inline-block}
 .role-card-label{font-size:calc(15px * var(--font-scale));font-weight:600;color:var(--color-text-primary)}
 .role-card-sub{font-size:calc(11px * var(--font-scale));color:var(--color-text-secondary);letter-spacing:0.5px;text-transform:uppercase}
 .cta-btn{width:100%;padding:13px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:calc(16px * var(--font-scale));font-weight:600;cursor:pointer;margin-top:4px;min-height:46px}
 .cta-btn:hover{background:#0F6E56}
 .section-title{font-size:calc(12px * var(--font-scale));font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
-.slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
 .slot-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;background:var(--color-background-primary);cursor:pointer;transition:border-color 0.15s;min-height:112px}
-.slot-card:hover{border-color:#1D9E75}
 .slot-card.selected{border:2px solid #1D9E75;background:#EAF3DE}
 .slot-card.full{background:#F1EFE8;cursor:default;opacity:0.6}
 .slot-card.mine{border:2px solid #1D9E75}
@@ -229,6 +227,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <button class="snav" data-screen="confirm" onclick="showScreen('confirm')" id="navBooking">Booking</button>
     <button class="snav" data-screen="admin" onclick="showScreen('admin')" id="navAdmin">Admin</button>
     <button class="snav" data-screen="audit" onclick="showScreen('audit')" id="navAudit">Revenue</button>
+    <button class="snav" data-screen="systemaudit" onclick="showScreen('systemaudit')" id="navSystemAudit">Audit</button>
   </div>
 </div>
 
@@ -415,9 +414,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div class="atab" onclick="showAdminTab('messages',this)" id="tabMessages">Messages</div>
       <div class="atab" onclick="showAdminTab('services',this)" id="tabServices">Services</div>
       <div class="atab" onclick="showAdminTab('orders',this)" id="tabOrders">Orders</div>
-      <div class="atab" onclick="showAdminTab('adminaudit',this)" id="tabAdminAudit">Audit</div>
       <div class="atab" onclick="showAdminTab('settings',this)" id="tabSettings">Settings</div>
-      <div class="atab" onclick="showAdminTab('platformowners',this)" id="tabPlatformOwners">Owners</div>
       <div class="atab" onclick="showAdminTab('platformvenues',this)" id="tabPlatformVenues">Venues</div>
     </div>
 
@@ -623,29 +620,6 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <div id="orderHistoryList"><div class="audit-sub">Press Filter to load orders.</div></div>
     </div>
 
-    <!-- ADMIN AUDIT PANEL -->
-    <div class="admin-panel" id="ap-adminaudit">
-      <div class="section-title" id="adminAuditTitle">Action audit log</div>
-      <div id="adminAuditList"><div class="audit-sub">Loading...</div></div>
-    </div>
-
-    <div class="admin-panel" id="ap-platformowners">
-      <div class="section-title">Business owners</div>
-      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
-        <div class="section-title" style="margin-bottom:10px">Create business owner</div>
-        <div style="display:grid;gap:8px">
-          <input class="login-input" id="platformOwnerName" placeholder="Owner name">
-          <input class="login-input" id="platformOwnerPhone" placeholder="WhatsApp phone">
-          <input class="login-input" id="platformOwnerPassword" type="password" placeholder="Temporary password">
-          <button class="cta-btn" id="createOwnerBtn">Create owner</button>
-        </div>
-      </div>
-      <div style="margin-bottom:10px">
-        <input class="login-input" id="platformOwnerSearch" placeholder="Search owner by name or phone">
-      </div>
-      <div id="platformOwnersRows"><div class="audit-sub">Loading owners...</div></div>
-    </div>
-
     <div class="admin-panel" id="ap-platformvenues">
       <div class="section-title">Venues</div>
       <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:14px">
@@ -658,13 +632,19 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
           <input class="login-input" id="platformVenueOwnerName" placeholder="Owner full name">
 
           <div class="login-label">Business owner WhatsApp phone</div>
-          <input class="login-input" id="platformVenueOwnerPhone" placeholder="+85298765432">
+          <div style="display:grid;grid-template-columns:84px 1fr;gap:8px">
+            <input class="login-input" id="platformVenueOwnerPhoneCode" value="+852" placeholder="+852" style="text-align:center">
+            <input class="login-input" id="platformVenueOwnerPhoneLocal" placeholder="98765432">
+          </div>
 
           <div class="login-label">Business owner login password</div>
           <input class="login-input" id="platformVenueOwnerPassword" type="password" placeholder="Set initial password">
 
           <div class="login-label">Business WhatsApp (shown to players)</div>
-          <input class="login-input" id="platformVenueBusinessWhatsapp" placeholder="+85298765432">
+          <div style="display:grid;grid-template-columns:84px 1fr;gap:8px">
+            <input class="login-input" id="platformVenueBusinessWhatsappCode" value="+852" placeholder="+852" style="text-align:center">
+            <input class="login-input" id="platformVenueBusinessWhatsappLocal" placeholder="98765432">
+          </div>
 
           <div class="login-label">Currency</div>
           <select class="login-input" id="platformVenueCurrency">
@@ -706,45 +686,31 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
   <div class="screen" id="screen-audit">
     <div class="topbar">
       <div>
-        <div class="topbar-title" id="auditRevenueTitle">Audit & Revenue</div>
-        <div class="topbar-sub" id="auditSubTitle">Dragon Palace · April 2025</div>
+        <div class="topbar-title" id="auditRevenueTitle">Revenue</div>
+        <div class="topbar-sub" id="auditSubTitle">Select a venue on Admin to view revenue</div>
       </div>
       <span class="badge badge-blue" id="auditAdminBadge">Admin</span>
     </div>
     <div class="content">
-      <div class="metric-grid">
-        <div class="metric-card"><div class="metric-num">47</div><div class="metric-label" id="metricFullTables">Full tables booked</div></div>
-        <div class="metric-card"><div class="metric-num">188</div><div class="metric-label" id="metricPlayerSessions">Player sessions</div></div>
-        <div class="metric-card"><div class="metric-num">£1,880</div><div class="metric-label" id="metricGrossFees">Gross table fees</div></div>
-        <div class="metric-card"><div class="metric-num">£94</div><div class="metric-label" id="metricPlatformFee">Platform fee (5%)</div></div>
-      </div>
-      <div class="section-title" id="confirmedTablesTitle">Confirmed tables - this week</div>
-      <div class="audit-row">
-        <div><div class="audit-left">Thu 17 Apr · 2:00 PM · Table 3</div><div class="audit-sub">Wei L · Alex K · Shu M · Jade L</div></div>
-        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
-      </div>
-      <div class="audit-row">
-        <div><div class="audit-left">Thu 17 Apr · 4:00 PM · Table 1</div><div class="audit-sub">4 players confirmed</div></div>
-        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
-      </div>
-      <div class="audit-row">
-        <div><div class="audit-left">Wed 16 Apr · 6:00 PM · Table 2</div><div class="audit-sub">4 players confirmed</div></div>
-        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
-      </div>
-      <div class="audit-row">
-        <div><div class="audit-left">Wed 16 Apr · 2:00 PM · Table 4</div><div class="audit-sub">4 players confirmed</div></div>
-        <div style="text-align:right"><div class="audit-fee">£40</div><div style="font-size:10px;color:var(--color-text-secondary)">fee £2</div></div>
-      </div>
-      <div style="margin-top:14px;padding:14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
-        <div class="section-title" id="unlockLogTitle">Unlock log (admin actions)</div>
-        <div class="info-row"><span class="info-key">Tony W. — 4:00 PM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
-        <div class="info-row"><span class="info-key">Mei C. — 10:00 AM</span><span class="info-val" style="font-size:12px;color:#A32D2D">Unlocked by admin</span></div>
-        <div class="info-row"><span class="info-key" id="auditExportedLabel">Audit exported</span><span class="badge badge-green" id="csvReadyBadge">&#x2713; CSV ready</span></div>
-      </div>
+      <div class="metric-grid" id="revenueMetricGrid"></div>
+      <div class="section-title" id="confirmedTablesTitle">Revenue-driving tables</div>
+      <div id="revenueRows"><div class="audit-sub">No venue selected.</div></div>
     </div>
     <div class="bottom-bar">
-      <button class="nav-btn" onclick="showScreen('admin')" id="auditBackAdminBtn">&#x2190; Admin</button>
       <button class="nav-btn" style="flex:2;color:#1D9E75" id="exportCsvBtn">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-systemaudit">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="systemAuditTitle">System Audit</div>
+        <div class="topbar-sub" id="systemAuditSubTitle">All actions carried out in the system</div>
+      </div>
+      <span class="badge badge-blue" id="systemAuditBadge">Admin</span>
+    </div>
+    <div class="content">
+      <div id="systemAuditList"><div class="audit-sub">Loading...</div></div>
     </div>
   </div>
 
@@ -1234,10 +1200,9 @@ async function loadAdminData(){
 
 function renderAdminScreen(){
   if(session.user&&session.user.role==='platform_owner'){
-    renderPlatformOwnersTab();
     renderPlatformVenuesTab();
-    var ownersTab=document.getElementById('tabPlatformOwners');
-    if(ownersTab)showAdminTab('platformowners',ownersTab);
+    var venuesTab=document.getElementById('tabPlatformVenues');
+    if(venuesTab)showAdminTab('platformvenues',venuesTab);
     return;
   }
   renderScheduleTab();
@@ -1415,24 +1380,6 @@ function renderReallocationDrafts(){
   wrap.innerHTML=html||'<div class="audit-sub">No reallocation drafts.</div>';
 }
 
-function renderPlatformOwnersTab(){
-  var wrap=document.getElementById('platformOwnersRows');
-  if(!wrap)return;
-  var owners=(session.platformOwners||[]).filter(function(user){return user.role==='business_owner';});
-  var searchInput=document.getElementById('platformOwnerSearch');
-  var query=((searchInput&&searchInput.value)||'').trim().toLowerCase();
-  var filteredOwners=owners.filter(function(owner){
-    if(!query)return true;
-    return String(owner.name||'').toLowerCase().indexOf(query)>=0 || String(owner.phone||'').toLowerCase().indexOf(query)>=0;
-  });
-  var html='';
-  filteredOwners.forEach(function(owner){
-    html+='<div class="customer-row"><div class="avatar">'+initials(owner.name)+'</div>'+
-      '<div class="cust-info"><div class="cust-name">'+escapeHtml(owner.name)+'</div><div class="cust-meta">'+escapeHtml(owner.phone)+' · '+escapeHtml(owner.status)+'</div></div></div>';
-  });
-  wrap.innerHTML=html||'<div class="audit-sub">No business owners match this search.</div>';
-}
-
 function renderPlatformVenuesTab(){
   var wrap=document.getElementById('platformVenuesRows');
   if(!wrap)return;
@@ -1444,33 +1391,44 @@ function renderPlatformVenuesTab(){
     return showInactive||venue.status==='active';
   }).forEach(function(venue){
     var owner=ownerMap[venue.owner_id];
+    var selected=session.selectedPlatformVenueId===venue.id;
     var statusBadge=venue.status==='active'
       ?'<span class="badge badge-green" style="margin-left:6px">Active</span>'
       :'<span class="badge badge-gray" style="margin-left:6px">Inactive</span>';
-    html+='<div class="audit-row" style="border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:10px 10px;margin-bottom:8px"><div><div class="audit-left">'+escapeHtml(venue.name)+statusBadge+'</div>'+
+    html+='<div class="audit-row" style="cursor:pointer;border:'+(selected?'1px solid #1D9E75':'0.5px solid var(--color-border-tertiary)')+';border-radius:10px;padding:10px 10px;margin-bottom:8px" onclick="setPlatformRevenueVenue(\''+venue.id+'\')"><div><div class="audit-left">'+escapeHtml(venue.name)+statusBadge+(selected?' <span class="badge badge-blue" style="margin-left:6px">Revenue</span>':'')+'</div>'+
       '<div class="audit-sub">Owner: '+escapeHtml(owner?owner.name:venue.owner_id)+' ('+escapeHtml(owner&&owner.phone?owner.phone:'')+') · '+formatTime(venue.opening_time)+'-'+formatTime(venue.closing_time)+' · '+venue.table_count+' tables</div></div>'+
       '<div style="text-align:right"><div class="audit-fee">£'+Number(venue.session_fee||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+Number(venue.platform_fee_pct||0)+'%</div></div></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+
-        '<button class="action-chip" onclick="openPlatformVenueEditor(\''+venue.id+'\')">Edit details</button>'+
-        '<button class="action-chip" onclick="resetPlatformOwnerPassword(\''+venue.owner_id+'\')">Reset owner password</button>'+
+        '<button class="action-chip" onclick="event.stopPropagation();openPlatformVenueEditor(\''+venue.id+'\')">Edit details</button>'+
+        '<button class="action-chip" onclick="event.stopPropagation();resetPlatformOwnerPassword(\''+venue.owner_id+'\')">Reset owner password</button>'+
         (venue.status==='active'
-          ?'<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="inactivatePlatformVenue(\''+venue.id+'\')">Inactivate</button>'
-          :'<button class="action-chip" onclick="activatePlatformVenue(\''+venue.id+'\')">Activate</button>')+
+          ?'<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="event.stopPropagation();inactivatePlatformVenue(\''+venue.id+'\')">Inactivate</button>'
+          :'<button class="action-chip" onclick="event.stopPropagation();activatePlatformVenue(\''+venue.id+'\')">Activate</button>')+
       '</div>';
   });
   wrap.innerHTML=html||'<div class="audit-sub">No venues found.</div>';
+}
+
+function setPlatformRevenueVenue(venueId){
+  session.selectedPlatformVenueId=venueId;
+  var adminSubTitle=document.getElementById('adminSubTitle');
+  var selectedVenue=(session.venues||[]).find(function(v){return v.id===venueId;});
+  if(adminSubTitle)adminSubTitle.textContent=selectedVenue?('Revenue venue: '+selectedVenue.name):'Manage venues';
+  renderPlatformVenuesTab();
 }
 
 async function openPlatformVenueEditor(venueId){
   var venue=(session.venues||[]).find(function(v){return v.id===venueId;});
   if(!venue)return;
   var profile=await apiCall('GET','/venues/'+venueId+'/profile');
+  var phoneParts=splitPhoneNumber(profile&&profile.business_whatsapp?profile.business_whatsapp:'', '+852');
   var content='<div style="display:grid;gap:10px">'+
     '<div><div class="login-label">Venue name</div><input id="editVenueName" class="login-input" value="'+escapeHtml(venue.name)+'"></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Open</div><input id="editVenueOpen" class="login-input" type="time" value="'+formatTime(venue.opening_time)+'"></div><div><div class="login-label">Close</div><input id="editVenueClose" class="login-input" type="time" value="'+formatTime(venue.closing_time)+'"></div></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div class="login-label">Tables</div><input id="editVenueTables" class="login-input" type="number" min="1" max="20" value="'+Number(venue.table_count||4)+'"></div><div><div class="login-label">Session hours</div><input id="editVenueDuration" class="login-input" type="number" min="1" max="6" value="'+Number(venue.session_duration_hrs||2)+'"></div><div><div class="login-label">Cooldown</div><input id="editVenueCooldown" class="login-input" type="number" min="5" max="120" value="'+Number(venue.cooldown_minutes||30)+'"></div></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Session fee</div><input id="editVenueFee" class="login-input" type="number" min="1" step="0.01" value="'+Number(venue.session_fee||40)+'"></div><div><div class="login-label">Platform fee %</div><input id="editVenuePlatformFee" class="login-input" type="number" min="0" max="100" value="'+Number(venue.platform_fee_pct||5)+'"></div></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="login-label">Currency</div><input id="editVenueCurrency" class="login-input" value="'+escapeHtml(profile&&profile.currency_code?profile.currency_code:'HKD')+'" maxlength="3"></div><div><div class="login-label">Business WhatsApp</div><input id="editVenueWhatsapp" class="login-input" value="'+escapeHtml(profile&&profile.business_whatsapp?profile.business_whatsapp:'')+'"></div></div>'+
+    '<div><div class="login-label">Currency</div><input id="editVenueCurrency" class="login-input" value="'+escapeHtml(profile&&profile.currency_code?profile.currency_code:'HKD')+'" maxlength="3"></div>'+
+    '<div><div class="login-label">Business WhatsApp</div><div style="display:grid;grid-template-columns:84px 1fr;gap:8px"><input id="editVenueWhatsappCode" class="login-input" value="'+escapeHtml(phoneParts.countryCode||'+852')+'" style="text-align:center"><input id="editVenueWhatsappLocal" class="login-input" value="'+escapeHtml(phoneParts.localNumber||'')+'"></div></div>'+
     '<button class="cta-btn" id="saveVenueEditBtn">Save venue changes</button>'+
   '</div>';
   var overlay=showBottomSheet('Edit venue',content);
@@ -1489,7 +1447,7 @@ async function openPlatformVenueEditor(venueId){
     if(!updated)return;
     var profilePayload={
       currency_code:(overlay.querySelector('#editVenueCurrency').value||'HKD').trim().toUpperCase(),
-      business_whatsapp:(overlay.querySelector('#editVenueWhatsapp').value||'').trim(),
+      business_whatsapp:buildPhoneNumber((overlay.querySelector('#editVenueWhatsappCode').value||'').trim(),(overlay.querySelector('#editVenueWhatsappLocal').value||'').trim()),
       nudge_window_minutes:profile&&profile.nudge_window_minutes?profile.nudge_window_minutes:60,
       nudge_message_template:profile&&profile.nudge_message_template?profile.nudge_message_template:'Hi {player_name}, we are filling a table around {slot_time}. Want to join today\'s game?',
       reminder_lead_minutes:profile&&profile.reminder_lead_minutes?profile.reminder_lead_minutes:30,
@@ -1545,9 +1503,9 @@ async function createBusinessOwner(){
 async function createVenueAsPlatform(){
   var name=(document.getElementById('platformVenueName').value||'').trim();
   var ownerName=(document.getElementById('platformVenueOwnerName').value||'').trim();
-  var ownerPhone=(document.getElementById('platformVenueOwnerPhone').value||'').trim();
+  var ownerPhone=buildPhoneNumber((document.getElementById('platformVenueOwnerPhoneCode').value||'').trim(),(document.getElementById('platformVenueOwnerPhoneLocal').value||'').trim());
   var ownerPassword=(document.getElementById('platformVenueOwnerPassword').value||'').trim();
-  var businessWhatsapp=(document.getElementById('platformVenueBusinessWhatsapp').value||'').trim();
+  var businessWhatsapp=buildPhoneNumber((document.getElementById('platformVenueBusinessWhatsappCode').value||'').trim(),(document.getElementById('platformVenueBusinessWhatsappLocal').value||'').trim());
   var currency=(document.getElementById('platformVenueCurrency').value||'HKD').trim().toUpperCase();
   var open=(document.getElementById('platformVenueOpen').value||'').trim();
   var close=(document.getElementById('platformVenueClose').value||'').trim();
@@ -1588,9 +1546,11 @@ async function createVenueAsPlatform(){
   session.selectedPlatformVenueId=created.id;
   document.getElementById('platformVenueName').value='';
   document.getElementById('platformVenueOwnerName').value='';
-  document.getElementById('platformVenueOwnerPhone').value='';
+  document.getElementById('platformVenueOwnerPhoneCode').value='+852';
+  document.getElementById('platformVenueOwnerPhoneLocal').value='';
   document.getElementById('platformVenueOwnerPassword').value='';
-  document.getElementById('platformVenueBusinessWhatsapp').value='';
+  document.getElementById('platformVenueBusinessWhatsappCode').value='+852';
+  document.getElementById('platformVenueBusinessWhatsappLocal').value='';
   showToast('Venue created with business owner.');
   await loadVenueAdmin();
 }
@@ -2147,6 +2107,26 @@ async function loadAndRenderAdminAudit(){
   wrap.innerHTML=html;
 }
 
+async function loadAndRenderSystemAudit(){
+  showScreen('systemaudit');
+  var data=await apiCall('GET','/audit');
+  if(!data)return;
+  var wrap=document.getElementById('systemAuditList');
+  if(!wrap)return;
+  if(!data.length){wrap.innerHTML='<div class="audit-sub">No action audit events found.</div>';return;}
+  var venueMap={};
+  (session.venues||[]).forEach(function(v){venueMap[v.id]=v.name;});
+  var html='';
+  data.forEach(function(a){
+    html+='<div class="audit-log-row">'+
+      '<div class="audit-log-type">'+escapeHtml(a.action_type)+'</div>'+
+      '<div class="audit-log-meta">'+escapeHtml(a.actor_role||'')+(a.venue_id?(' · '+escapeHtml(venueMap[a.venue_id]||a.venue_id)):'')+' · '+new Date(a.created_at).toLocaleString()+'</div>'+
+      (a.target_type||a.metadata_json?'<div class="audit-sub" style="margin-top:4px">'+escapeHtml((a.target_type||'')+(a.target_id?(' · '+a.target_id):'')+(a.metadata_json?(' · '+a.metadata_json):''))+'</div>':'')+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
 // ============ COMPOSE MODAL ============
 function showComposeModal(){
   var overlay=document.createElement('div');
@@ -2267,31 +2247,32 @@ function showScreen(id){
   var navAdmin=document.getElementById('navAdmin');
   var navAudit=document.getElementById('navAudit');
   var navBooking=document.getElementById('navBooking');
+  var navSystemAudit=document.getElementById('navSystemAudit');
   if(!session.user){
     if(navPlayer)navPlayer.style.display='none';
     if(navAdmin)navAdmin.style.display='none';
     if(navAudit)navAudit.style.display='none';
+    if(navSystemAudit)navSystemAudit.style.display='none';
     if(navBooking)navBooking.style.display='none';
   }else if(session.user.role==='player'){
     if(navPlayer)navPlayer.style.display='';
     if(navBooking)navBooking.style.display='';
     if(navAdmin)navAdmin.style.display='none';
     if(navAudit)navAudit.style.display='none';
+    if(navSystemAudit)navSystemAudit.style.display='none';
   }else if(session.user.role==='business_owner'){
     if(navPlayer)navPlayer.style.display='none';
     if(navBooking)navBooking.style.display='none';
     if(navAdmin)navAdmin.style.display='';
     if(navAudit)navAudit.style.display='none';
+    if(navSystemAudit)navSystemAudit.style.display='none';
     // Business-owner tabs
-    var tabAudit=document.getElementById('tabAdminAudit');
-    if(tabAudit)tabAudit.style.display='none';
     var tabSchedule=document.getElementById('tabSchedule');
     var tabCustomers=document.getElementById('tabCustomers');
     var tabMessages=document.getElementById('tabMessages');
     var tabServices=document.getElementById('tabServices');
     var tabOrders=document.getElementById('tabOrders');
     var tabSettings=document.getElementById('tabSettings');
-    var tabPlatformOwners=document.getElementById('tabPlatformOwners');
     var tabPlatformVenues=document.getElementById('tabPlatformVenues');
     if(tabSchedule)tabSchedule.style.display='';
     if(tabCustomers)tabCustomers.style.display='';
@@ -2299,7 +2280,6 @@ function showScreen(id){
     if(tabServices)tabServices.style.display='';
     if(tabOrders)tabOrders.style.display='';
     if(tabSettings)tabSettings.style.display='';
-    if(tabPlatformOwners)tabPlatformOwners.style.display='none';
     if(tabPlatformVenues)tabPlatformVenues.style.display='none';
   }else{
     // platform_owner
@@ -2307,23 +2287,20 @@ function showScreen(id){
     if(navBooking)navBooking.style.display='none';
     if(navAdmin)navAdmin.style.display='';
     if(navAudit)navAudit.style.display='';
+    if(navSystemAudit)navSystemAudit.style.display='';
     var tabSchedule2=document.getElementById('tabSchedule');
     var tabCustomers2=document.getElementById('tabCustomers');
     var tabMessages2=document.getElementById('tabMessages');
     var tabServices2=document.getElementById('tabServices');
     var tabOrders2=document.getElementById('tabOrders');
-    var tabAudit2=document.getElementById('tabAdminAudit');
     var tabSettings2=document.getElementById('tabSettings');
-    var tabPlatformOwners2=document.getElementById('tabPlatformOwners');
     var tabPlatformVenues2=document.getElementById('tabPlatformVenues');
     if(tabSchedule2)tabSchedule2.style.display='none';
     if(tabCustomers2)tabCustomers2.style.display='none';
     if(tabMessages2)tabMessages2.style.display='none';
     if(tabServices2)tabServices2.style.display='none';
     if(tabOrders2)tabOrders2.style.display='none';
-    if(tabAudit2)tabAudit2.style.display='none';
     if(tabSettings2)tabSettings2.style.display='none';
-    if(tabPlatformOwners2)tabPlatformOwners2.style.display='';
     if(tabPlatformVenues2)tabPlatformVenues2.style.display='';
   }
   // addons screen not shown in nav bar
@@ -2363,27 +2340,68 @@ function showAdminTab(tab,el){
   var panel=document.getElementById('ap-'+tab);
   if(panel)panel.classList.add('active');
   if(el)el.classList.add('active');
-  if(tab==='adminaudit')loadAndRenderAdminAudit();
   if(tab==='orders'){var wrap=document.getElementById('orderHistoryList');if(wrap&&wrap.innerHTML.indexOf('Press Filter')>=0)loadOrderHistory();}
 }
 
-// ============ AUDIT SCREEN ============
-function renderAuditScreen(){
+// ============ REVENUE SCREEN ============
+async function openRevenueScreen(){
+  var venueId=session.user&&session.user.role==='platform_owner'?session.selectedPlatformVenueId:session.currentVenueId;
+  if(!venueId){
+    showToast('Select a venue on the admin page first.','warn');
+    return;
+  }
+  var selectedVenue=(session.venues||[]).find(function(v){return v.id===venueId;});
+  if(!selectedVenue){
+    showToast('Selected venue not found.','error');
+    return;
+  }
+  var bookings=await apiCall('GET','/venues/'+venueId+'/bookings');
+  if(bookings)session.bookingHistory=bookings;
+  var audit=await apiCall('GET','/venues/'+venueId+'/audit');
+  if(audit)session.auditLog=audit;
+  renderAuditScreen(selectedVenue);
+  showScreen('audit');
+}
+
+function renderAuditScreen(selectedVenue){
+  var venue=selectedVenue||((session.venues||[]).find(function(v){return v.id===session.selectedPlatformVenueId||v.id===session.currentVenueId;}));
   var audit=session.auditLog||[];
+  var bookings=(session.bookingHistory||[]).filter(function(b){return b.status!=='cancelled';});
   var totalFees=0,totalPlatformFee=0;
   audit.forEach(function(a){
     totalFees+=(a.session_fee||0);
     totalPlatformFee+=(a.platform_fee||0);
   });
-  
-  var auditPanel=document.getElementById('screen-audit');
-  if(auditPanel){
-    var metricsGrid=auditPanel.querySelector('.metric-grid');
-    if(metricsGrid){
-      metricsGrid.innerHTML='<div class="metric-card"><div class="metric-num">'+audit.length+'</div><div class="metric-label">Full tables booked</div></div>'+
-        '<div class="metric-card"><div class="metric-num">0</div><div class="metric-label">Player sessions</div></div>'+
-        '<div class="metric-card"><div class="metric-num">£'+totalFees.toFixed(2)+'</div><div class="metric-label">Gross table fees</div></div>'+
-        '<div class="metric-card"><div class="metric-num">£'+totalPlatformFee.toFixed(2)+'</div><div class="metric-label">Platform fee</div></div>';
+  var grouped={};
+  bookings.forEach(function(b){
+    var key=[b.timeslot_id,b.start_time,b.table_number].join('|');
+    if(!grouped[key])grouped[key]={row:b,count:0};
+    grouped[key].count+=1;
+  });
+  var rows=Object.keys(grouped).map(function(key){return grouped[key];});
+  var auditTitle=document.getElementById('auditRevenueTitle');
+  var auditSub=document.getElementById('auditSubTitle');
+  var grid=document.getElementById('revenueMetricGrid');
+  var list=document.getElementById('revenueRows');
+  if(auditTitle)auditTitle.textContent='Revenue';
+  if(auditSub)auditSub.textContent=venue?(venue.name+' · Revenue view'):'No venue selected';
+  if(grid){
+    grid.innerHTML='<div class="metric-card"><div class="metric-num">'+rows.length+'</div><div class="metric-label">Full tables booked</div></div>'+
+      '<div class="metric-card"><div class="metric-num">'+bookings.length+'</div><div class="metric-label">Player sessions</div></div>'+
+      '<div class="metric-card"><div class="metric-num">£'+totalFees.toFixed(2)+'</div><div class="metric-label">Gross table fees</div></div>'+
+      '<div class="metric-card"><div class="metric-num">£'+totalPlatformFee.toFixed(2)+'</div><div class="metric-label">Platform fee</div></div>';
+  }
+  if(list){
+    if(!rows.length){
+      list.innerHTML='<div class="audit-sub">No revenue data for this venue yet.</div>';
+    }else{
+      var html='';
+      rows.forEach(function(entry){
+        var row=entry.row;
+        html+='<div class="audit-row"><div><div class="audit-left">'+formatDateFriendly(row.booked_at)+' · '+formatTime(row.start_time)+' · Table '+row.table_number+'</div><div class="audit-sub">'+entry.count+' player session(s)</div></div>'+
+          '<div style="text-align:right"><div class="audit-fee">£'+Number(venue&&venue.session_fee?venue.session_fee:0).toFixed(2)+'</div><div style="font-size:10px;color:var(--color-text-secondary)">fee '+Number(venue&&venue.platform_fee_pct?((venue.session_fee*venue.platform_fee_pct)/100):0).toFixed(2)+'</div></div></div>';
+      });
+      list.innerHTML=html;
     }
   }
 }
@@ -2391,7 +2409,7 @@ function renderAuditScreen(){
 var translations={
   'en':{
     srTitle:'Mahjong booking system interactive mockup - navigate between Login, Player view, Admin view, Booking confirmation, and Audit screens',
-    navLogin:'Login',navPlayer:'Player',navBooking:'Booking',navAdmin:'Admin',navAudit:'Audit',
+    navLogin:'Login',navPlayer:'Player',navBooking:'Booking',navAdmin:'Admin',navAudit:'Revenue',navSystemAudit:'Audit',
     loginBrandTitle:'Punctual Game',loginBrandSubtitle:'Punctual Game Network Platform',
     rolePlayerLabel:'玩家登入',rolePlayerSub:'JOIN A GAME',roleAdminLabel:'場主登入',roleAdminSub:'MANAGE YOUR VENUE',
     mobileLabel:'Mobile / WhatsApp number',mobilePlaceholder:'99999999',passwordLabel:'PIN / Password',signInBtn:'Sign in / 登入',
@@ -2409,11 +2427,11 @@ var translations={
     cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'WhatsApp notifications',waNotifSub:'Auto-send on table full',
     sessionFeeLabel:'Session fee (per table)',sessionFeeSub:'Used for audit and billing',platformFeeLabel:'Platform fee %',platformFeeSub:'Developer charge per session',saveSettingsBtn:'Save settings',
     auditRevenueTitle:'Audit and Revenue',auditSubTitle:'Dragon Palace · April 2025',auditAdminBadge:'Admin',metricFullTables:'Full tables booked',metricPlayerSessions:'Player sessions',metricGrossFees:'Gross table fees',metricPlatformFee:'Platform fee (5%)',
-    confirmedTablesTitle:'Confirmed tables - this week',unlockLogTitle:'Unlock log (admin actions)',auditExportedLabel:'Audit exported',csvReadyBadge:'✓ CSV ready',auditBackAdminBtn:'<- Admin',exportCsvBtn:'Export CSV'
+    confirmedTablesTitle:'Revenue-driving tables',exportCsvBtn:'Export CSV',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system'
   },
   'zh-Hant':{
     srTitle:'麻將訂位系統互動原型 - 可在登入、玩家、訂位、商家與審計畫面切換',
-    navLogin:'登入',navPlayer:'玩家',navBooking:'訂位',navAdmin:'商家',navAudit:'審計',
+    navLogin:'登入',navPlayer:'玩家',navBooking:'訂位',navAdmin:'商家',navAudit:'營收',navSystemAudit:'審計',
     loginBrandTitle:'準時開檯',loginBrandSubtitle:'Punctual Game Network Platform',
     rolePlayerLabel:'玩家登入',rolePlayerSub:'JOIN A GAME',roleAdminLabel:'場主登入',roleAdminSub:'MANAGE YOUR VENUE',
     mobileLabel:'手機 / WhatsApp 號碼',mobilePlaceholder:'91234567',passwordLabel:'PIN / 密碼',signInBtn:'登入',
@@ -2431,11 +2449,11 @@ var translations={
     cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'WhatsApp 通知',waNotifSub:'滿桌時自動發送',
     sessionFeeLabel:'每桌場次費',sessionFeeSub:'用於審計與計費',platformFeeLabel:'平台服務費 %',platformFeeSub:'每場抽成比例',saveSettingsBtn:'儲存設定',
     auditRevenueTitle:'審計與營收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'滿桌場次',metricPlayerSessions:'玩家出席次數',metricGrossFees:'總桌費',metricPlatformFee:'平台費 (5%)',
-    confirmedTablesTitle:'本週已確認滿桌',unlockLogTitle:'解鎖紀錄 (商家操作)',auditExportedLabel:'審計已匯出',csvReadyBadge:'✓ CSV 已就緒',auditBackAdminBtn:'<- 商家',exportCsvBtn:'匯出 CSV'
+    confirmedTablesTitle:'營收桌次',exportCsvBtn:'匯出 CSV',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作'
   },
   'zh-Hans':{
     srTitle:'麻将订位系统互动原型 - 可在登录、玩家、订位、商家与审计画面切换',
-    navLogin:'登录',navPlayer:'玩家',navBooking:'订位',navAdmin:'商家',navAudit:'审计',
+    navLogin:'登录',navPlayer:'玩家',navBooking:'订位',navAdmin:'商家',navAudit:'营收',navSystemAudit:'审计',
     loginBrandTitle:'准时开档',loginBrandSubtitle:'Punctual Game Network Platform',
     rolePlayerLabel:'玩家登入',rolePlayerSub:'JOIN A GAME',roleAdminLabel:'場主登入',roleAdminSub:'MANAGE YOUR VENUE',
     mobileLabel:'手机 / WhatsApp 号码',mobilePlaceholder:'91234567',passwordLabel:'PIN / 密码',signInBtn:'登录',
@@ -2453,7 +2471,7 @@ var translations={
     cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'WhatsApp 通知',waNotifSub:'满桌时自动发送',
     sessionFeeLabel:'每桌场次费',sessionFeeSub:'用于审计与计费',platformFeeLabel:'平台服务费 %',platformFeeSub:'每场抽成比例',saveSettingsBtn:'保存设置',
     auditRevenueTitle:'审计与营收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'满桌场次',metricPlayerSessions:'玩家出席次数',metricGrossFees:'总桌费',metricPlatformFee:'平台费 (5%)',
-    confirmedTablesTitle:'本周已确认满桌',unlockLogTitle:'解锁记录 (商家操作)',auditExportedLabel:'审计已导出',csvReadyBadge:'✓ CSV 已就绪',auditBackAdminBtn:'<- 商家',exportCsvBtn:'导出 CSV'
+    confirmedTablesTitle:'营收桌次',exportCsvBtn:'导出 CSV',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作'
   }
 };
 
@@ -2508,9 +2526,9 @@ document.addEventListener('DOMContentLoaded',function(){
   var navBooking=document.getElementById('navBooking');
   var navAdmin=document.getElementById('navAdmin');
   var navAudit=document.getElementById('navAudit');
+  var navSystemAudit=document.getElementById('navSystemAudit');
   var backBtn=document.getElementById('backBtn');
   var signOutBtn=document.getElementById('signOutBtn');
-  var auditBackAdminBtn=document.getElementById('auditBackAdminBtn');
   var passwordInput=document.getElementById('passwordInput');
   var claimBtn=document.getElementById('claimSeatBtn');
   var undoBtn=document.getElementById('undoBookingBtn');
@@ -2520,9 +2538,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var saveSettingsBtn=document.getElementById('saveSettingsBtn');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
   var customerAddBtn=document.getElementById('customerAddBtn');
-  var createOwnerBtn=document.getElementById('createOwnerBtn');
   var createVenueBtn=document.getElementById('createVenueBtn');
-  var platformOwnerSearch=document.getElementById('platformOwnerSearch');
   var platformShowInactive=document.getElementById('platformShowInactive');
   updateAuthNavButton();
   if(startLoginBtn){
@@ -2565,7 +2581,12 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   if(navAudit){
     navAudit.onclick=function(){
-      showScreen('audit');
+      openRevenueScreen();
+    };
+  }
+  if(navSystemAudit){
+    navSystemAudit.onclick=function(){
+      loadAndRenderSystemAudit();
     };
   }
   if(backBtn){
@@ -2576,11 +2597,6 @@ document.addEventListener('DOMContentLoaded',function(){
   if(signOutBtn){
     signOutBtn.onclick=function(){
       handleSignOut();
-    };
-  }
-  if(auditBackAdminBtn){
-    auditBackAdminBtn.onclick=function(){
-      showScreen('admin');
     };
   }
   if(passwordInput){
@@ -2631,20 +2647,10 @@ document.addEventListener('DOMContentLoaded',function(){
       openCustomerForm();
     };
   }
-  if(createOwnerBtn){
-    createOwnerBtn.onclick=function(){
-      createBusinessOwner();
-    };
-  }
   if(createVenueBtn){
     createVenueBtn.onclick=function(){
       createVenueAsPlatform();
     };
-  }
-  if(platformOwnerSearch){
-    platformOwnerSearch.addEventListener('input',function(){
-      renderPlatformOwnersTab();
-    });
   }
   if(platformShowInactive){
     platformShowInactive.addEventListener('change',function(){
