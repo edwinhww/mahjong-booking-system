@@ -250,7 +250,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div style="margin-bottom:16px">
           <div class="login-label" id="mobileLabel">手機 / WhatsApp 號碼</div>
           <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
-            <input class="login-input" id="countryCodeInput" type="tel" placeholder="+852" style="text-align:center">
+            <input class="login-input" id="countryCodeInput" type="tel" placeholder="+852" value="+852" style="text-align:center">
             <input class="login-input" id="mobileInput" type="tel" placeholder="91234567">
           </div>
         </div>
@@ -2297,7 +2297,12 @@ async function loadOrderHistory(){
   if(from)qs+='&from_date='+encodeURIComponent(from);
   if(to)qs+='&to_date='+encodeURIComponent(to);
   var rows=await apiCall('GET','/venues/'+session.currentVenueId+'/order-history'+qs);
-  renderOrdersTab(rows||[]);
+  var filtered=(rows||[]).filter(function(r){
+    var hasItems=!!String(r.items_summary||'').trim();
+    var hasValue=Number(r.total_cost||0)>0;
+    return hasItems||hasValue;
+  });
+  renderOrdersTab(filtered);
 }
 
 function renderOrdersTab(rows){
@@ -2314,7 +2319,7 @@ function renderOrdersTab(rows){
       '</div>'+
       (r.player_phone?'<div class="order-row-items">'+r.player_phone+'</div>':'')+
       (r.items_summary?'<div class="order-row-items">'+r.items_summary+'</div>':'')+
-      '<div class="order-row-total">'+formatMoney(r.total_cost,session.currentVenueId)+'  <span style="font-weight:400;font-size:11px;color:var(--color-text-secondary)">'+r.order_status+'</span></div>'+
+      '<div class="order-row-total">'+formatMoney(r.total_cost,session.currentVenueId)+'  <span style="font-weight:400;font-size:11px;color:var(--color-text-secondary)">'+(r.order_status||r.booking_status||'')+'</span></div>'+
     '</div>';
   });
   wrap.innerHTML=html;
@@ -2575,7 +2580,7 @@ function backToRoleSelection(){
   document.getElementById('loginForm').style.display='none';
   document.getElementById('mobileInput').value='';
   document.getElementById('passwordInput').value='';
-  document.getElementById('countryCodeInput').value='';
+  document.getElementById('countryCodeInput').value='+852';
 }
 
 function showAdminTab(tab,el){
