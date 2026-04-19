@@ -168,6 +168,8 @@ class AuditRead(BaseModel):
 class VenueProfileUpsert(BaseModel):
     currency_code: str = Field(min_length=3, max_length=3)
     business_whatsapp: str
+    business_whatsapp_cc: str = Field(default="+852", max_length=10)
+    business_whatsapp_local: str = Field(default="", max_length=20)
     nudge_window_minutes: int = Field(default=60, ge=0, le=240)
     nudge_message_template: str = Field(default="Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?", min_length=1, max_length=600)
     reminder_lead_minutes: int = Field(default=30, ge=0, le=240)
@@ -179,6 +181,8 @@ class VenueProfileRead(BaseModel):
     venue_id: str
     currency_code: str
     business_whatsapp: str
+    business_whatsapp_cc: str
+    business_whatsapp_local: str
     nudge_window_minutes: int
     nudge_message_template: str
     reminder_lead_minutes: int

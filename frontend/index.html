@@ -535,7 +535,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="settings-row">
           <div><div class="settings-label" id="waNotifLabel">Business WhatsApp</div><div class="settings-sub" id="waNotifSub">Used to open click-to-chat links</div></div>
           <div style="display:flex;gap:6px;align-items:center">
-            <input class="settings-input" id="settingBusinessWhatsappCode" type="tel" value="+852" readonly style="width:72px;text-align:center;background:#F7F5EF;color:#6B7280">
+            <input class="settings-input" id="settingBusinessWhatsappCode" type="tel" value="+852" placeholder="+852" style="width:72px;text-align:center">
             <input class="settings-input textwide" id="settingBusinessWhatsappLocal" type="tel" value="" placeholder="91234567">
           </div>
         </div>
@@ -1201,8 +1201,8 @@ async function loadAdminData(){
     var settingReminderLead=document.getElementById('settingReminderLead');
     var settingReminderMessage=document.getElementById('settingReminderMessage');
     var phoneParts=splitPhoneNumber(session.profile.business_whatsapp||'', '+852');
-    if(settingBusinessWhatsappCode)settingBusinessWhatsappCode.value='+852';
-    if(settingBusinessWhatsappLocal)settingBusinessWhatsappLocal.value=phoneParts.localNumber;
+    if(settingBusinessWhatsappCode)settingBusinessWhatsappCode.value=session.profile.business_whatsapp_cc||phoneParts.countryCode||'+852';
+    if(settingBusinessWhatsappLocal)settingBusinessWhatsappLocal.value=session.profile.business_whatsapp_local||phoneParts.localNumber;
     if(settingCurrency)settingCurrency.value=(session.profile.currency_code||'HKD').toUpperCase();
     if(settingNudgeWindow)settingNudgeWindow.value=session.profile.nudge_window_minutes;
     if(settingNudgeMessage)settingNudgeMessage.value=session.profile.nudge_message_template||'';
@@ -1675,7 +1675,9 @@ async function saveSettings(){
 
   var profilePayload={
     currency_code:((document.getElementById('settingCurrency')||{}).value||'HKD').trim().toUpperCase(),
-    business_whatsapp:buildHongKongPhoneNumber((document.getElementById('settingBusinessWhatsappLocal')||{}).value),
+    business_whatsapp_cc:((document.getElementById('settingBusinessWhatsappCode')||{}).value||'+852').trim(),
+    business_whatsapp_local:phoneDigits((document.getElementById('settingBusinessWhatsappLocal')||{}).value||''),
+    business_whatsapp:buildPhoneNumber(((document.getElementById('settingBusinessWhatsappCode')||{}).value||'+852').trim(),(document.getElementById('settingBusinessWhatsappLocal')||{}).value||''),
     nudge_window_minutes:Number(document.getElementById('settingNudgeWindow').value),
     nudge_message_template:document.getElementById('settingNudgeMessage').value,
     reminder_lead_minutes:Number(document.getElementById('settingReminderLead').value),

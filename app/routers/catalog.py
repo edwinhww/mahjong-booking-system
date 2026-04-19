@@ -63,6 +63,8 @@ def get_venue_profile(venue_id: str, db: Session = Depends(get_db)) -> VenueProf
             venue_id=venue_id,
             currency_code="GBP",
             business_whatsapp="",
+            business_whatsapp_cc="+852",
+            business_whatsapp_local="",
             nudge_window_minutes=60,
             nudge_message_template="Hi {player_name}, we are filling a table around {slot_time}. Want to join today's game?",
             reminder_lead_minutes=30,
@@ -77,6 +79,8 @@ def get_venue_profile(venue_id: str, db: Session = Depends(get_db)) -> VenueProf
         venue_id=profile.venue_id,
         currency_code=profile.currency_code,
         business_whatsapp=profile.business_whatsapp,
+        business_whatsapp_cc=profile.business_whatsapp_cc or "+852",
+        business_whatsapp_local=profile.business_whatsapp_local or "",
         nudge_window_minutes=profile.nudge_window_minutes,
         nudge_message_template=profile.nudge_message_template,
         reminder_lead_minutes=profile.reminder_lead_minutes,
@@ -94,11 +98,20 @@ def upsert_venue_profile(venue_id: str, payload: VenueProfileUpsert, admin_id: s
     _require_venue_admin(db, venue, admin_id)
 
     profile = db.scalar(select(VenueProfile).where(VenueProfile.venue_id == venue_id))
+    # Derive the combined value from the split fields when available
+    cc = (payload.business_whatsapp_cc or "+852").strip()
+    if cc and cc[0] != "+":
+        cc = "+" + cc
+    local = "".join(c for c in (payload.business_whatsapp_local or "") if c.isdigit())
+    combined_whatsapp = (cc + local) if local else payload.business_whatsapp
+
     if not profile:
         profile = VenueProfile(
             venue_id=venue_id,
             currency_code=payload.currency_code.upper(),
-            business_whatsapp=payload.business_whatsapp,
+            business_whatsapp=combined_whatsapp,
+            business_whatsapp_cc=cc,
+            business_whatsapp_local=local,
             nudge_window_minutes=payload.nudge_window_minutes,
             nudge_message_template=payload.nudge_message_template,
             reminder_lead_minutes=payload.reminder_lead_minutes,
@@ -107,7 +120,9 @@ def upsert_venue_profile(venue_id: str, payload: VenueProfileUpsert, admin_id: s
         db.add(profile)
     else:
         profile.currency_code = payload.currency_code.upper()
-        profile.business_whatsapp = payload.business_whatsapp
+        profile.business_whatsapp = combined_whatsapp
+        profile.business_whatsapp_cc = cc
+        profile.business_whatsapp_local = local
         profile.nudge_window_minutes = payload.nudge_window_minutes
         profile.nudge_message_template = payload.nudge_message_template
         profile.reminder_lead_minutes = payload.reminder_lead_minutes
@@ -131,6 +146,8 @@ def upsert_venue_profile(venue_id: str, payload: VenueProfileUpsert, admin_id: s
         venue_id=profile.venue_id,
         currency_code=profile.currency_code,
         business_whatsapp=profile.business_whatsapp,
+        business_whatsapp_cc=profile.business_whatsapp_cc or "+852",
+        business_whatsapp_local=profile.business_whatsapp_local or "",
         nudge_window_minutes=profile.nudge_window_minutes,
         nudge_message_template=profile.nudge_message_template,
         reminder_lead_minutes=profile.reminder_lead_minutes,

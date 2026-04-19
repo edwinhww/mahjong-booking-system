@@ -46,6 +46,10 @@ def ensure_schema() -> None:
         statements.append(
             "ALTER TABLE mahjoh_t_venue_profiles ADD COLUMN reminder_message_template TEXT NOT NULL DEFAULT 'Hi {player_name}, this is a reminder that your Mahjong game starts at {slot_time} today.'"
         )
+    if "business_whatsapp_cc" not in existing:
+        statements.append("ALTER TABLE mahjoh_t_venue_profiles ADD COLUMN business_whatsapp_cc VARCHAR(10) NOT NULL DEFAULT '+852'")
+    if "business_whatsapp_local" not in existing:
+        statements.append("ALTER TABLE mahjoh_t_venue_profiles ADD COLUMN business_whatsapp_local VARCHAR(20) NOT NULL DEFAULT ''")
 
     if not statements:
         _bootstrap_demo_users()
@@ -54,6 +58,23 @@ def ensure_schema() -> None:
     with engine.begin() as conn:
         for statement in statements:
             conn.execute(text(statement))
+
+    # Back-fill split columns from the combined business_whatsapp value for existing rows
+    with engine.begin() as conn:
+        conn.execute(text(
+            """
+            UPDATE mahjoh_t_venue_profiles
+               SET business_whatsapp_cc = CASE
+                     WHEN business_whatsapp ~ '^\\+[0-9]{1,4}' THEN substring(business_whatsapp from '^\\+[0-9]{1,4}')
+                     ELSE '+852'
+                   END,
+                   business_whatsapp_local = CASE
+                     WHEN business_whatsapp ~ '^\\+[0-9]{1,4}([0-9]+)$' THEN substring(business_whatsapp from '^\\+[0-9]{1,4}([0-9]+)$')
+                     ELSE regexp_replace(business_whatsapp, '[^0-9]', '', 'g')
+                   END
+             WHERE business_whatsapp_cc = '+852' AND business_whatsapp_local = ''
+            """
+        ))
 
     # Bootstrap demo users
     _bootstrap_demo_users()
