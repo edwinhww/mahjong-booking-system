@@ -18,6 +18,8 @@ def list_action_audit(
     search: str | None = None,
     from_date: date | None = None,
     to_date: date | None = None,
+    limit: int | None = None,
+    offset: int = 0,
     db: Session = Depends(get_db),
 ) -> list[ActionAuditRead]:
     stmt = select(ActionAudit).order_by(ActionAudit.created_at.desc())
@@ -38,6 +40,14 @@ def list_action_audit(
     if to_date:
         stmt = stmt.where(func.date(ActionAudit.created_at) <= to_date)
 
+    if offset < 0:
+        offset = 0
+    if limit is not None:
+        # Cap to prevent accidentally huge payloads from the client.
+        safe_limit = max(1, min(limit, 500))
+        stmt = stmt.limit(safe_limit)
+    stmt = stmt.offset(offset)
+
     rows = db.execute(stmt).scalars().all()
     return [
         ActionAuditRead(
@@ -53,6 +63,37 @@ def list_action_audit(
         )
         for r in rows
     ]
+
+
+@router.get("/count")
+def count_action_audit(
+    actor_role: str | None = None,
+    action_type: str | None = None,
+    search: str | None = None,
+    from_date: date | None = None,
+    to_date: date | None = None,
+    db: Session = Depends(get_db),
+) -> dict[str, int]:
+    stmt = select(func.count(ActionAudit.id))
+
+    if actor_role:
+        stmt = stmt.where(ActionAudit.actor_role == actor_role)
+    if action_type:
+        stmt = stmt.where(ActionAudit.action_type == action_type)
+    if search:
+        pattern = f"%{search.lower()}%"
+        stmt = stmt.where(
+            func.lower(ActionAudit.action_type).like(pattern)
+            | func.lower(func.coalesce(ActionAudit.target_type, "")).like(pattern)
+            | func.lower(func.coalesce(ActionAudit.metadata_json, "")).like(pattern)
+        )
+    if from_date:
+        stmt = stmt.where(func.date(ActionAudit.created_at) >= from_date)
+    if to_date:
+        stmt = stmt.where(func.date(ActionAudit.created_at) <= to_date)
+
+    total = db.scalar(stmt) or 0
+    return {"total": int(total)}
 
 
 @router.get("/roles")

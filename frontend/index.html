@@ -698,7 +698,19 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       <span class="badge badge-blue" id="systemAuditBadge">Admin</span>
     </div>
     <div class="content">
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <input class="login-input" id="systemAuditActionType" placeholder="Action type" style="flex:1;min-width:120px">
+        <input class="login-input" id="systemAuditFromDate" type="date" style="width:128px">
+        <input class="login-input" id="systemAuditToDate" type="date" style="width:128px">
+        <button class="action-chip" id="systemAuditApplyBtn" style="align-self:flex-end;height:42px">Apply</button>
+        <button class="action-chip" id="systemAuditResetBtn" style="align-self:flex-end;height:42px">Reset</button>
+      </div>
       <div id="systemAuditList"><div class="audit-sub">Loading...</div></div>
+    </div>
+    <div class="bottom-bar" style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <button class="nav-btn" id="systemAuditPrevBtn">Prev</button>
+      <div style="font-size:12px;color:var(--color-text-secondary)" id="systemAuditPageInfo">Page 1 / 1</div>
+      <button class="nav-btn" id="systemAuditNextBtn">Next</button>
     </div>
   </div>
 
@@ -735,6 +747,9 @@ var session={
   profile:null,
   playerStatsCache:{},
   addonSelections:{},
+  systemAuditPage:1,
+  systemAuditPageSize:20,
+  systemAuditTotal:0,
   currentVenueId:null,
   selectedTimeslotId:null,
   selectedBookingId:null,
@@ -2349,7 +2364,31 @@ async function loadAndRenderAdminAudit(){
 
 async function loadAndRenderSystemAudit(){
   showScreen('systemaudit');
-  var data=await apiCall('GET','/audit');
+  var page=Math.max(1,session.systemAuditPage||1);
+  var pageSize=20;
+  session.systemAuditPageSize=pageSize;
+  var offset=(page-1)*pageSize;
+
+  var actionType=(document.getElementById('systemAuditActionType')||{}).value||'';
+  var fromDate=(document.getElementById('systemAuditFromDate')||{}).value||'';
+  var toDate=(document.getElementById('systemAuditToDate')||{}).value||'';
+
+  var qs=[];
+  if(actionType.trim())qs.push('action_type='+encodeURIComponent(actionType.trim()));
+  if(fromDate)qs.push('from_date='+encodeURIComponent(fromDate));
+  if(toDate)qs.push('to_date='+encodeURIComponent(toDate));
+  qs.push('limit='+pageSize);
+  qs.push('offset='+offset);
+
+  var countQs=[];
+  if(actionType.trim())countQs.push('action_type='+encodeURIComponent(actionType.trim()));
+  if(fromDate)countQs.push('from_date='+encodeURIComponent(fromDate));
+  if(toDate)countQs.push('to_date='+encodeURIComponent(toDate));
+
+  var countRes=await apiCall('GET','/audit/count'+(countQs.length?('?'+countQs.join('&')):''));
+  if(countRes&&typeof countRes.total==='number')session.systemAuditTotal=countRes.total;
+
+  var data=await apiCall('GET','/audit?'+qs.join('&'));
   if(!data)return;
   var wrap=document.getElementById('systemAuditList');
   if(!wrap)return;
@@ -2365,6 +2404,17 @@ async function loadAndRenderSystemAudit(){
     '</div>';
   });
   wrap.innerHTML=html;
+
+  var totalPages=Math.max(1,Math.ceil((session.systemAuditTotal||0)/pageSize));
+  if(session.systemAuditPage>totalPages){
+    session.systemAuditPage=totalPages;
+  }
+  var pageInfo=document.getElementById('systemAuditPageInfo');
+  if(pageInfo)pageInfo.textContent='Page '+session.systemAuditPage+' / '+totalPages;
+  var prevBtn=document.getElementById('systemAuditPrevBtn');
+  var nextBtn=document.getElementById('systemAuditNextBtn');
+  if(prevBtn)prevBtn.disabled=session.systemAuditPage<=1;
+  if(nextBtn)nextBtn.disabled=session.systemAuditPage>=totalPages;
 }
 
 // ============ COMPOSE MODAL ============
@@ -2796,6 +2846,10 @@ document.addEventListener('DOMContentLoaded',function(){
   var ownerChangePasswordBtn=document.getElementById('ownerChangePasswordBtn');
   var settingCurrency=document.getElementById('settingCurrency');
   var exportCsvBtn=document.getElementById('exportCsvBtn');
+  var systemAuditApplyBtn=document.getElementById('systemAuditApplyBtn');
+  var systemAuditResetBtn=document.getElementById('systemAuditResetBtn');
+  var systemAuditPrevBtn=document.getElementById('systemAuditPrevBtn');
+  var systemAuditNextBtn=document.getElementById('systemAuditNextBtn');
   var customerAddBtn=document.getElementById('customerAddBtn');
   var createVenueBtn=document.getElementById('createVenueBtn');
   var platformShowInactive=document.getElementById('platformShowInactive');
@@ -2919,6 +2973,39 @@ document.addEventListener('DOMContentLoaded',function(){
   if(exportCsvBtn){
     exportCsvBtn.onclick=function(){
       exportAuditCsv();
+    };
+  }
+  if(systemAuditApplyBtn){
+    systemAuditApplyBtn.onclick=function(){
+      session.systemAuditPage=1;
+      loadAndRenderSystemAudit();
+    };
+  }
+  if(systemAuditResetBtn){
+    systemAuditResetBtn.onclick=function(){
+      var actionInput=document.getElementById('systemAuditActionType');
+      var fromInput=document.getElementById('systemAuditFromDate');
+      var toInput=document.getElementById('systemAuditToDate');
+      if(actionInput)actionInput.value='';
+      if(fromInput)fromInput.value='';
+      if(toInput)toInput.value='';
+      session.systemAuditPage=1;
+      loadAndRenderSystemAudit();
+    };
+  }
+  if(systemAuditPrevBtn){
+    systemAuditPrevBtn.onclick=function(){
+      if(session.systemAuditPage<=1)return;
+      session.systemAuditPage-=1;
+      loadAndRenderSystemAudit();
+    };
+  }
+  if(systemAuditNextBtn){
+    systemAuditNextBtn.onclick=function(){
+      var totalPages=Math.max(1,Math.ceil((session.systemAuditTotal||0)/(session.systemAuditPageSize||20)));
+      if(session.systemAuditPage>=totalPages)return;
+      session.systemAuditPage+=1;
+      loadAndRenderSystemAudit();
     };
   }
   if(customerAddBtn){
