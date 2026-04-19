@@ -2165,9 +2165,12 @@ function openCustomerForm(player){
 }
 
 function exportAuditCsv(){
-  var rows=['created_at,action_type,reference_id,session_fee,platform_fee,performed_by'];
+  var venueId=session.currentVenueId;
+  var tzLabel=timezoneLabelForCurrency(venueId,new Date());
+  var rows=['created_at_local ('+tzLabel+'),created_at_utc,action_type,reference_id,session_fee,platform_fee,performed_by'];
   (session.auditLog||[]).forEach(function(a){
-    rows.push([a.created_at,a.action_type,a.reference_id||'',a.session_fee||'',a.platform_fee||'',a.performed_by].join(','));
+    var localTs=formatTimestampWithCurrencyTimezone(a.created_at,venueId);
+    rows.push(['"'+localTs+'"',a.created_at||'',a.action_type,a.reference_id||'',a.session_fee||'',a.platform_fee||'',a.performed_by||''].join(','));
   });
   var blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'});
   var url=URL.createObjectURL(blob);
