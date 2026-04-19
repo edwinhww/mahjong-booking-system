@@ -276,13 +276,13 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
   <div class="screen" id="screen-player">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Hello, Wei Lin</div>
+        <div class="topbar-title" id="playerGreeting">Hello</div>
         <div class="topbar-sub" id="playerSubTitle">Thu 17 Apr - Select a timeslot</div>
       </div>
       <span class="badge badge-green" id="playerBadge">Player</span>
     </div>
-    <div class="content">
-      <div class="notif-bar">
+    <div class="content" id="playerContent">
+      <div class="notif-bar" id="playerNoticeBar">
         <span style="font-size:16px">&#x2709;</span>
         <div class="notif-text" id="playerNotice">Table at <strong>2:00 PM</strong> now has 3/4 players - only 1 seat left! Tap to claim it.</div>
       </div>
@@ -324,9 +324,13 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
       </div>
       <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px">
         <div class="section-title" id="historyTitle">My session history</div>
-        <div class="info-row"><span class="info-key" id="lastPlayedLabel">Last played</span><span class="info-val">Tue 15 Apr, 2:00 PM</span></div>
-        <div class="info-row"><span class="info-key" id="sessionsMonthLabel">Sessions this month</span><span class="info-val">6</span></div>
+        <div class="info-row"><span class="info-key" id="lastPlayedLabel">Last played</span><span class="info-val" id="lastPlayedValue">-</span></div>
+        <div class="info-row"><span class="info-key" id="sessionsMonthLabel">Sessions this month</span><span class="info-val" id="sessionsMonthValue">0</span></div>
         <div class="info-row"><span class="info-key" id="statusLabel">Status</span><span class="badge badge-green" id="statusActive">Active</span></div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="soft-btn" id="playerChangePasswordBtn">Change password</button>
+          <button class="soft-btn" id="playerToTopBtn">Back to top</button>
+        </div>
       </div>
     </div>
     <div class="bottom-bar">
@@ -339,10 +343,10 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     <div class="topbar">
       <button class="nav-btn" style="padding:5px 10px;font-size:12px" onclick="showScreen('player')" id="backBtn">&#x2190; Back</button>
       <div style="flex:1;padding-left:10px">
-        <div class="topbar-title">2:00 PM — 4:00 PM</div>
-        <div class="topbar-sub">Thu 17 Apr · Table 3</div>
+        <div class="topbar-title" id="confirmSlotTitle">Booking</div>
+        <div class="topbar-sub" id="confirmSlotSub">No active booking selected</div>
       </div>
-      <span class="badge badge-red">1 seat left</span>
+      <span class="badge badge-red" id="confirmSeatBadge">-</span>
     </div>
     <div class="content">
       <div class="confirm-card">
@@ -354,26 +358,7 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
           <div style="font-size:12px;color:var(--color-text-secondary)" id="seatLockedText">Seat locked after 30 min cooldown</div>
         </div>
         <div class="section-title" id="playersTableTitle">Players at this table</div>
-        <div class="player-chip">
-          <div class="avatar">AK</div>
-          <div><div class="player-name">Alex K.</div><div class="player-status">Confirmed · locked in</div></div>
-          <span class="badge badge-green">&#x2713;</span>
-        </div>
-        <div class="player-chip">
-          <div class="avatar">SM</div>
-          <div><div class="player-name">Shu Ming</div><div class="player-status">Confirmed · locked in</div></div>
-          <span class="badge badge-green">&#x2713;</span>
-        </div>
-        <div class="player-chip">
-          <div class="avatar">JL</div>
-          <div><div class="player-name">Jade L.</div><div class="player-status">Cooling down · 12 min left</div></div>
-          <span class="badge badge-amber">&#x231B;</span>
-        </div>
-        <div class="player-chip">
-          <div class="avatar" style="background:#F1EFE8;color:#888">?</div>
-          <div><div class="player-name">Seat 4 — Open</div><div class="player-status">Waiting for final player</div></div>
-          <span class="badge badge-red">Free</span>
-        </div>
+        <div id="confirmPlayersList"></div>
       </div>
       <button class="cta-btn" style="background:#1D9E75;margin-bottom:10px" id="claimSeatBtn">Claim this seat</button>
       <button class="cta-btn" style="background:var(--color-background-secondary);color:#A32D2D;border:0.5px solid #F7C1C1" id="undoBookingBtn">Undo my booking (28 min left)</button>
@@ -862,6 +847,18 @@ function formatDateFriendly(raw){
   return new Date(raw).toLocaleDateString();
 }
 
+function langText(en,zhHant,zhHans){
+  var lang=document.documentElement.lang||'en';
+  if(lang==='zh-Hans')return zhHans;
+  if(lang==='zh-Hant')return zhHant;
+  return en;
+}
+
+function formatBookingDateTime(slotDate,startTime){
+  if(!slotDate||!startTime)return '—';
+  return slotDate+' '+formatTime(startTime);
+}
+
 function showBottomSheet(title,contentHtml){
   var overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.42);z-index:8500;display:flex;align-items:flex-end;justify-content:center;padding:0 12px';
@@ -1025,13 +1022,20 @@ async function loadPlayerTimeslots(){
   var slots=await apiCall('GET','/venues/'+session.currentVenueId+'/timeslots?day='+today);
   if(!slots)return;
   var bookings=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings?day='+today);
+  var allBookings=await apiCall('GET','/venues/'+session.currentVenueId+'/bookings');
+  var players=await apiCall('GET','/venues/'+session.currentVenueId+'/players');
   session.timeslots[session.currentVenueId]=slots;
   session.bookings=bookings||[];
+  session.bookingHistory=(allBookings||[]).filter(function(b){
+    return b.player_id===session.user.id && b.status!=='cancelled';
+  });
+  if(players)session.players=players;
 
   var myActive=session.bookings.find(function(b){
     return b.player_id===session.user.id && b.status!=='cancelled';
   });
   session.selectedBookingId=myActive?myActive.id:null;
+  session.selectedTimeslotId=myActive?myActive.timeslot_id:null;
 
   renderPlayerScreen();
 }
@@ -1040,7 +1044,9 @@ function renderPlayerScreen(){
   var slots=session.timeslots[session.currentVenueId]||[];
   var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
   var grid=document.querySelector('.slot-grid');
+  var greeting=document.getElementById('playerGreeting');
   if(!grid)return;
+  if(greeting&&session.user)greeting.textContent='Hello, '+session.user.name;
   grid.innerHTML='';
   
   slots.forEach(function(slot){
@@ -1067,6 +1073,137 @@ function renderPlayerScreen(){
     }
     grid.appendChild(card);
   });
+
+  renderPlayerNotice(slots,activeBookings);
+  renderPlayerHistory();
+  if(document.getElementById('screen-confirm').classList.contains('active')){
+    renderConfirmScreen();
+  }
+}
+
+function renderPlayerNotice(slots,activeBookings){
+  var bar=document.getElementById('playerNoticeBar');
+  var notice=document.getElementById('playerNotice');
+  if(!bar||!notice)return;
+
+  var candidate=null;
+  slots.some(function(slot){
+    var count=activeBookings.filter(function(b){return b.timeslot_id===slot.id;}).length;
+    var mine=activeBookings.some(function(b){return b.timeslot_id===slot.id && b.player_id===session.user.id;});
+    if(count===3 && !mine && slot.status!=='full'){
+      candidate=slot;
+      return true;
+    }
+    return false;
+  });
+
+  if(!candidate){
+    notice.textContent=langText('No table is currently one seat away from full.','目前沒有只差 1 人滿桌的場次。','目前没有只差 1 人满桌的场次。');
+    return;
+  }
+
+  notice.innerHTML='';
+  notice.appendChild(document.createTextNode(langText('Table at ','場次 ','场次 ')));
+  var strong=document.createElement('strong');
+  strong.textContent=formatTime(candidate.start_time);
+  notice.appendChild(strong);
+  notice.appendChild(document.createTextNode(langText(' now has 3/4 players - only 1 seat left! ',' 目前 3/4 人，僅剩最後 1 位！',' 目前 3/4 人，仅剩最后 1 位！')));
+  var btn=document.createElement('button');
+  btn.className='soft-btn';
+  btn.style.marginLeft='8px';
+  btn.textContent=langText('Join now','立即加入','立即加入');
+  btn.onclick=function(){showTimeslotDetail(candidate);};
+  notice.appendChild(btn);
+}
+
+function renderPlayerHistory(){
+  var lastPlayedValue=document.getElementById('lastPlayedValue');
+  var sessionsMonthValue=document.getElementById('sessionsMonthValue');
+  if(!lastPlayedValue||!sessionsMonthValue)return;
+
+  var myBookings=(session.bookingHistory||[]).slice();
+  myBookings.sort(function(a,b){
+    var aa=(a.date||'')+'T'+formatTime(a.start_time);
+    var bb=(b.date||'')+'T'+formatTime(b.start_time);
+    return aa<bb?1:(aa>bb?-1:0);
+  });
+
+  if(!myBookings.length){
+    lastPlayedValue.textContent='-';
+    sessionsMonthValue.textContent='0';
+    return;
+  }
+
+  var latest=myBookings[0];
+  lastPlayedValue.textContent=formatBookingDateTime(latest.date,latest.start_time);
+
+  var now=new Date();
+  var currentMonth=now.getMonth();
+  var currentYear=now.getFullYear();
+  var monthCount=myBookings.filter(function(b){
+    if(!b.date)return false;
+    var d=new Date(b.date+'T00:00:00');
+    return d.getMonth()===currentMonth && d.getFullYear()===currentYear;
+  }).length;
+  sessionsMonthValue.textContent=String(monthCount);
+}
+
+function renderConfirmScreen(){
+  var titleEl=document.getElementById('confirmSlotTitle');
+  var subEl=document.getElementById('confirmSlotSub');
+  var badgeEl=document.getElementById('confirmSeatBadge');
+  var playersList=document.getElementById('confirmPlayersList');
+  var claimBtn=document.getElementById('claimSeatBtn');
+  var undoBtn=document.getElementById('undoBookingBtn');
+
+  if(!titleEl||!subEl||!badgeEl||!playersList||!claimBtn||!undoBtn)return;
+
+  var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
+  var myBooking=activeBookings.find(function(b){return b.player_id===session.user.id;})||null;
+  if(myBooking){
+    session.selectedBookingId=myBooking.id;
+    session.selectedTimeslotId=myBooking.timeslot_id;
+  }
+
+  var slot=findSlot(session.selectedTimeslotId);
+  if(!slot){
+    titleEl.textContent=langText('Booking','訂位','订位');
+    subEl.textContent=langText('No active booking selected','目前沒有已選取的訂位','目前没有已选取的订位');
+    badgeEl.textContent='-';
+    playersList.innerHTML='<div class="audit-sub">'+langText('Select a timeslot from Player tab first.','請先在玩家頁選擇時段。','请先在玩家页选择时段。')+'</div>';
+    claimBtn.style.display='none';
+    undoBtn.style.display='none';
+    return;
+  }
+
+  var slotBookings=activeBookings.filter(function(b){return b.timeslot_id===slot.id;});
+  var remaining=Math.max(0,4-slotBookings.length);
+  titleEl.textContent=formatTime(slot.start_time)+' — '+formatTime(slot.end_time);
+  subEl.textContent=(slot.date||'')+' · Table '+slot.table_number;
+  badgeEl.textContent=remaining>0?(remaining+' seat'+(remaining>1?'s':'')+' left'):'Full';
+  badgeEl.className='badge '+(remaining>0?'badge-red':'badge-gray');
+
+  var html='';
+  slotBookings.forEach(function(b){
+    var p=findPlayer(b.player_id);
+    var nm=p?p.player_name:'Player';
+    var st=b.status==='cooling_down'?langText('Cooling down','冷卻中','冷却中'):langText('Confirmed · locked in','已確認 · 已鎖定','已确认 · 已锁定');
+    var badge=b.status==='cooling_down'?'<span class="badge badge-amber">&#x231B;</span>':'<span class="badge badge-green">&#x2713;</span>';
+    html+='<div class="player-chip"><div class="avatar">'+initials(nm)+'</div><div><div class="player-name">'+escapeHtml(nm)+'</div><div class="player-status">'+st+'</div></div>'+badge+'</div>';
+  });
+  for(var i=slotBookings.length;i<4;i++){
+    html+='<div class="player-chip"><div class="avatar" style="background:#F1EFE8;color:#888">?</div><div><div class="player-name">'+langText('Seat '+(i+1)+' — Open','座位 '+(i+1)+' — 空位','座位 '+(i+1)+' — 空位')+'</div><div class="player-status">'+langText('Waiting for player','等待玩家加入','等待玩家加入')+'</div></div><span class="badge badge-red">Free</span></div>';
+  }
+  playersList.innerHTML=html;
+
+  var iBooked=!!slotBookings.find(function(b){return b.player_id===session.user.id;});
+  claimBtn.style.display=(!iBooked && remaining>0)?'':'none';
+  undoBtn.style.display=(iBooked && myBooking && myBooking.status==='cooling_down')?'':'none';
+
+  if(iBooked && myBooking && myBooking.cooldown_expires){
+    var sec=Math.max(0,Math.floor((new Date(myBooking.cooldown_expires)-new Date())/1000));
+    startTimer(sec);
+  }
 }
 
 async function showTimeslotDetail(slot){
@@ -1966,6 +2103,52 @@ function openSetPasswordSheet(currentPin){
   });
 }
 
+function openPlayerChangePasswordSheet(){
+  if(!session.user)return;
+  var sheet=showBottomSheet(
+    langText('Change password','更改密碼','更改密码'),
+    '<div class="login-label">'+langText('Current password','目前密碼','当前密码')+'</div>'+
+    '<input id="cpCurrentPwd" class="login-input" type="password" placeholder="'+langText('Enter current password','請輸入目前密碼','请输入当前密码')+'" style="margin-bottom:10px">'+
+    '<div class="login-label">'+langText('New password (min 4 characters)','新密碼（至少 4 碼）','新密码（至少 4 位）')+'</div>'+
+    '<input id="cpNewPwd" class="login-input" type="password" placeholder="'+langText('Choose a new password','請輸入新密碼','请输入新密码')+'" style="margin-bottom:10px">'+
+    '<div class="login-label">'+langText('Confirm new password','確認新密碼','确认新密码')+'</div>'+
+    '<input id="cpConfirmPwd" class="login-input" type="password" placeholder="'+langText('Re-enter new password','請再次輸入新密碼','请再次输入新密码')+'" style="margin-bottom:16px">'+
+    '<div id="cpError" style="color:#c0392b;font-size:13px;margin-bottom:10px;display:none"></div>'+
+    '<button class="btn-primary" id="cpSaveBtn" style="width:100%">'+langText('Save password','儲存密碼','保存密码')+'</button>'
+  );
+
+  sheet.querySelector('#cpSaveBtn').addEventListener('click',async function(){
+    var cur=sheet.querySelector('#cpCurrentPwd').value;
+    var np=sheet.querySelector('#cpNewPwd').value;
+    var nc=sheet.querySelector('#cpConfirmPwd').value;
+    var errEl=sheet.querySelector('#cpError');
+    errEl.style.display='none';
+
+    if(np.length<4){
+      errEl.textContent=langText('New password must be at least 4 characters.','新密碼至少 4 碼。','新密码至少 4 位。');
+      errEl.style.display='block';
+      return;
+    }
+    if(np!==nc){
+      errEl.textContent=langText('Passwords do not match.','兩次輸入的新密碼不一致。','两次输入的新密码不一致。');
+      errEl.style.display='block';
+      return;
+    }
+
+    var res=await apiCall('POST','/auth/change-password',{user_id:session.user.id,current_password:cur,new_password:np});
+    if(!res)return;
+    sheet.remove();
+    showToast(langText('Password updated successfully.','密碼更新成功。','密码更新成功。'));
+  });
+}
+
+function scrollPlayerToTop(){
+  var content=document.getElementById('playerContent');
+  if(content){
+    content.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
 function renderServicesTab(){
   var wrap=document.getElementById('servicesList');
   if(!wrap)return;
@@ -2329,6 +2512,9 @@ function showScreen(id){
   }
   // addons screen not shown in nav bar
   if(id==='addons'){document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));}
+  if(id==='confirm' && session.user && session.user.role==='player'){
+    renderConfirmScreen();
+  }
 }
 
 function setDevice(device,el){
@@ -2440,7 +2626,7 @@ var translations={
     newPlayerHint:'New player? Contact the business to register. / 新玩家？請聯絡場主完成註冊。',
     playerSubTitle:'Thu 17 Apr - Select a timeslot',playerBadge:'Player',
     playerNotice:'Table at <strong>2:00 PM</strong> now has 3/4 players - only 1 seat left! Tap to claim it.',
-    availableSlotsTitle:'Available timeslots',historyTitle:'My session history',lastPlayedLabel:'Last played',sessionsMonthLabel:'Sessions this month',statusLabel:'Status',statusActive:'Active',signOutBtn:'<- Sign out',
+    availableSlotsTitle:'Available timeslots',historyTitle:'My session history',lastPlayedLabel:'Last played',sessionsMonthLabel:'Sessions this month',statusLabel:'Status',statusActive:'Active',playerChangePasswordBtn:'Change password',playerToTopBtn:'Back to top',signOutBtn:'<- Sign out',
     backBtn:'<- Back',seatLockedText:'Seat locked after 30 min cooldown',playersTableTitle:'Players at this table',claimSeatBtn:'Claim this seat',undoBookingBtn:'Undo my booking (28 min left)',
     adminSubTitle:'Admin · Thu 17 Apr',adminBadge:'Admin',tabSchedule:'Schedule',tabCustomers:'Customers',tabMessages:'Messages',tabSettings:'Settings',
     todayTablesTitle:'Today\'s tables',lockedPlayersTitle:'Locked-in players needing admin unlock',registeredPlayersTitle:'Registered players (12)',
@@ -2462,7 +2648,7 @@ var translations={
     newPlayerHint:'新玩家？請聯絡場主完成註冊。',
     playerSubTitle:'4月17日 週四 - 選擇可玩時段',playerBadge:'玩家',
     playerNotice:'<strong>2:00 PM</strong> 場次目前 3/4 人 - 剩最後 1 位，立即加入。',
-    availableSlotsTitle:'可預約時段',historyTitle:'我的對局紀錄',lastPlayedLabel:'上次遊玩',sessionsMonthLabel:'本月場次',statusLabel:'狀態',statusActive:'啟用中',signOutBtn:'<- 登出',
+    availableSlotsTitle:'可預約時段',historyTitle:'我的對局紀錄',lastPlayedLabel:'上次遊玩',sessionsMonthLabel:'本月場次',statusLabel:'狀態',statusActive:'啟用中',playerChangePasswordBtn:'更改密碼',playerToTopBtn:'回到頂部',signOutBtn:'<- 登出',
     backBtn:'<- 返回',seatLockedText:'30 分鐘後座位將鎖定',playersTableTitle:'本桌玩家',claimSeatBtn:'我要這個位子',undoBookingBtn:'取消本次預約 (剩 28 分)',
     adminSubTitle:'商家 · 4月17日 週四',adminBadge:'商家',tabSchedule:'排程',tabCustomers:'客戶',tabMessages:'訊息',tabSettings:'設定',
     todayTablesTitle:'今日桌況',lockedPlayersTitle:'已鎖定且需商家解鎖',registeredPlayersTitle:'已註冊玩家 (12)',
@@ -2484,7 +2670,7 @@ var translations={
     newPlayerHint:'新玩家？请联系商家完成注册。',
     playerSubTitle:'4月17日 周四 - 选择可玩时段',playerBadge:'玩家',
     playerNotice:'<strong>2:00 PM</strong> 场次目前 3/4 人 - 剩最后 1 位，立即加入。',
-    availableSlotsTitle:'可预约时段',historyTitle:'我的对局记录',lastPlayedLabel:'上次游玩',sessionsMonthLabel:'本月场次',statusLabel:'状态',statusActive:'启用中',signOutBtn:'<- 退出登录',
+    availableSlotsTitle:'可预约时段',historyTitle:'我的对局记录',lastPlayedLabel:'上次游玩',sessionsMonthLabel:'本月场次',statusLabel:'状态',statusActive:'启用中',playerChangePasswordBtn:'更改密码',playerToTopBtn:'回到顶部',signOutBtn:'<- 退出登录',
     backBtn:'<- 返回',seatLockedText:'30 分钟后座位将锁定',playersTableTitle:'本桌玩家',claimSeatBtn:'我要这个座位',undoBookingBtn:'取消本次预约 (剩 28 分)',
     adminSubTitle:'商家 · 4月17日 周四',adminBadge:'商家',tabSchedule:'排程',tabCustomers:'客户',tabMessages:'消息',tabSettings:'设置',
     todayTablesTitle:'今日桌况',lockedPlayersTitle:'已锁定且需商家解锁',registeredPlayersTitle:'已注册玩家 (12)',
@@ -2514,6 +2700,12 @@ function applyLanguage(lang){
     }
   });
   updateAuthNavButton();
+  if(session.user&&session.user.role==='player'){
+    renderPlayerScreen();
+    if(document.getElementById('screen-confirm').classList.contains('active')){
+      renderConfirmScreen();
+    }
+  }
 }
 
 function setLanguage(lang,el){
@@ -2554,6 +2746,8 @@ document.addEventListener('DOMContentLoaded',function(){
   var backBtn=document.getElementById('backBtn');
   var signOutBtn=document.getElementById('signOutBtn');
   var passwordInput=document.getElementById('passwordInput');
+  var playerToTopBtn=document.getElementById('playerToTopBtn');
+  var playerChangePasswordBtn=document.getElementById('playerChangePasswordBtn');
   var claimBtn=document.getElementById('claimSeatBtn');
   var undoBtn=document.getElementById('undoBookingBtn');
   var broadcastBtn=document.getElementById('broadcastBtn');
@@ -2630,6 +2824,16 @@ document.addEventListener('DOMContentLoaded',function(){
         handleSignIn();
       }
     });
+  }
+  if(playerToTopBtn){
+    playerToTopBtn.onclick=function(){
+      scrollPlayerToTop();
+    };
+  }
+  if(playerChangePasswordBtn){
+    playerChangePasswordBtn.onclick=function(){
+      openPlayerChangePasswordSheet();
+    };
   }
   if(claimBtn){
     claimBtn.onclick=function(){

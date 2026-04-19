@@ -86,6 +86,7 @@ class VenueBookingRead(BaseModel):
     status: BookingStatus
     booked_at: datetime
     cooldown_expires: datetime
+    date: date
     table_number: int
     start_time: time
     end_time: time

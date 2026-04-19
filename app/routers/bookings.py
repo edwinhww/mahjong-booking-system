@@ -204,6 +204,7 @@ def list_venue_bookings(venue_id: str, day: date | None = None, db: Session = De
             status=b.status,
             booked_at=b.booked_at,
             cooldown_expires=b.cooldown_expires,
+            date=t.date,
             table_number=t.table_number,
             start_time=t.start_time,
             end_time=t.end_time,
