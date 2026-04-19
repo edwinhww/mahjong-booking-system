@@ -806,7 +806,7 @@ function splitPhoneNumber(raw,defaultCountryCode){
   var value=String(raw||'').trim();
   if(!value)return {countryCode:fallback,localNumber:''};
   var withPlus=value.charAt(0)==='+'?value:('+'+phoneDigits(value));
-  var match=withPlus.match(/^(\+\d{1,4})(\d*)$/);
+  var match=withPlus.match(/^(\+\d{1,3})(\d*)$/);
   if(!match)return {countryCode:fallback,localNumber:phoneDigits(value)};
   return {countryCode:match[1],localNumber:match[2]||''};
 }
