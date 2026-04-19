@@ -2372,7 +2372,7 @@ async function loadSystemAuditActionTypes(){
   var res=await apiCall('GET','/audit/action-types');
   if(!res||!Array.isArray(res.action_types))return;
 
-  var html='<option value="">All action types</option>';
+  var html='<option value="">'+langText('All action types','所有動作類型','所有动作类型')+'</option>';
   res.action_types.forEach(function(actionType){
     html+='<option value="'+escapeHtml(actionType)+'">'+escapeHtml(actionType)+'</option>';
   });
@@ -2411,7 +2411,7 @@ async function loadAndRenderSystemAudit(){
   if(!data)return;
   var wrap=document.getElementById('systemAuditList');
   if(!wrap)return;
-  if(!data.length){wrap.innerHTML='<div class="audit-sub">No action audit events found.</div>';return;}
+  if(!data.length){wrap.innerHTML='<div class="audit-sub">'+langText('No action audit events found.','找不到系統審計紀錄。','找不到系统审计记录。')+'</div>';return;}
   var venueMap={};
   (session.venues||[]).forEach(function(v){venueMap[v.id]=v.name;});
   var html='';
@@ -2429,7 +2429,7 @@ async function loadAndRenderSystemAudit(){
     session.systemAuditPage=totalPages;
   }
   var pageInfo=document.getElementById('systemAuditPageInfo');
-  if(pageInfo)pageInfo.textContent='Page '+session.systemAuditPage+' / '+totalPages;
+  if(pageInfo)pageInfo.textContent=langText('Page ','第 ','第 ')+session.systemAuditPage+' / '+totalPages;
   var prevBtn=document.getElementById('systemAuditPrevBtn');
   var nextBtn=document.getElementById('systemAuditNextBtn');
   if(prevBtn)prevBtn.disabled=session.systemAuditPage<=1;
@@ -2745,7 +2745,7 @@ var translations={
     cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'Business WhatsApp',waNotifSub:'Fixed to Hong Kong +852 for click-to-chat links',currencyLabel:'Currency',currencySub:'Shown in revenue and billing',
     sessionFeeLabel:'Session fee (per table)',sessionFeeSub:'Used for audit and billing',platformFeeLabel:'Platform fee %',platformFeeSub:'Developer charge per session',saveSettingsBtn:'Save settings',
     auditRevenueTitle:'Audit and Revenue',auditSubTitle:'Dragon Palace · April 2025',auditAdminBadge:'Admin',metricFullTables:'Full tables booked',metricPlayerSessions:'Player sessions',metricGrossFees:'Gross table fees',metricPlatformFee:'Platform fee (5%)',
-    confirmedTablesTitle:'Revenue-driving tables',exportCsvBtn:'Export CSV',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system'
+    confirmedTablesTitle:'Revenue-driving tables',exportCsvBtn:'Export CSV',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system',systemAuditApplyBtn:'Apply',systemAuditResetBtn:'Reset',systemAuditPrevBtn:'Prev',systemAuditNextBtn:'Next'
   },
   'zh-Hant':{
     srTitle:'麻將訂位系統互動原型 - 可在登入、玩家、訂位、商家與審計畫面切換',
@@ -2767,7 +2767,7 @@ var translations={
     cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一鍵開啟 WhatsApp',currencyLabel:'貨幣',currencySub:'顯示於營收與計費',
     sessionFeeLabel:'每桌場次費',sessionFeeSub:'用於審計與計費',platformFeeLabel:'平台服務費 %',platformFeeSub:'每場抽成比例',saveSettingsBtn:'儲存設定',
     auditRevenueTitle:'審計與營收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'滿桌場次',metricPlayerSessions:'玩家出席次數',metricGrossFees:'總桌費',metricPlatformFee:'平台費 (5%)',
-    confirmedTablesTitle:'營收桌次',exportCsvBtn:'匯出 CSV',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作'
+    confirmedTablesTitle:'營收桌次',exportCsvBtn:'匯出 CSV',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重設',systemAuditPrevBtn:'上一頁',systemAuditNextBtn:'下一頁'
   },
   'zh-Hans':{
     srTitle:'麻将订位系统互动原型 - 可在登录、玩家、订位、商家与审计画面切换',
@@ -2789,7 +2789,7 @@ var translations={
     cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一键打开 WhatsApp',currencyLabel:'货币',currencySub:'显示于营收与计费',
     sessionFeeLabel:'每桌场次费',sessionFeeSub:'用于审计与计费',platformFeeLabel:'平台服务费 %',platformFeeSub:'每场抽成比例',saveSettingsBtn:'保存设置',
     auditRevenueTitle:'审计与营收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'满桌场次',metricPlayerSessions:'玩家出席次数',metricGrossFees:'总桌费',metricPlatformFee:'平台费 (5%)',
-    confirmedTablesTitle:'营收桌次',exportCsvBtn:'导出 CSV',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作'
+    confirmedTablesTitle:'营收桌次',exportCsvBtn:'导出 CSV',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作',systemAuditApplyBtn:'套用',systemAuditResetBtn:'重设',systemAuditPrevBtn:'上一页',systemAuditNextBtn:'下一页'
   }
 };
 
