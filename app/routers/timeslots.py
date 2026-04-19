@@ -11,6 +11,18 @@ from app.schemas import TimeslotRead
 router = APIRouter(prefix="/venues", tags=["timeslots"])
 
 
+def _in_operating_window(slot_time, opening_time, closing_time) -> bool:
+    """Return True if slot_time falls within the venue's operating hours.
+    Handles overnight spans (e.g. 13:00 opening, 02:00 closing next day).
+    """
+    if opening_time < closing_time:
+        # Normal same-day window
+        return opening_time <= slot_time < closing_time
+    else:
+        # Overnight window: valid if >= opening OR < closing
+        return slot_time >= opening_time or slot_time < closing_time
+
+
 def _sort_slot_rows(rows: list[Timeslot], opening_time) -> list[Timeslot]:
     opening_minutes = opening_time.hour * 60 + opening_time.minute
 
@@ -74,6 +86,9 @@ def list_timeslots(venue_id: str, day: date | None = None, db: Session = Depends
         select(Timeslot).where(Timeslot.venue_id == venue_id, Timeslot.date == target_date).order_by(Timeslot.start_time, Timeslot.table_number)
     ).scalars().all()
 
+    # Filter out stale slots that no longer fall in the venue's current operating window
+    # (e.g. leftover rows from a previous opening-time setting).
+    rows = [t for t in rows if _in_operating_window(t.start_time, venue.opening_time, venue.closing_time)]
     rows = _sort_slot_rows(rows, venue.opening_time)
 
     return [
