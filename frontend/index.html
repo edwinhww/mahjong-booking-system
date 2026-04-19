@@ -2174,6 +2174,12 @@ function showComposeModal(){
 function showAddOnsScreen(slot){
   session.selectedTimeslotId=slot.id;
   session.addonSelections={};
+  // If no active services, skip add-ons and go straight to confirmation
+  var activeServices=(session.services||[]).filter(function(s){return s.is_active;});
+  if(!activeServices.length){
+    confirmAddOnsAndClaim();
+    return;
+  }
   var title=document.getElementById('addonsTitle');
   var sub=document.getElementById('addonsSub');
   if(title)title.textContent=formatTime(slot.start_time)+' — Add-ons';
