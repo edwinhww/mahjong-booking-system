@@ -31,6 +31,9 @@ body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 20%,#
 .screen.active{display:flex}
     if(navSystemAudit)navSystemAudit.style.display='none';
 .topbar{padding:14px 16px 10px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px}
+.topbar.admin-topbar{position:relative;justify-content:center}
+.admin-topbar-center{flex:1;text-align:center}
+.topbar.admin-topbar #adminBadge{position:absolute;right:16px;top:50%;transform:translateY(-50%)}
 .topbar-sub{font-size:calc(12px * var(--font-scale));color:var(--color-text-secondary);line-height:1.35}
 .badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
 .badge-green{background:#EAF3DE;color:#3B6D11}
@@ -380,8 +383,8 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
 
   <!-- ADMIN SCREEN -->
   <div class="screen" id="screen-admin">
-    <div class="topbar">
-      <div>
+    <div class="topbar admin-topbar">
+      <div class="admin-topbar-center">
         <div class="topbar-title" id="adminVenueName">Dragon Palace MJ</div>
         <div class="topbar-sub" id="adminSubTitle">Admin · Thu 17 Apr</div>
       </div>
