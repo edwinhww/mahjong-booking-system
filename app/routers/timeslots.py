@@ -11,9 +11,23 @@ from app.schemas import TimeslotRead
 router = APIRouter(prefix="/venues", tags=["timeslots"])
 
 
+def _sort_slot_rows(rows: list[Timeslot], opening_time) -> list[Timeslot]:
+    opening_minutes = opening_time.hour * 60 + opening_time.minute
+
+    def sort_key(slot: Timeslot) -> tuple[int, int]:
+        slot_minutes = slot.start_time.hour * 60 + slot.start_time.minute
+        if slot_minutes < opening_minutes:
+            slot_minutes += 24 * 60
+        return (slot_minutes, slot.table_number)
+
+    return sorted(rows, key=sort_key)
+
+
 def _generate_timeslots_for_date(db: Session, venue: Venue, target_date: date) -> None:
     opening = datetime.combine(target_date, venue.opening_time)
     closing = datetime.combine(target_date, venue.closing_time)
+    if closing <= opening:
+        closing += timedelta(days=1)
     slot_delta = timedelta(hours=venue.session_duration_hrs)
 
     current = opening
@@ -54,6 +68,8 @@ def list_timeslots(venue_id: str, day: date | None = None, db: Session = Depends
     rows = db.execute(
         select(Timeslot).where(Timeslot.venue_id == venue_id, Timeslot.date == target_date).order_by(Timeslot.start_time, Timeslot.table_number)
     ).scalars().all()
+
+    rows = _sort_slot_rows(rows, venue.opening_time)
 
     return [
         TimeslotRead(
@@ -98,6 +114,7 @@ def list_timeslots_window(
     ).scalars().all()
 
     if not one_seat_left_only:
+        slots = _sort_slot_rows(slots, venue.opening_time)
         return [
             TimeslotRead(
                 id=t.id,
@@ -111,6 +128,7 @@ def list_timeslots_window(
             for t in slots
         ]
 
+    slots = _sort_slot_rows(slots, venue.opening_time)
     output: list[TimeslotRead] = []
     for t in slots:
         active_count = db.scalar(

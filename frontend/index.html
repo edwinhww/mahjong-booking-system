@@ -535,9 +535,18 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
         <div class="settings-row">
           <div><div class="settings-label" id="waNotifLabel">Business WhatsApp</div><div class="settings-sub" id="waNotifSub">Used to open click-to-chat links</div></div>
           <div style="display:flex;gap:6px;align-items:center">
-            <input class="settings-input" id="settingBusinessWhatsappCode" type="tel" value="+852" style="width:72px;text-align:center">
+            <input class="settings-input" id="settingBusinessWhatsappCode" type="tel" value="+852" readonly style="width:72px;text-align:center;background:#F7F5EF;color:#6B7280">
             <input class="settings-input textwide" id="settingBusinessWhatsappLocal" type="tel" value="" placeholder="91234567">
           </div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label" id="currencyLabel">Currency</div><div class="settings-sub" id="currencySub">Shown in revenue and billing</div></div>
+          <select class="settings-input" id="settingCurrency" style="width:90px">
+            <option value="HKD">HKD</option>
+            <option value="GBP">GBP</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
         </div>
         <div class="settings-row">
           <div><div class="settings-label" id="sessionFeeLabel">Session fee (per table)</div><div class="settings-sub" id="sessionFeeSub">Used for audit & billing</div></div>
@@ -809,6 +818,10 @@ function buildPhoneNumber(countryCode,localNumber){
   if(!cc)cc='+852';
   if(cc.charAt(0)!=='+')cc='+'+phoneDigits(cc);
   return cc+local;
+}
+
+function buildHongKongPhoneNumber(localNumber){
+  return buildPhoneNumber('+852',localNumber);
 }
 
 function escapeHtml(value){
@@ -1182,13 +1195,15 @@ async function loadAdminData(){
   if(session.profile){
     var settingBusinessWhatsappCode=document.getElementById('settingBusinessWhatsappCode');
     var settingBusinessWhatsappLocal=document.getElementById('settingBusinessWhatsappLocal');
+    var settingCurrency=document.getElementById('settingCurrency');
     var settingNudgeWindow=document.getElementById('settingNudgeWindow');
     var settingNudgeMessage=document.getElementById('settingNudgeMessage');
     var settingReminderLead=document.getElementById('settingReminderLead');
     var settingReminderMessage=document.getElementById('settingReminderMessage');
     var phoneParts=splitPhoneNumber(session.profile.business_whatsapp||'', '+852');
-    if(settingBusinessWhatsappCode)settingBusinessWhatsappCode.value=phoneParts.countryCode;
+    if(settingBusinessWhatsappCode)settingBusinessWhatsappCode.value='+852';
     if(settingBusinessWhatsappLocal)settingBusinessWhatsappLocal.value=phoneParts.localNumber;
+    if(settingCurrency)settingCurrency.value=(session.profile.currency_code||'HKD').toUpperCase();
     if(settingNudgeWindow)settingNudgeWindow.value=session.profile.nudge_window_minutes;
     if(settingNudgeMessage)settingNudgeMessage.value=session.profile.nudge_message_template||'';
     if(settingReminderLead)settingReminderLead.value=session.profile.reminder_lead_minutes;
@@ -1223,7 +1238,9 @@ function renderScheduleTab(){
   var activeBookings=session.bookings.filter(function(b){return b.status!=='cancelled';});
   var scheduleRows=document.getElementById('scheduleRows');
   var lockedRows=document.getElementById('lockedBookingsRows');
+  var lockedTitle=document.getElementById('lockedPlayersTitle');
   if(!scheduleRows||!lockedRows)return;
+  if(lockedTitle)lockedTitle.textContent='Locked bookings needing owner release';
 
   var grouped={};
   slots.forEach(function(slot){
@@ -1265,7 +1282,7 @@ function renderScheduleTab(){
     });
   });
 
-  scheduleRows.innerHTML=html||'<div class="audit-sub">No timeslots today.</div>';
+  scheduleRows.innerHTML=html||'<div class="audit-sub">No timeslots generated for this venue yet. Check opening hours, closing hours, and session duration.</div>';
 
   var locked=session.bookings.filter(function(b){return b.status==='locked';});
   var lockedHtml='';
@@ -1273,10 +1290,10 @@ function renderScheduleTab(){
     var p=session.players.find(function(x){return x.player_id===b.player_id;});
     lockedHtml+='<div class="customer-row"><div class="avatar">'+initials(p?p.player_name:'?')+'</div>'+
       '<div class="cust-info"><div class="cust-name">'+(p?p.player_name:b.player_id.substring(0,8))+'</div>'+
-      '<div class="cust-meta">'+formatTime(b.start_time)+' · Table '+b.table_number+' · locked</div></div>'+
+      '<div class="cust-meta">'+formatTime(b.start_time)+' · Table '+b.table_number+' · booking passed cooldown and now needs owner release</div></div>'+
       '<button class="action-chip" style="color:#A32D2D;border-color:#F7C1C1" onclick="unlockBookingAdmin(\''+b.id+'\')">Unlock</button></div>';
   });
-  lockedRows.innerHTML=lockedHtml||'<div class="audit-sub">No locked players.</div>';
+  lockedRows.innerHTML=lockedHtml||'<div class="audit-sub">No bookings currently need owner release.</div>';
 }
 
 function renderCustomersTab(){
@@ -1655,11 +1672,8 @@ async function saveSettings(){
   showToast(toastMsg);
 
   var profilePayload={
-    currency_code:(session.profile&&session.profile.currency_code)||'GBP',
-    business_whatsapp:buildPhoneNumber(
-      (document.getElementById('settingBusinessWhatsappCode')||{}).value,
-      (document.getElementById('settingBusinessWhatsappLocal')||{}).value
-    ),
+    currency_code:((document.getElementById('settingCurrency')||{}).value||'HKD').trim().toUpperCase(),
+    business_whatsapp:buildHongKongPhoneNumber((document.getElementById('settingBusinessWhatsappLocal')||{}).value),
     nudge_window_minutes:Number(document.getElementById('settingNudgeWindow').value),
     nudge_message_template:document.getElementById('settingNudgeMessage').value,
     reminder_lead_minutes:Number(document.getElementById('settingReminderLead').value),
@@ -2424,7 +2438,7 @@ var translations={
     recentMessagesTitle:'Recent messages sent',composeBtn:'Compose new message',
     businessSettingsTitle:'Business settings',openingTimeLabel:'Opening time',openingTimeSub:'First slot of the day',closingTimeLabel:'Closing time',closingTimeSub:'Last slot ends by',
     tablesAvailableLabel:'Tables available',tablesAvailableSub:'Concurrent games hosted',sessionDurationLabel:'Session duration',sessionDurationSub:'Hours per game slot',
-    cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'WhatsApp notifications',waNotifSub:'Auto-send on table full',
+    cooldownLabel:'Cooldown period',cooldownSub:'Minutes to undo booking',waNotifLabel:'Business WhatsApp',waNotifSub:'Fixed to Hong Kong +852 for click-to-chat links',currencyLabel:'Currency',currencySub:'Shown in revenue and billing',
     sessionFeeLabel:'Session fee (per table)',sessionFeeSub:'Used for audit and billing',platformFeeLabel:'Platform fee %',platformFeeSub:'Developer charge per session',saveSettingsBtn:'Save settings',
     auditRevenueTitle:'Audit and Revenue',auditSubTitle:'Dragon Palace · April 2025',auditAdminBadge:'Admin',metricFullTables:'Full tables booked',metricPlayerSessions:'Player sessions',metricGrossFees:'Gross table fees',metricPlatformFee:'Platform fee (5%)',
     confirmedTablesTitle:'Revenue-driving tables',exportCsvBtn:'Export CSV',systemAuditTitle:'System Audit',systemAuditSubTitle:'All actions carried out in the system'
@@ -2446,7 +2460,7 @@ var translations={
     recentMessagesTitle:'近期已發送訊息',composeBtn:'撰寫新訊息',
     businessSettingsTitle:'店家設定',openingTimeLabel:'營業開始',openingTimeSub:'每日第一個場次時間',closingTimeLabel:'營業結束',closingTimeSub:'最後場次結束時間',
     tablesAvailableLabel:'可用桌數',tablesAvailableSub:'同時可進行的牌局',sessionDurationLabel:'場次時長',sessionDurationSub:'每場遊戲小時數',
-    cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'WhatsApp 通知',waNotifSub:'滿桌時自動發送',
+    cooldownLabel:'冷卻期',cooldownSub:'可取消預約的分鐘數',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一鍵開啟 WhatsApp',currencyLabel:'貨幣',currencySub:'顯示於營收與計費',
     sessionFeeLabel:'每桌場次費',sessionFeeSub:'用於審計與計費',platformFeeLabel:'平台服務費 %',platformFeeSub:'每場抽成比例',saveSettingsBtn:'儲存設定',
     auditRevenueTitle:'審計與營收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'滿桌場次',metricPlayerSessions:'玩家出席次數',metricGrossFees:'總桌費',metricPlatformFee:'平台費 (5%)',
     confirmedTablesTitle:'營收桌次',exportCsvBtn:'匯出 CSV',systemAuditTitle:'系統審計',systemAuditSubTitle:'系統中所有已執行動作'
@@ -2468,7 +2482,7 @@ var translations={
     recentMessagesTitle:'近期已发送消息',composeBtn:'撰写新消息',
     businessSettingsTitle:'店家设置',openingTimeLabel:'营业开始',openingTimeSub:'每日第一个场次时间',closingTimeLabel:'营业结束',closingTimeSub:'最后场次结束时间',
     tablesAvailableLabel:'可用桌数',tablesAvailableSub:'同时可进行的牌局',sessionDurationLabel:'场次时长',sessionDurationSub:'每场游戏小时数',
-    cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'WhatsApp 通知',waNotifSub:'满桌时自动发送',
+    cooldownLabel:'冷却期',cooldownSub:'可取消预约的分钟数',waNotifLabel:'Business WhatsApp',waNotifSub:'固定使用香港 +852，供玩家一键打开 WhatsApp',currencyLabel:'货币',currencySub:'显示于营收与计费',
     sessionFeeLabel:'每桌场次费',sessionFeeSub:'用于审计与计费',platformFeeLabel:'平台服务费 %',platformFeeSub:'每场抽成比例',saveSettingsBtn:'保存设置',
     auditRevenueTitle:'审计与营收',auditSubTitle:'Dragon Palace · 2025年4月',auditAdminBadge:'商家',metricFullTables:'满桌场次',metricPlayerSessions:'玩家出席次数',metricGrossFees:'总桌费',metricPlatformFee:'平台费 (5%)',
     confirmedTablesTitle:'营收桌次',exportCsvBtn:'导出 CSV',systemAuditTitle:'系统审计',systemAuditSubTitle:'系统中所有已执行动作'

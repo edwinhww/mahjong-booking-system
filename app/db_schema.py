@@ -165,6 +165,8 @@ def _bootstrap_demo_users() -> None:
                 slot_date = date.today() + timedelta(days=day_offset)
                 opening_dt = datetime.combine(slot_date, venue.opening_time)
                 closing_dt = datetime.combine(slot_date, venue.closing_time)
+                if closing_dt <= opening_dt:
+                    closing_dt += timedelta(days=1)
                 slot_duration = timedelta(hours=venue.session_duration_hrs)
                 current = opening_dt
                 while current + slot_duration <= closing_dt:
