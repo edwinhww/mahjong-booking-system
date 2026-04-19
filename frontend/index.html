@@ -699,7 +699,9 @@ body[data-device="ios"]{--device-width:390px;--device-height:844px}
     </div>
     <div class="content">
       <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-        <input class="login-input" id="systemAuditActionType" placeholder="Action type" style="flex:1;min-width:120px">
+        <select class="login-input" id="systemAuditActionType" style="flex:1;min-width:160px">
+          <option value="">All action types</option>
+        </select>
         <input class="login-input" id="systemAuditFromDate" type="date" style="width:128px">
         <input class="login-input" id="systemAuditToDate" type="date" style="width:128px">
         <button class="action-chip" id="systemAuditApplyBtn" style="align-self:flex-end;height:42px">Apply</button>
@@ -2362,8 +2364,25 @@ async function loadAndRenderAdminAudit(){
   wrap.innerHTML=html;
 }
 
+async function loadSystemAuditActionTypes(){
+  var selectEl=document.getElementById('systemAuditActionType');
+  if(!selectEl)return;
+
+  var currentValue=selectEl.value||'';
+  var res=await apiCall('GET','/audit/action-types');
+  if(!res||!Array.isArray(res.action_types))return;
+
+  var html='<option value="">All action types</option>';
+  res.action_types.forEach(function(actionType){
+    html+='<option value="'+escapeHtml(actionType)+'">'+escapeHtml(actionType)+'</option>';
+  });
+  selectEl.innerHTML=html;
+  selectEl.value=currentValue;
+}
+
 async function loadAndRenderSystemAudit(){
   showScreen('systemaudit');
+  await loadSystemAuditActionTypes();
   var page=Math.max(1,session.systemAuditPage||1);
   var pageSize=20;
   session.systemAuditPageSize=pageSize;

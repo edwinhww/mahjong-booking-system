@@ -102,3 +102,12 @@ def available_roles(db: Session = Depends(get_db)) -> dict[str, list[str]]:
     users = db.execute(select(User.role).distinct()).all()
     seen = sorted({u[0].value for u in users})
     return {"supported_roles": roles, "seen_roles": seen}
+
+
+@router.get("/action-types")
+def available_action_types(db: Session = Depends(get_db)) -> dict[str, list[str]]:
+    rows = db.execute(
+        select(ActionAudit.action_type).distinct().order_by(ActionAudit.action_type.asc())
+    ).all()
+    action_types = [row[0] for row in rows if row[0]]
+    return {"action_types": action_types}
