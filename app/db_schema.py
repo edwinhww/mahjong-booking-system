@@ -170,13 +170,14 @@ def _bootstrap_demo_users() -> None:
                 slot_duration = timedelta(hours=venue.session_duration_hrs)
                 current = opening_dt
                 while current + slot_duration <= closing_dt:
+                    actual_date = current.date()
                     start = current.time()
                     end = (current + slot_duration).time()
                     for table_num in range(1, venue.table_count + 1):
                         exists = db.scalar(
                             select(Timeslot).where(
                                 Timeslot.venue_id == venue.id,
-                                Timeslot.date == slot_date,
+                                Timeslot.date == actual_date,
                                 Timeslot.start_time == start,
                                 Timeslot.table_number == table_num,
                             )
@@ -185,7 +186,7 @@ def _bootstrap_demo_users() -> None:
                             db.add(
                                 Timeslot(
                                     venue_id=venue.id,
-                                    date=slot_date,
+                                    date=actual_date,
                                     start_time=start,
                                     end_time=end,
                                     table_number=table_num,

@@ -32,11 +32,13 @@ def _generate_timeslots_for_date(db: Session, venue: Venue, target_date: date) -
 
     current = opening
     while current + slot_delta <= closing:
+        # Use the actual calendar date the slot falls on (handles overnight venues)
+        actual_slot_date = current.date()
         for table_num in range(1, venue.table_count + 1):
             exists = db.scalar(
                 select(Timeslot).where(
                     Timeslot.venue_id == venue.id,
-                    Timeslot.date == target_date,
+                    Timeslot.date == actual_slot_date,
                     Timeslot.start_time == current.time(),
                     Timeslot.table_number == table_num,
                 )
@@ -45,7 +47,7 @@ def _generate_timeslots_for_date(db: Session, venue: Venue, target_date: date) -
                 db.add(
                     Timeslot(
                         venue_id=venue.id,
-                        date=target_date,
+                        date=actual_slot_date,
                         start_time=current.time(),
                         end_time=(current + slot_delta).time(),
                         table_number=table_num,
@@ -62,6 +64,9 @@ def list_timeslots(venue_id: str, day: date | None = None, db: Session = Depends
         raise HTTPException(status_code=404, detail="Venue not found")
 
     target_date = day or date.today()
+    # For overnight venues, also generate for the previous day so that after-midnight
+    # slots (which are stored on target_date) already exist.
+    _generate_timeslots_for_date(db, venue, target_date - timedelta(days=1))
     _generate_timeslots_for_date(db, venue, target_date)
     db.commit()
 

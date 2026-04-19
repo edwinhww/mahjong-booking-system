@@ -1242,15 +1242,17 @@ function renderScheduleTab(){
   if(!scheduleRows||!lockedRows)return;
   if(lockedTitle)lockedTitle.textContent='Locked bookings needing owner release';
 
+  // Preserve server-side ordering (which already respects overnight opening hours).
   var grouped={};
+  var groupOrder=[];
   slots.forEach(function(slot){
     var key=formatTime(slot.start_time);
-    if(!grouped[key])grouped[key]=[];
+    if(!grouped[key]){grouped[key]=[];groupOrder.push(key);}
     grouped[key].push(slot);
   });
 
   var html='';
-  Object.keys(grouped).sort().forEach(function(timeKey){
+  groupOrder.forEach(function(timeKey){
     html+='<div class="slot-divider">'+timeKey+'</div>';
     grouped[timeKey].forEach(function(slot){
     var slotBookings=activeBookings.filter(function(b){return b.timeslot_id===slot.id;});
